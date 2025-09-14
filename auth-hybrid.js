@@ -153,14 +153,6 @@ const HybridAuthManager = {
         console.log('顯示註冊模態視窗');
         this.removeExistingModal();
 
-        const availableCodes = Object.entries(this.registrationCodes)
-            .filter(([code, info]) => info.isActive)
-            .map(([code, info]) => {
-                const remaining = info.maxUses > 0 ? info.maxUses - info.currentUses : '無限制';
-                return `${code} (剩餘: ${remaining})`;
-            })
-            .join(', ');
-
         const modal = document.createElement('div');
         modal.className = 'auth-modal center-modal';
         modal.id = 'auth-modal';
@@ -200,8 +192,7 @@ const HybridAuthManager = {
 
                     <div class="form-group">
                         <label for="register-code">註冊碼</label>
-                        <input type="text" id="register-code" placeholder="請輸入有效的註冊碼" required />
-                        <small>可用註冊碼：${availableCodes}</small>
+                        <input type="text" id="register-code" placeholder="請輸入註冊碼" required />
                     </div>
 
                     <div class="form-options">
