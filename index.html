@@ -2227,22 +2227,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- html2canvas for converting charts to images in PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Firebase Scripts (Module type for ES6 imports) -->
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="firestore-service.js"></script>
-    <script type="module" src="auth-firebase.js"></script>
-    <script src="calculator-firebase.js"></script>
+    <!-- 使用混合版認證系統 - 包含註冊碼管理功能 -->
+    <script type="module" src="auth-hybrid.js"></script>
 
     <!-- Original Scripts -->
     <script src="profile-modal.js"></script>
     <script src="calculator.js"></script>
 
-    <!-- Initialize Firebase App -->
-    <script type="module">
-      // 確保 Firebase 服務正確載入
-      import('./auth-firebase.js').then(module => {
-        console.log('Firebase Auth 模組已載入');
-      });
+    <!-- 初始化認證系統 -->
+    <script>
+      // 確保 DOM 載入後初始化
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          if (window.AuthManager) {
+            window.AuthManager.init();
+          }
+        });
+      } else {
+        if (window.AuthManager) {
+          window.AuthManager.init();
+        }
+      }
     </script>
 </body>
 </html>
