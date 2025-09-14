@@ -2217,7 +2217,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Meta-Analysis Calculator. 用於教學與練習。</p>
+            <p>&copy; 2025 Meta-Analysis Calculator 用於教學與練習<br>製作者：<a href="https://wycswimming.blogspot.com/" target="_blank">運動醫學科吳易澄醫師</a></p>
         </div>
     </footer>
 
@@ -2227,10 +2227,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- html2canvas for converting charts to images in PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Scripts -->
-    <script src="api-client.js"></script>
-    <script src="auth.js"></script>
+    <!-- Firebase Scripts (Module type for ES6 imports) -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="firestore-service.js"></script>
+    <script type="module" src="auth-firebase.js"></script>
+    <script src="calculator-firebase.js"></script>
+
+    <!-- Original Scripts -->
     <script src="profile-modal.js"></script>
     <script src="calculator.js"></script>
+
+    <!-- Initialize Firebase App -->
+    <script type="module">
+      // 確保 Firebase 服務正確載入
+      import('./auth-firebase.js').then(module => {
+        console.log('Firebase Auth 模組已載入');
+      });
+    </script>
 </body>
 </html>

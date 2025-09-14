@@ -1352,6 +1352,16 @@ html {
     letter-spacing: 0.025em;
 }
 
+.footer a {
+    color: #87CEEB;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #B0E0E6;
+    text-decoration: underline;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {

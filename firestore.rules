@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 工具函數：檢查用戶是否已認證且為資料擁有者
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // 工具函數：檢查用戶是否有有效的訂閱
+    function hasValidSubscription() {
+      return request.auth != null &&
+             request.auth.token.subscriptionPlan in ['FREE', 'PREMIUM'] &&
+             request.auth.token.isActive == true;
+    }
+
+    // 工具函數：檢查是否為有效的計算類型
+    function isValidCalculationType(type) {
+      return type in ['effect_size', 'confidence_interval', 'sample_size', 'power_analysis'];
+    }
+
+    // 用戶個人資料
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // 確保寫入時包含必要欄位
+      allow create: if isOwner(userId) &&
+                    resource.data.keys().hasAll(['email', 'createdAt']) &&
+                    resource.data.createdAt is timestamp;
+
+      allow update: if isOwner(userId) &&
+                    resource.data.updatedAt is timestamp;
+
+      // 計算記錄子集合
+      match /calculations/{calculationId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                      hasValidSubscription() &&
+                      resource.data.keys().hasAll(['calculationType', 'inputData', 'results', 'createdAt']) &&
+                      isValidCalculationType(resource.data.calculationType) &&
+                      resource.data.createdAt is timestamp;
+
+        allow update: if isOwner(userId) &&
+                      resource.data.updatedAt is timestamp;
+
+        allow delete: if isOwner(userId);
+      }
+
+      // 資料夾子集合
+      match /folders/{folderId} {
+        allow read, write: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                      resource.data.keys().hasAll(['name', 'createdAt']) &&
+                      resource.data.name is string &&
+                      resource.data.name.size() > 0 &&
+                      resource.data.name.size() <= 100 &&
+                      resource.data.createdAt is timestamp;
+
+        allow update: if isOwner(userId) &&
+                      resource.data.updatedAt is timestamp;
+
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // 系統統計數據（只讀）
+    match /statistics/users/{userId} {
+      allow read: if isOwner(userId);
+      // 寫入權限保留給 Cloud Functions
+      allow write: if false;
+    }
+
+    // 系統配置（所有用戶只讀）
+    match /config/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false; // 只能由管理員通過控制台修改
+    }
+
+    // 拒絕所有其他訪問
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// Firebase Storage 安全規則（如果需要檔案上傳功能）
+// service firebase.storage {
+//   match /b/{bucket}/o {
+//     match /users/{userId}/avatars/{filename} {
+//       allow read, write: if request.auth != null && request.auth.uid == userId;
+//     }
+//
+//     match /users/{userId}/exports/{filename} {
+//       allow read, write: if request.auth != null && request.auth.uid == userId;
+//     }
+//   }
+// }

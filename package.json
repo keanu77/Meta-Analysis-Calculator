@@ -1,11 +1,15 @@
 {
   "name": "meta-analysis-calculator",
-  "version": "0.1.0-beta",
-  "description": "Meta-Analysis Calculator - 系統性文獻回顧／統合分析一站式換算工具（測試版）",
+  "version": "0.2.0-firebase",
+  "description": "Meta-Analysis Calculator - 系統性文獻回顧／統合分析一站式換算工具（Firebase版）",
   "main": "index.html",
   "scripts": {
-    "start": "npx http-server -p 8080 -o",
-    "serve": "npx serve ."
+    "dev": "firebase serve",
+    "build": "echo 'No build step needed for static site'",
+    "deploy": "firebase deploy",
+    "start": "firebase serve --only hosting",
+    "emulators": "firebase emulators:start",
+    "emulators:ui": "firebase emulators:start --inspect-functions"
   },
   "keywords": [
     "meta-analysis",
@@ -16,16 +20,21 @@
     "effect-size",
     "confidence-interval",
     "education",
-    "sports-medicine"
+    "sports-medicine",
+    "firebase",
+    "firestore"
   ],
   "author": "運動醫學科吳易澄醫師",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wycswimming/meta-analysis-calculator.git"
+    "url": "https://github.com/keanu77/Meta-Analysis-Calculator.git"
   },
-  "homepage": "https://wycswimming.blogspot.com/",
+  "homepage": "https://your-project.web.app/",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
   }
 }
