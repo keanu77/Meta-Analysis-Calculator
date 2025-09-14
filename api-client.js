@@ -287,7 +287,19 @@ class ApiError extends Error {
             return '登入狀態已失效，請重新登入';
         }
 
-        return this.message || '操作失敗，請重試';
+        // 針對註冊碼相關的錯誤提供友好訊息
+        switch (this.code) {
+            case 'REGISTRATION_CODE_LIMIT_REACHED':
+                return '此註冊碼的使用人數已達上限，請聯絡管理員取得新的註冊碼';
+            case 'REGISTRATION_CODE_EXPIRED':
+                return '註冊碼已過期，請聯絡管理員取得有效的註冊碼';
+            case 'INVALID_REGISTRATION_CODE':
+                return '無效的註冊碼，請檢查輸入是否正確';
+            case 'EMAIL_EXISTS':
+                return '此電子郵件已被註冊，請使用其他郵箱或直接登入';
+            default:
+                return this.message || '操作失敗，請重試';
+        }
     }
 }
 

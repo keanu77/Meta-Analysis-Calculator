@@ -11,19 +11,41 @@ const {
 
 const router = express.Router();
 
-// 有效的註冊碼
-const VALID_REGISTRATION_CODES = ['EBM2025'];
-
 // 用戶註冊
 router.post('/register', validateRequest(authSchemas.register), async (req, res) => {
   try {
     const { email, password, username, registrationCode } = req.validatedData;
 
-    // 驗證註冊碼
-    if (!VALID_REGISTRATION_CODES.includes(registrationCode)) {
+    // 驗證註冊碼並檢查使用上限
+    const registrationCodeCheck = await global.db.execute(
+      `SELECT id, code, max_uses, current_uses, is_active, expires_at
+       FROM registration_codes
+       WHERE code = ? AND is_active = TRUE`,
+      [registrationCode]
+    );
+
+    if (registrationCodeCheck.rows.length === 0) {
       return res.status(400).json({
         error: '無效的註冊碼',
         code: 'INVALID_REGISTRATION_CODE'
+      });
+    }
+
+    const codeInfo = registrationCodeCheck.rows[0];
+
+    // 檢查是否已到期
+    if (codeInfo.expires_at && new Date() > new Date(codeInfo.expires_at)) {
+      return res.status(400).json({
+        error: '註冊碼已過期',
+        code: 'REGISTRATION_CODE_EXPIRED'
+      });
+    }
+
+    // 檢查使用次數是否已達上限 (max_uses = 0 表示無限制)
+    if (codeInfo.max_uses > 0 && codeInfo.current_uses >= codeInfo.max_uses) {
+      return res.status(400).json({
+        error: '註冊碼使用人數已達上限',
+        code: 'REGISTRATION_CODE_LIMIT_REACHED'
       });
     }
 
@@ -67,6 +89,14 @@ router.post('/register', validateRequest(authSchemas.register), async (req, res)
       `INSERT INTO user_settings (id, user_id, created_at)
        VALUES (?, ?, NOW())`,
       [settingsId, userId]
+    );
+
+    // 更新註冊碼使用次數
+    await global.db.execute(
+      `UPDATE registration_codes
+       SET current_uses = current_uses + 1, updated_at = NOW()
+       WHERE code = ?`,
+      [registrationCode]
     );
 
     // 生成 JWT Token

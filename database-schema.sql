@@ -15,6 +15,20 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT TRUE
 );
 
+-- 註冊碼管理表
+CREATE TABLE registration_codes (
+    id VARCHAR(36) PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    description VARCHAR(200),
+    max_uses INT NOT NULL DEFAULT 0, -- 最大使用次數，0表示無限制
+    current_uses INT NOT NULL DEFAULT 0, -- 目前已使用次數
+    is_active BOOLEAN DEFAULT TRUE, -- 是否啟用
+    expires_at TIMESTAMP NULL, -- 到期時間，NULL表示永不到期
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_code_active (code, is_active)
+);
+
 -- 用戶個人資料表
 CREATE TABLE user_profiles (
     id VARCHAR(36) PRIMARY KEY,
@@ -102,3 +116,20 @@ CREATE INDEX idx_users_active ON users(is_active, created_at);
 CREATE INDEX idx_calculations_user_date ON calculations(user_id, created_at DESC);
 CREATE INDEX idx_calculations_favorite ON calculations(user_id, is_favorite, created_at DESC);
 CREATE INDEX idx_usage_stats_date ON usage_statistics(date);
+
+-- 初始化註冊碼資料
+INSERT INTO registration_codes (
+    id,
+    code,
+    description,
+    max_uses,
+    current_uses,
+    is_active
+) VALUES (
+    UUID(),
+    'EBM2025',
+    '實證醫學註冊碼',
+    100, -- 設定上限為100人，您可以調整這個數字
+    0,
+    TRUE
+);
