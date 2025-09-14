@@ -26,7 +26,7 @@ import {
 console.log('載入 Firebase AuthManager...');
 
 const FirebaseAuthManager = {
-  VALID_REGISTRATION_CODES: ['EBM2025', 'META2025', 'RESEARCH2025', 'ADMIN123'],
+  VALID_REGISTRATION_CODES: ['EBM2025'],
   currentUser: null,
   messageTimer: null,
   unsubscribeAuth: null,
@@ -185,7 +185,7 @@ const FirebaseAuthManager = {
           <div class="form-group">
             <label for="register-code">註冊碼</label>
             <input type="text" id="register-code" placeholder="請輸入註冊碼" required />
-            <small>有效註冊碼：EBM2025, META2025, RESEARCH2025, ADMIN123</small>
+            <small>有效註冊碼：EBM2025</small>
           </div>
 
           <button type="submit" class="auth-btn primary">

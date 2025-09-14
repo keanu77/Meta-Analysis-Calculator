@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 
 // 有效的註冊碼
-const VALID_REGISTRATION_CODES = ['EBM2025', 'META2025', 'RESEARCH2025', 'ADMIN123'];
+const VALID_REGISTRATION_CODES = ['EBM2025'];
 
 // 用戶註冊
 router.post('/register', validateRequest(authSchemas.register), async (req, res) => {

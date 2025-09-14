@@ -4,7 +4,7 @@ console.log('載入 AuthManager...');
 const AuthManager = {
     STORAGE_KEY: 'meta_calculator_auth',
     USERS_KEY: 'meta_calculator_users',
-    VALID_REGISTRATION_CODES: ['EBM2025', 'META2025', 'RESEARCH2025', 'ADMIN123'],
+    VALID_REGISTRATION_CODES: ['EBM2025'],
     currentUser: null,
     messageTimer: null,
 
