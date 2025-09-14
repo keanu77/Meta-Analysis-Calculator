@@ -4,12 +4,12 @@
   "description": "Meta-Analysis Calculator - 系統性文獻回顧／統合分析一站式換算工具（Firebase版）",
   "main": "index.html",
   "scripts": {
-    "dev": "firebase serve",
+    "dev": "npx http-server -p 8080 -o",
     "build": "echo 'No build step needed for static site'",
-    "deploy": "firebase deploy",
-    "start": "firebase serve --only hosting",
-    "emulators": "firebase emulators:start",
-    "emulators:ui": "firebase emulators:start --inspect-functions"
+    "start": "npx http-server -p 8080",
+    "firebase:dev": "firebase serve",
+    "firebase:deploy": "firebase deploy",
+    "firebase:emulators": "firebase emulators:start"
   },
   "keywords": [
     "meta-analysis",
@@ -34,7 +34,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "devDependencies": {
-    "firebase-tools": "^13.0.0"
+  "dependencies": {
+    "http-server": "^14.1.1"
   }
 }

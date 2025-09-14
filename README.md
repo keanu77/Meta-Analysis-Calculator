@@ -175,20 +175,34 @@ const firebaseConfig = {
 
 ## 🚀 部署指南
 
-### 快速部署
+### 🔥 方案一：Firebase Hosting（推薦）
 ```bash
-# 1. 建立 Firebase 專案
+# 1. 安裝 Firebase CLI
+npm install -g firebase-tools
+
+# 2. 建立 Firebase 專案
 firebase init
 
-# 2. 部署到 Firebase
+# 3. 部署到 Firebase
 firebase deploy
 
-# 3. 設定自訂域名（可選）
+# 4. 設定自訂域名（可選）
 # Firebase Console → Hosting → 自訂網域
 ```
 
-### 完整部署教學
 詳細步驟請參考：[FIREBASE-DEPLOYMENT.md](./FIREBASE-DEPLOYMENT.md)
+
+### 🚢 方案二：Zeabur 靜態部署
+```bash
+# 1. 連接 GitHub 到 Zeabur
+# 2. 選擇此倉庫
+# 3. 自動部署完成！
+```
+
+**Zeabur 部署注意事項：**
+- 僅作為靜態網站託管
+- 不包含 Firebase 後端功能
+- 適合純前端展示用途
 
 ## 📊 成本分析
 

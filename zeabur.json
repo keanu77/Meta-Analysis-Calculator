@@ -1,14 +1,9 @@
 {
   "name": "meta-analysis-calculator",
   "type": "static",
-  "buildCommand": "echo 'No build step needed for static site'",
+  "buildCommand": "echo 'Building static site...'",
   "outputDirectory": ".",
-  "deployHooks": [
-    {
-      "name": "api-deployment",
-      "type": "function",
-      "source": "./api",
-      "environment": "nodejs18.x"
-    }
-  ]
+  "environment": {
+    "NODE_VERSION": "18"
+  }
 }
