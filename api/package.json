@@ -1,0 +1,23 @@
+{
+  "name": "meta-calculator-api",
+  "version": "1.0.0",
+  "description": "Backend API for Meta Analysis Calculator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --env-file=.env index.js",
+    "start": "node index.js",
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "@planetscale/database": "^1.11.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "keywords": ["meta-analysis", "api", "statistics"],
+  "author": "運動醫學科吳易澄醫師",
+  "license": "MIT"
+}
