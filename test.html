@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>測試登入系統</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="padding: 20px;">
+        <h1>測試登入系統</h1>
+        <button onclick="AuthManager.showLoginModal()">顯示登入視窗</button>
+        <button onclick="AuthManager.showRegisterModal()">顯示註冊視窗</button>
+        <button onclick="console.log('AuthManager:', AuthManager)">檢查 AuthManager</button>
+        <div id="subscription-status"></div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        console.log('AuthManager loaded:', typeof AuthManager);
+        console.log('AuthManager methods:', Object.keys(AuthManager));
+
+        // 檢查是否有錯誤
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Error:', msg, 'at line:', lineNo);
+            return false;
+        };
+    </script>
+</body>
+</html>

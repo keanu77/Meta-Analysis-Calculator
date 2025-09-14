@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最小測試版本</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 未登入遮罩層 -->
+    <div id="auth-overlay" class="auth-overlay" style="display: none;">
+        <div class="auth-prompt">
+            <i class="fas fa-lock"></i>
+            <h2>請先登入以使用計算機</h2>
+            <p>登入後即可使用所有功能</p>
+            <div class="auth-prompt-buttons">
+                <button class="auth-prompt-login" onclick="AuthManager.showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> 登入
+                </button>
+                <button class="auth-prompt-register" onclick="AuthManager.showRegisterModal()">
+                    <i class="fas fa-user-plus"></i> 註冊新帳號
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-calculator"></i> Meta-Analysis Calculator</h1>
+            <p class="subtitle">系統性文獻回顧／統合分析一站式換算工具</p>
+            <div class="auth-status" id="subscription-status">
+                <!-- 登入狀態將由 auth.js 動態更新 -->
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <div class="container">
+            <button class="tab-btn active">
+                <i class="fas fa-book-open"></i>
+                使用指南
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div style="padding: 40px; text-align: center;">
+                <h2>測試登入系統</h2>
+                <p>如果您看到這個頁面，代表 HTML 和 CSS 載入正常</p>
+                <div style="margin: 20px 0;">
+                    <button onclick="testAuthManager()" style="padding: 12px 24px; margin: 5px; background: #14b8a6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        測試 AuthManager
+                    </button>
+                    <button onclick="manualShowLogin()" style="padding: 12px 24px; margin: 5px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        手動顯示登入
+                    </button>
+                    <button onclick="manualShowRegister()" style="padding: 12px 24px; margin: 5px; background: #f59e0b; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        手動顯示註冊
+                    </button>
+                </div>
+                <div id="test-log" style="background: #f3f4f6; padding: 20px; margin-top: 20px; border-radius: 8px; text-align: left; font-family: monospace; white-space: pre-line;"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function testAuthManager() {
+            log('測試開始...');
+            log('AuthManager 存在: ' + (typeof AuthManager !== 'undefined'));
+
+            if (typeof AuthManager !== 'undefined') {
+                log('AuthManager.showLoginModal: ' + (typeof AuthManager.showLoginModal === 'function'));
+                log('AuthManager.showRegisterModal: ' + (typeof AuthManager.showRegisterModal === 'function'));
+                log('AuthManager.currentUser: ' + JSON.stringify(AuthManager.currentUser));
+            } else {
+                log('AuthManager 未載入！');
+            }
+        }
+
+        function manualShowLogin() {
+            log('嘗試手動顯示登入視窗...');
+            try {
+                if (typeof AuthManager !== 'undefined' && AuthManager.showLoginModal) {
+                    AuthManager.showLoginModal();
+                    log('登入視窗已顯示');
+                } else {
+                    log('AuthManager 或 showLoginModal 不存在');
+                }
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function manualShowRegister() {
+            log('嘗試手動顯示註冊視窗...');
+            try {
+                if (typeof AuthManager !== 'undefined' && AuthManager.showRegisterModal) {
+                    AuthManager.showRegisterModal();
+                    log('註冊視窗已顯示');
+                } else {
+                    log('AuthManager 或 showRegisterModal 不存在');
+                }
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        // 捕獲所有 JavaScript 錯誤
+        window.addEventListener('error', (e) => {
+            log(`JavaScript 錯誤: ${e.message} (檔案: ${e.filename}, 行: ${e.lineno})`);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM 載入完成');
+
+            // 延遲測試
+            setTimeout(() => {
+                testAuthManager();
+            }, 1000);
+        });
+    </script>
+
+    <!-- 只載入 auth.js，不載入可能有問題的其他腳本 -->
+    <script src="auth.js"></script>
+</body>
+</html>

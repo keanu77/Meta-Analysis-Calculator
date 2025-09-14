@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>測試登入功能</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-btn {
+            margin: 10px 0;
+            padding: 12px 24px;
+            background: #14b8a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .test-btn:hover {
+            background: #0f766e;
+        }
+        #log {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-line;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>登入功能測試</h1>
+
+        <button class="test-btn" onclick="testAuthManager()">測試 AuthManager</button>
+        <button class="test-btn" onclick="testShowLoginModal()">顯示登入視窗</button>
+        <button class="test-btn" onclick="testShowRegisterModal()">顯示註冊視窗</button>
+        <button class="test-btn" onclick="testProfileManager()">測試 ProfileManager</button>
+        <button class="test-btn" onclick="clearLog()">清除日誌</button>
+
+        <div id="subscription-status">
+            <!-- 登入狀態 -->
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <!-- 認證遮罩 -->
+    <div id="auth-overlay" class="auth-overlay" style="display: none;">
+        <div class="auth-prompt">
+            <i class="fas fa-lock"></i>
+            <h2>請先登入以使用計算機</h2>
+            <p>登入後即可使用所有功能</p>
+            <div class="auth-prompt-buttons">
+                <button class="auth-prompt-login" onclick="AuthManager.showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> 登入
+                </button>
+                <button class="auth-prompt-register" onclick="AuthManager.showRegisterModal()">
+                    <i class="fas fa-user-plus"></i> 註冊新帳號
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="profile-modal.js"></script>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        function testAuthManager() {
+            log('測試 AuthManager...');
+            try {
+                log('AuthManager 存在: ' + (typeof AuthManager !== 'undefined'));
+                log('AuthManager.showLoginModal: ' + (typeof AuthManager.showLoginModal === 'function'));
+                log('AuthManager.currentUser: ' + JSON.stringify(AuthManager.currentUser));
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function testShowLoginModal() {
+            log('嘗試顯示登入視窗...');
+            try {
+                AuthManager.showLoginModal();
+                log('登入視窗應該已顯示');
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function testShowRegisterModal() {
+            log('嘗試顯示註冊視窗...');
+            try {
+                AuthManager.showRegisterModal();
+                log('註冊視窗應該已顯示');
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function testProfileManager() {
+            log('測試 ProfileManager...');
+            try {
+                log('ProfileManager 存在: ' + (typeof ProfileManager !== 'undefined'));
+                log('ProfileManager.showProfileModal: ' + (typeof ProfileManager.showProfileModal === 'function'));
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        // 捕獲所有錯誤
+        window.addEventListener('error', (e) => {
+            log('全域錯誤: ' + e.message + ' (檔案: ' + e.filename + ', 行: ' + e.lineno + ')');
+        });
+
+        // 初始化測試
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM 載入完成');
+            log('開始初始化測試...');
+            testAuthManager();
+        });
+    </script>
+</body>
+</html>

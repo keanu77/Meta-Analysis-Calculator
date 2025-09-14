@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta-Analysis Calculator | 統合分析計算機</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 未登入遮罩層 -->
+    <div id="auth-overlay" class="auth-overlay" style="display: none;">
+        <div class="auth-prompt">
+            <i class="fas fa-lock"></i>
+            <h2>請先登入以使用計算機</h2>
+            <p>登入後即可使用所有功能</p>
+            <div class="auth-prompt-buttons">
+                <button class="auth-prompt-login" onclick="AuthManager.showLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i> 登入
+                </button>
+                <button class="auth-prompt-register" onclick="AuthManager.showRegisterModal()">
+                    <i class="fas fa-user-plus"></i> 註冊新帳號
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-calculator"></i> Meta-Analysis Calculator</h1>
+            <p class="subtitle">系統性文獻回顧／統合分析一站式換算工具</p>
+            <div class="auth-status" id="subscription-status">
+                <!-- 登入狀態將由 auth.js 動態更新 -->
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <div class="container">
+            <button class="tab-btn active" data-tab="module-guide">
+                <i class="fas fa-book-open"></i>
+                使用指南
+            </button>
+            <button class="tab-btn" data-tab="module-stats">
+                <i class="fas fa-chart-pie"></i>
+                MA基本概念
+            </button>
+            <button class="tab-btn" data-tab="module-a">
+                <i class="fas fa-chart-bar"></i>
+                單組內統計轉換
+            </button>
+            <button class="tab-btn" data-tab="module-b">
+                <i class="fas fa-balance-scale"></i>
+                兩組比較效果量
+            </button>
+            <button class="tab-btn" data-tab="module-c">
+                <i class="fas fa-exchange-alt"></i>
+                CI/SE互轉
+            </button>
+            <button class="tab-btn" data-tab="module-rob">
+                <i class="fas fa-shield-alt"></i>
+                風險偏差評估 (RoB 2.0)
+            </button>
+            <button class="tab-btn" data-tab="module-e">
+                <i class="fas fa-info-circle"></i>
+                參考資料
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Module Guide: 使用指南 -->
+            <div id="module-guide" class="tab-content active">
+                <div class="module-header">
+                    <h2>歡迎使用 Meta-Analysis Calculator</h2>
+                    <p>本指南將協助您快速掌握計算機的各項功能</p>
+                </div>
+
+                <div class="guide-content">
+                    <div class="guide-section">
+                        <h3><i class="fas fa-rocket"></i> 快速開始</h3>
+                        <div class="guide-card">
+                            <h4>基本操作流程</h4>
+                            <ol class="guide-steps">
+                                <li><strong>選擇功能模組</strong>：點擊上方導航標籤選擇所需的計算功能</li>
+                                <li><strong>輸入數據</strong>：在對應欄位填入您的研究數據</li>
+                                <li><strong>執行計算</strong>：點擊「計算」按鈕獲得結果</li>
+                                <li><strong>查看結果</strong>：結果會顯示在綠色背景的結果框中</li>
+                                <li><strong>查看公式</strong>：點擊「查看公式」了解計算原理</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3><i class="fas fa-keyboard"></i> 鍵盤快捷鍵</h3>
+                        <div class="guide-card">
+                            <table class="shortcut-table">
+                                <tr>
+                                    <td class="shortcut-key">ESC</td>
+                                    <td>關閉彈出視窗</td>
+                                </tr>
+                                <tr>
+                                    <td class="shortcut-key">Ctrl + Enter</td>
+                                    <td>執行當前模組的計算</td>
+                                </tr>
+                                <tr>
+                                    <td class="shortcut-key">Tab</td>
+                                    <td>切換輸入欄位</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3><i class="fas fa-th-large"></i> 功能模組概覽</h3>
+                        <div class="module-overview">
+                            <div class="overview-card">
+                                <div class="overview-icon"><i class="fas fa-chart-bar"></i></div>
+                                <h4>單組內統計轉換</h4>
+                                <p>處理單一組別的統計數據轉換，如 SE↔SD、CI→Mean/SD、次序統計轉換等</p>
+                                <div class="when-to-use">
+                                    <strong>使用時機：</strong>文獻只報告部分統計值，需要轉換為標準格式進行meta-analysis
+                                </div>
+                            </div>
+
+                            <div class="overview-card">
+                                <div class="overview-icon"><i class="fas fa-balance-scale"></i></div>
+                                <h4>兩組比較效果量</h4>
+                                <p>計算實驗組與對照組的比較指標，包括 MD、SMD、OR、RR、RD 等</p>
+                                <div class="when-to-use">
+                                    <strong>使用時機：</strong>進行兩組比較的效果量計算，為森林圖準備數據
+                                </div>
+                            </div>
+
+                            <div class="overview-card">
+                                <div class="overview-icon"><i class="fas fa-exchange-alt"></i></div>
+                                <h4>CI/SE 互轉</h4>
+                                <p>各種效果量的信賴區間、標準誤、Z/t值相互轉換</p>
+                                <div class="when-to-use">
+                                    <strong>使用時機：</strong>文獻報告格式不一致，需要統一為CI或SE格式
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3><i class="fas fa-lightbulb"></i> 使用建議</h3>
+                        <div class="tips-grid">
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-check-circle"></i></div>
+                                <h4>數據準備</h4>
+                                <ul>
+                                    <li>確保數據單位一致</li>
+                                    <li>檢查樣本數是否正確</li>
+                                    <li>注意標準差vs標準誤的區別</li>
+                                </ul>
+                            </div>
+
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <h4>常見錯誤</h4>
+                                <ul>
+                                    <li>混淆 SD 和 SE</li>
+                                    <li>錯誤的信賴區間水準</li>
+                                    <li>零事件未進行修正</li>
+                                </ul>
+                            </div>
+
+                            <div class="tip-card">
+                                <div class="tip-icon"><i class="fas fa-chart-line"></i></div>
+                                <h4>結果解讀</h4>
+                                <ul>
+                                    <li>檢查 95% CI 是否包含 0（或1）</li>
+                                    <li>注意效果量大小的臨床意義</li>
+                                    <li>考慮樣本大小對精確度的影響</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Module A: 單組內與描述統計轉換 -->
+            <div id="module-a" class="tab-content">
+                <div class="module-header">
+                    <h2>單組內與描述統計轉換</h2>
+                    <p>提供 SE、CI、次序統計等與 Mean、SD 間的轉換</p>
+                </div>
+
+                <!-- 使用時機說明 -->
+                <div class="usage-guide">
+                    <div class="usage-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>何時使用此模組？</h3>
+                    </div>
+                    <div class="usage-content">
+                        <div class="usage-scenario">
+                            <h4>典型應用場景：</h4>
+                            <ul>
+                                <li><strong>文獻報告不完整：</strong>只提供 SE 而需要 SD 進行 meta-analysis</li>
+                                <li><strong>報告格式不一：</strong>有些研究報告 95% CI，有些報告 Mean±SD</li>
+                                <li><strong>只有中位數資料：</strong>文獻只報告中位數、四分位距或範圍</li>
+                                <li><strong>合併多組數據：</strong>需要計算 pooled SD 或變化量 SD</li>
+                            </ul>
+                        </div>
+                        <div class="usage-examples">
+                            <h4>實際範例：</h4>
+                            <div class="example-case">
+                                <span class="example-tag">案例1</span>
+                                文獻報告「Mean = 85.3 (SE = 2.5), n = 45」→ 轉換為 SD = 16.77
+                            </div>
+                            <div class="example-case">
+                                <span class="example-tag">案例2</span>
+                                文獻報告「Median (IQR): 71.3 (62.5-82.7)」→ 估計 Mean 和 SD
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-grid">
+                    <!-- SE to SD -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> SE → SD</h3>
+                        <div class="input-group">
+                            <label>Standard Error (SE):</label>
+                            <input type="number" id="se-input" step="any" placeholder="輸入 SE 值">
+                        </div>
+                        <div class="input-group">
+                            <label>Sample Size (n):</label>
+                            <input type="number" id="se-n-input" step="1" min="1" placeholder="輸入樣本數">
+                        </div>
+                        <button class="calc-btn" onclick="calculateSEtoSD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="se-sd-result"></div>
+                        <button class="formula-btn" onclick="showFormula('se-sd')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- CI to Mean & SD -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> CI → Mean & SD</h3>
+                        <div class="input-group">
+                            <label>Lower CI:</label>
+                            <input type="number" id="ci-lower" step="any" placeholder="下界">
+                        </div>
+                        <div class="input-group">
+                            <label>Upper CI:</label>
+                            <input type="number" id="ci-upper" step="any" placeholder="上界">
+                        </div>
+                        <div class="input-group">
+                            <label>Confidence Level (%):</label>
+                            <select id="ci-level">
+                                <option value="95">95%</option>
+                                <option value="90">90%</option>
+                                <option value="99">99%</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Sample Size (n):</label>
+                            <input type="number" id="ci-n" step="1" min="1" placeholder="樣本數">
+                        </div>
+                        <div class="input-group">
+                            <label>Distribution:</label>
+                            <select id="ci-distribution">
+                                <option value="auto" selected>自動選擇 (建議)</option>
+                                <option value="t">t-distribution</option>
+                                <option value="normal">Normal (Z)</option>
+                            </select>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                自動: n&lt;120 使用 t 分布, n≥120 使用 Z 分布
+                            </small>
+                        </div>
+                        <button class="calc-btn" onclick="calculateCItoMeanSD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="ci-mean-sd-result"></div>
+                        <button class="formula-btn" onclick="showFormula('ci-mean-sd')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- Quantiles to Mean & SD -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> 次序統計 → Mean & SD</h3>
+                        <div class="input-group">
+                            <label>Method:</label>
+                            <select id="quantile-method">
+                                <option value="luo">Luo et al. (2018)</option>
+                                <option value="wan">Wan et al. (2014)</option>
+                                <option value="hozo">Hozo et al. (2005)</option>
+                                <option value="shi">Shi et al. (2020)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Min:</label>
+                            <input type="number" id="q-min" step="any" placeholder="最小值">
+                        </div>
+                        <div class="input-group">
+                            <label>Q1:</label>
+                            <input type="number" id="q-q1" step="any" placeholder="第一四分位數 (可選)">
+                        </div>
+                        <div class="input-group">
+                            <label>Median:</label>
+                            <input type="number" id="q-median" step="any" placeholder="中位數">
+                        </div>
+                        <div class="input-group">
+                            <label>Q3:</label>
+                            <input type="number" id="q-q3" step="any" placeholder="第三四分位數 (可選)">
+                        </div>
+                        <div class="input-group">
+                            <label>Max:</label>
+                            <input type="number" id="q-max" step="any" placeholder="最大值">
+                        </div>
+                        <div class="input-group">
+                            <label>Sample Size (n):</label>
+                            <input type="number" id="q-n" step="1" min="1" placeholder="樣本數">
+                        </div>
+                        <button class="calc-btn" onclick="calculateQuantilesToMeanSD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="quantiles-result"></div>
+                        <button class="formula-btn" onclick="showFormula('quantiles')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- Median & Range to Mean & SD (Hozo Method) -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Median & Range → Mean & SD</h3>
+                        <div class="note-box">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>專用於 Hozo (2005) 方法：</strong>當文獻只報告中位數、最小值、最大值時使用
+                        </div>
+                        <div class="input-group">
+                            <label>Minimum (a):</label>
+                            <input type="number" id="hozo-min" step="any" placeholder="最小值">
+                        </div>
+                        <div class="input-group">
+                            <label>Median (m):</label>
+                            <input type="number" id="hozo-median" step="any" placeholder="中位數">
+                        </div>
+                        <div class="input-group">
+                            <label>Maximum (b):</label>
+                            <input type="number" id="hozo-max" step="any" placeholder="最大值">
+                        </div>
+                        <div class="input-group">
+                            <label>Sample Size (n):</label>
+                            <input type="number" id="hozo-n" step="1" min="1" placeholder="樣本數">
+                        </div>
+                        <button class="calc-btn" onclick="calculateHozoOnly()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="hozo-only-result"></div>
+                        <button class="formula-btn" onclick="showFormula('hozo-method')">
+                            <i class="fas fa-eye"></i> 查看 Hozo 公式
+                        </button>
+                        <div class="method-info">
+                            <h4>方法說明：</h4>
+                            <ul>
+                                <li><strong>n ≤ 25：</strong>使用修正公式 Mean = (a + 2m + b)/4</li>
+                                <li><strong>n > 25：</strong>Mean ≈ median</li>
+                                <li><strong>n ≤ 15：</strong>使用精確公式 SD = √[(a-2m+b)²/48 + (b-a)²/12]</li>
+                                <li><strong>15 < n ≤ 70：</strong>SD ≈ (b-a)/4</li>
+                                <li><strong>n > 70：</strong>SD ≈ (b-a)/6</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Pooled SD -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Pooled SD</h3>
+                        <div class="input-group">
+                            <label>SD1:</label>
+                            <input type="number" id="pooled-sd1" step="any" placeholder="第一組標準差">
+                        </div>
+                        <div class="input-group">
+                            <label>n1:</label>
+                            <input type="number" id="pooled-n1" step="1" min="1" placeholder="第一組樣本數">
+                        </div>
+                        <div class="input-group">
+                            <label>SD2:</label>
+                            <input type="number" id="pooled-sd2" step="any" placeholder="第二組標準差">
+                        </div>
+                        <div class="input-group">
+                            <label>n2:</label>
+                            <input type="number" id="pooled-n2" step="1" min="1" placeholder="第二組樣本數">
+                        </div>
+                        <button class="calc-btn" onclick="calculatePooledSD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="pooled-sd-result"></div>
+                        <button class="formula-btn" onclick="showFormula('pooled-sd')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- Change Score SD -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Change Score SD</h3>
+                        <div class="input-group">
+                            <label>SD Pre:</label>
+                            <input type="number" id="change-sd-pre" step="any" placeholder="前測標準差">
+                        </div>
+                        <div class="input-group">
+                            <label>SD Post:</label>
+                            <input type="number" id="change-sd-post" step="any" placeholder="後測標準差">
+                        </div>
+                        <div class="input-group">
+                            <label>Correlation (r):</label>
+                            <input type="number" id="change-r" step="any" min="-1" max="1" placeholder="相關係數 (-1 to 1)">
+                        </div>
+                        <button class="calc-btn" onclick="calculateChangeSD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="change-sd-result"></div>
+                        <button class="formula-btn" onclick="showFormula('change-sd')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module B: 兩組比較與效果量 -->
+            <div id="module-b" class="tab-content">
+                <div class="module-header">
+                    <h2>兩組比較與效果量</h2>
+                    <p>計算 MD、SMD、OR、RR、HR 等效果量及信賴區間</p>
+                </div>
+
+                <!-- 使用時機說明 -->
+                <div class="usage-guide">
+                    <div class="usage-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>何時使用此模組？</h3>
+                    </div>
+                    <div class="usage-content">
+                        <div class="usage-scenario">
+                            <h4>典型應用場景：</h4>
+                            <ul>
+                                <li><strong>連續型變項比較：</strong>比較實驗組與對照組的平均值差異（血壓、體重、疼痛分數等）</li>
+                                <li><strong>二分型結果比較：</strong>計算事件發生率的差異（死亡率、治癒率、不良事件等）</li>
+                                <li><strong>不同單位的整合：</strong>使用 SMD 標準化不同量表的測量結果</li>
+                                <li><strong>森林圖準備：</strong>為 meta-analysis 森林圖準備效果量數據</li>
+                            </ul>
+                        </div>
+                        <div class="usage-tips">
+                            <h4>選擇建議：</h4>
+                            <div class="tip-box">
+                                <i class="fas fa-ruler"></i>
+                                <strong>MD vs SMD：</strong>相同測量單位用 MD，不同量表或單位用 SMD
+                            </div>
+                            <div class="tip-box">
+                                <i class="fas fa-percentage"></i>
+                                <strong>OR vs RR：</strong>病例對照研究用 OR，隊列研究或 RCT 用 RR
+                            </div>
+                            <div class="tip-box">
+                                <i class="fas fa-users"></i>
+                                <strong>小樣本修正：</strong>n < 20 時建議使用 Hedges' g 而非 Cohen's d
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-grid">
+                    <!-- Mean Difference -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Mean Difference (MD)</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 1 Mean:</label>
+                                <input type="number" id="md-mean1" step="any" placeholder="實驗組平均">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 1 SD:</label>
+                                <input type="number" id="md-sd1" step="any" placeholder="實驗組標準差">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 1 n:</label>
+                                <input type="number" id="md-n1" step="1" min="1" placeholder="實驗組樣本數">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 2 Mean:</label>
+                                <input type="number" id="md-mean2" step="any" placeholder="對照組平均">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 2 SD:</label>
+                                <input type="number" id="md-sd2" step="any" placeholder="對照組標準差">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 2 n:</label>
+                                <input type="number" id="md-n2" step="1" min="1" placeholder="對照組樣本數">
+                            </div>
+                        </div>
+                        <button class="calc-btn" onclick="calculateMD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="md-result"></div>
+                        <button class="formula-btn" onclick="showFormula('md')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- Standardized Mean Difference -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Standardized Mean Difference (SMD)</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 1 Mean:</label>
+                                <input type="number" id="smd-mean1" step="any" placeholder="實驗組平均">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 1 SD:</label>
+                                <input type="number" id="smd-sd1" step="any" placeholder="實驗組標準差">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 1 n:</label>
+                                <input type="number" id="smd-n1" step="1" min="1" placeholder="實驗組樣本數">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 2 Mean:</label>
+                                <input type="number" id="smd-mean2" step="any" placeholder="對照組平均">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 2 SD:</label>
+                                <input type="number" id="smd-sd2" step="any" placeholder="對照組標準差">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 2 n:</label>
+                                <input type="number" id="smd-n2" step="1" min="1" placeholder="對照組樣本數">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>
+                                <input type="checkbox" id="smd-correction" checked> 
+                                Apply Hedges' g small-sample correction
+                            </label>
+                        </div>
+                        <button class="calc-btn" onclick="calculateSMD()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="smd-result"></div>
+                        <button class="formula-btn" onclick="showFormula('smd')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+
+                    <!-- Binary Outcomes -->
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-arrow-right"></i> Binary Outcomes (OR/RR/RD)</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 1 Events:</label>
+                                <input type="number" id="bin-events1" step="1" min="0" placeholder="實驗組事件數">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 1 Total:</label>
+                                <input type="number" id="bin-total1" step="1" min="1" placeholder="實驗組總數">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Group 2 Events:</label>
+                                <input type="number" id="bin-events2" step="1" min="0" placeholder="對照組事件數">
+                            </div>
+                            <div class="input-group">
+                                <label>Group 2 Total:</label>
+                                <input type="number" id="bin-total2" step="1" min="1" placeholder="對照組總數">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Zero Event Correction:</label>
+                            <select id="bin-correction">
+                                <option value="haldane">Haldane-Anscombe (0.5)</option>
+                                <option value="continuity">Continuity Correction</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <button class="calc-btn" onclick="calculateBinaryOutcomes()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="binary-result"></div>
+                        <button class="formula-btn" onclick="showFormula('binary')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module C: CI/SE互轉 -->
+            <div id="module-c" class="tab-content">
+                <div class="module-header">
+                    <h2>信賴區間與標準誤互轉</h2>
+                    <p>各種效果量的 CI、SE、Z/t 值互相換算</p>
+                </div>
+
+                <!-- 使用時機說明 -->
+                <div class="usage-guide">
+                    <div class="usage-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>何時使用此模組？</h3>
+                    </div>
+                    <div class="usage-content">
+                        <div class="usage-scenario">
+                            <h4>典型應用場景：</h4>
+                            <ul>
+                                <li><strong>格式統一需求：</strong>某些研究報告 CI，某些報告 SE，需要統一格式</li>
+                                <li><strong>軟體輸入要求：</strong>meta-analysis 軟體要求特定格式（如 RevMan 需要 SE）</li>
+                                <li><strong>精確度評估：</strong>從 CI 寬度了解研究的精確度</li>
+                                <li><strong>異質性分析：</strong>比較不同研究的變異程度</li>
+                            </ul>
+                        </div>
+                        <div class="usage-examples">
+                            <h4>常見轉換情境：</h4>
+                            <div class="example-case">
+                                <span class="example-tag">情境1</span>
+                                文獻報告 OR = 2.5 (95% CI: 1.2-5.2) → 需要 log(OR) 和 SE
+                            </div>
+                            <div class="example-case">
+                                <span class="example-tag">情境2</span>
+                                有 SMD = 0.65, SE = 0.23 → 需要計算 95% CI
+                            </div>
+                            <div class="example-case">
+                                <span class="example-tag">情境3</span>
+                                想知道研究的統計檢定力 → 需要 Z 值和 p 值
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator-grid">
+                    <div class="calculator-card">
+                        <h3><i class="fas fa-exchange-alt"></i> Effect Size ↔ CI ↔ SE</h3>
+                        <div class="input-group">
+                            <label>Effect Size Type:</label>
+                            <select id="es-type">
+                                <option value="mean">Mean/MD</option>
+                                <option value="smd">SMD</option>
+                                <option value="log-or">log(OR)</option>
+                                <option value="log-rr">log(RR)</option>
+                                <option value="log-hr">log(HR)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Effect Size:</label>
+                            <input type="number" id="es-value" step="any" placeholder="效果量值">
+                        </div>
+                        <div class="input-group">
+                            <label>Lower CI:</label>
+                            <input type="number" id="es-ci-lower" step="any" placeholder="下界">
+                        </div>
+                        <div class="input-group">
+                            <label>Upper CI:</label>
+                            <input type="number" id="es-ci-upper" step="any" placeholder="上界">
+                        </div>
+                        <div class="input-group">
+                            <label>Standard Error:</label>
+                            <input type="number" id="es-se" step="any" placeholder="標準誤">
+                        </div>
+                        <div class="input-group">
+                            <label>Confidence Level (%):</label>
+                            <select id="es-ci-level">
+                                <option value="95">95%</option>
+                                <option value="90">90%</option>
+                                <option value="99">99%</option>
+                            </select>
+                        </div>
+                        <button class="calc-btn" onclick="calculateESConversion()">
+                            <i class="fas fa-calculator"></i> 計算
+                        </button>
+                        <div class="result-box" id="es-conversion-result"></div>
+                        <button class="formula-btn" onclick="showFormula('es-conversion')">
+                            <i class="fas fa-eye"></i> 查看公式
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module RoB: Risk of Bias 2.0 Assessment Tool -->
+            <div id="module-rob" class="tab-content">
+                <div class="module-header">
+                    <h2>風險偏差評估工具 (Risk of Bias 2.0)</h2>
+                    <p>基於 Cochrane RoB 2.0 標準的互動式偏差風險評估系統</p>
+                </div>
+
+                <div class="rob-content">
+                    <!-- RoB 2.0 介紹 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-info-circle"></i> RoB 2.0 工具介紹</h3>
+                        <div class="rob-intro">
+                            <div class="intro-card">
+                                <div class="intro-content">
+                                    <p><strong>Risk of Bias 2.0 (RoB 2.0)</strong> 是 Cochrane 開發的修訂版偏差風險評估工具，專門用於評估隨機對照試驗 (RCT) 的方法學品質。</p>
+                                    <div class="intro-highlights">
+                                        <div class="highlight-item">
+                                            <i class="fas fa-target"></i>
+                                            <div>
+                                                <strong>結果導向評估</strong>
+                                                <p>針對特定結果進行評估，而非整體研究</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-sitemap"></i>
+                                            <div>
+                                                <strong>五個偏差領域</strong>
+                                                <p>系統性評估各類型偏差風險</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-question-circle"></i>
+                                            <div>
+                                                <strong>信號問題引導</strong>
+                                                <p>透過標準化問題進行客觀評估</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 五個偏差領域概覽 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-list-ol"></i> 五個偏差風險領域</h3>
+                        <div class="domains-overview">
+                            <div class="domain-card domain-1">
+                                <div class="domain-icon"><i class="fas fa-random"></i></div>
+                                <div class="domain-content">
+                                    <h4>隨機化過程偏差</h4>
+                                    <p>Bias arising from the randomization process</p>
+                                    <ul>
+                                        <li>隨機序列產生</li>
+                                        <li>分配隱藏</li>
+                                        <li>基線特徵差異</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="domain-card domain-2">
+                                <div class="domain-icon"><i class="fas fa-route"></i></div>
+                                <div class="domain-content">
+                                    <h4>偏離預定介入偏差</h4>
+                                    <p>Bias due to deviations from intended interventions</p>
+                                    <ul>
+                                        <li>參與者盲法</li>
+                                        <li>介入措施偏離</li>
+                                        <li>分析方法適當性</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="domain-card domain-3">
+                                <div class="domain-icon"><i class="fas fa-database"></i></div>
+                                <div class="domain-content">
+                                    <h4>結果數據缺失偏差</h4>
+                                    <p>Bias due to missing outcome data</p>
+                                    <ul>
+                                        <li>數據可得性</li>
+                                        <li>缺失數據處理</li>
+                                        <li>缺失機制評估</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="domain-card domain-4">
+                                <div class="domain-icon"><i class="fas fa-ruler"></i></div>
+                                <div class="domain-content">
+                                    <h4>結果測量偏差</h4>
+                                    <p>Bias in measurement of the outcome</p>
+                                    <ul>
+                                        <li>測量方法適當性</li>
+                                        <li>評估者盲法</li>
+                                        <li>測量誤差影響</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="domain-card domain-5">
+                                <div class="domain-icon"><i class="fas fa-file-alt"></i></div>
+                                <div class="domain-content">
+                                    <h4>選擇性報告偏差</h4>
+                                    <p>Bias in selection of the reported result</p>
+                                    <ul>
+                                        <li>結果選擇適當性</li>
+                                        <li>分析計劃一致性</li>
+                                        <li>多重檢定處理</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 研究管理系統 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-tasks"></i> 研究管理系統</h3>
+                        <div class="study-management">
+                            <div class="management-controls">
+                                <button class="rob-btn primary" data-action="add-new-study">
+                                    <i class="fas fa-plus"></i> 新增研究
+                                </button>
+                                <button class="rob-btn secondary" data-action="import-studies">
+                                    <i class="fas fa-upload"></i> 批次匯入
+                                </button>
+                                <button class="rob-btn info" data-action="export-studies">
+                                    <i class="fas fa-download"></i> 匯出清單
+                                </button>
+                                <button class="rob-btn danger" data-action="clear-all-studies">
+                                    <i class="fas fa-trash-alt"></i> 清空全部
+                                </button>
+                                <button class="rob-btn secondary" data-action="load-demo-data">
+                                    <i class="fas fa-flask"></i> 載入示範資料
+                                </button>
+                            </div>
+                            <div class="studies-container" id="studies-container">
+                                <div class="empty-state" id="empty-state">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <h4>尚未新增任何研究</h4>
+                                    <p>點擊「新增研究」開始您的 RoB 2.0 評估</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RoB 評估界面 -->
+                    <div class="rob-section" id="rob-assessment-section" style="display: none;">
+                        <h3><i class="fas fa-clipboard-check"></i> 偏差風險評估</h3>
+                        <div class="assessment-container">
+                            <div class="assessment-header">
+                                <div class="study-info" id="current-study-info">
+                                    <!-- 動態顯示當前評估的研究資訊 -->
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="assessment-progress"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- 五個領域的評估區塊 -->
+                            <div class="domains-assessment" id="domains-assessment">
+                                <!-- 這裡將動態生成五個領域的評估表單 -->
+                            </div>
+
+                            <!-- 整體風險判斷 -->
+                            <div class="overall-risk">
+                                <h4><i class="fas fa-balance-scale"></i> 整體偏差風險</h4>
+                                <div class="risk-summary" id="risk-summary">
+                                    <!-- 動態顯示整體風險判斷 -->
+                                </div>
+                            </div>
+
+                            <!-- 評估控制按鈕 -->
+                            <div class="assessment-controls">
+                                <button class="rob-btn secondary" onclick="saveAssessment()">
+                                    <i class="fas fa-save"></i> 儲存評估
+                                </button>
+                                <button class="rob-btn success" onclick="completeAssessment()">
+                                    <i class="fas fa-check"></i> 完成評估
+                                </button>
+                                <button class="rob-btn info" onclick="previewResults()">
+                                    <i class="fas fa-eye"></i> 預覽結果
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 結果視覺化 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-chart-bar"></i> RoB2.0 圖表生成</h3>
+                        <div class="visualization-controls">
+                            <div class="chart-options">
+                                <button class="chart-btn active" data-chart="traffic-light" onclick="selectChart('traffic-light')">
+                                    <i class="fas fa-traffic-light"></i> Traffic Light Plot
+                                </button>
+                                <button class="chart-btn" data-chart="weighted-bar" onclick="selectChart('weighted-bar')">
+                                    <i class="fas fa-chart-bar"></i> Weighted Bar Plot
+                                </button>
+                            </div>
+                            <div class="export-options">
+                                <button class="export-btn" onclick="exportChart('svg')">
+                                    <i class="fas fa-file-code"></i> 匯出 SVG
+                                </button>
+                                <button class="export-btn" onclick="exportChart('png')">
+                                    <i class="fas fa-file-image"></i> 匯出 PNG
+                                </button>
+                                <button class="export-btn" onclick="exportPDF()">
+                                    <i class="fas fa-file-pdf"></i> 匯出 PDF 報告
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div id="rob-chart-table" style="display: none;"></div>
+                            <canvas id="rob-chart" style="display: none;"></canvas>
+                            <div class="chart-placeholder" id="chart-placeholder">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>完成研究評估後，這裡將顯示 RoB 圖表</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 使用說明 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-question-circle"></i> 使用說明</h3>
+                        <div class="help-content">
+                            <div class="help-accordion">
+                                <div class="help-item">
+                                    <div class="help-header" onclick="toggleHelp('getting-started')">
+                                        <span><i class="fas fa-play"></i> 開始使用</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="help-content" id="getting-started">
+                                        <ol>
+                                            <li>點擊「新增研究」創建評估項目</li>
+                                            <li>輸入研究基本資訊（標題、作者、年份）</li>
+                                            <li>依序評估五個偏差領域</li>
+                                            <li>查看整體風險判斷結果</li>
+                                            <li>生成並匯出 RoB 圖表</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-header" onclick="toggleHelp('assessment-tips')">
+                                        <span><i class="fas fa-lightbulb"></i> 評估要訣</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="help-content" id="assessment-tips">
+                                        <ul>
+                                            <li>仔細閱讀每個信號問題，基於研究描述進行判斷</li>
+                                            <li>「低風險」需要有明確證據支持</li>
+                                            <li>不確定時選擇「部分擔憂」較為保守</li>
+                                            <li>在判斷理由中詳細記錄評估依據</li>
+                                            <li>建議雙人獨立評估後討論一致</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module Stats: Meta-Analysis 基本概念 -->
+            <div id="module-stats" class="tab-content">
+                <div class="module-header">
+                    <h2>Meta-Analysis 基本概念</h2>
+                    <p>了解統合分析的核心概念與統計方法</p>
+                </div>
+
+                <div class="stats-content">
+
+                    <!-- 統計模型選擇決策樹 (更新版) -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-sitemap"></i> 統計模型選擇決策 (Cochrane 建議)</h3>
+                        <div class="decision-card enhanced">
+                            <div class="decision-flow-enhanced">
+                                <div class="decision-step">
+                                    <div class="decision-box primary">
+                                        <h4>步驟 1：評估研究特性</h4>
+                                        <ul>
+                                            <li>研究人群是否相似？</li>
+                                            <li>介入措施是否一致？</li>
+                                            <li>研究設計是否相似？</li>
+                                            <li>研究品質如何？</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="decision-arrow">↓</div>
+                                <div class="decision-step">
+                                    <div class="decision-box secondary">
+                                        <h4>步驟 2：計算異質性指標</h4>
+                                        <p>計算 I²、τ²、Q 檢定統計量</p>
+                                    </div>
+                                </div>
+                                <div class="decision-arrow">↓</div>
+                                <div class="decision-branches-enhanced">
+                                    <div class="branch-column">
+                                        <div class="decision-box success">
+                                            <h4>情境 A</h4>
+                                            <ul>
+                                                <li>研究相似度高</li>
+                                                <li>I² < 40%</li>
+                                                <li>Q 檢定不顯著</li>
+                                                <li>效果方向一致</li>
+                                            </ul>
+                                        </div>
+                                        <div class="decision-arrow">↓</div>
+                                        <div class="decision-box result success">
+                                            <strong>固定效應模型</strong>
+                                            <p>Fixed Effect Model</p>
+                                        </div>
+                                    </div>
+                                    <div class="branch-column">
+                                        <div class="decision-box warning">
+                                            <h4>情境 B</h4>
+                                            <ul>
+                                                <li>研究存在差異</li>
+                                                <li>40% < I² < 75%</li>
+                                                <li>可解釋的異質性</li>
+                                            </ul>
+                                        </div>
+                                        <div class="decision-arrow">↓</div>
+                                        <div class="decision-box result warning">
+                                            <strong>隨機效應模型</strong>
+                                            <p>+ 次群組分析</p>
+                                        </div>
+                                    </div>
+                                    <div class="branch-column">
+                                        <div class="decision-box danger">
+                                            <h4>情境 C</h4>
+                                            <ul>
+                                                <li>I² > 75%</li>
+                                                <li>效果方向不一致</li>
+                                                <li>研究差異極大</li>
+                                            </ul>
+                                        </div>
+                                        <div class="decision-arrow">↓</div>
+                                        <div class="decision-box result danger">
+                                            <strong>考慮不進行統合</strong>
+                                            <p>敘述性回顧</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 固定效應模型 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-lock"></i> 固定效應模型 (Fixed Effect Model)</h3>
+                        <div class="model-grid">
+                            <div class="model-card">
+                                <h4>基本假設</h4>
+                                <ul>
+                                    <li>所有研究估計相同的真實效應</li>
+                                    <li>研究間的差異僅來自抽樣誤差</li>
+                                    <li>存在單一的真實效應值</li>
+                                </ul>
+                            </div>
+                            <div class="model-card">
+                                <h4>適用情境</h4>
+                                <ul>
+                                    <li>研究對象同質性高</li>
+                                    <li>研究設計相似</li>
+                                    <li>I² < 40% 或 Q 檢定不顯著</li>
+                                    <li>研究數量較少 (< 5個)</li>
+                                </ul>
+                            </div>
+                            <div class="model-card">
+                                <h4>權重計算</h4>
+                                <div class="formula-box">
+                                    <p>權重 w<sub>i</sub> = 1 / SE<sub>i</sub>²</p>
+                                    <p class="formula-note">權重與研究精確度成正比</p>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <h4>優缺點</h4>
+                                <div class="pros-cons">
+                                    <div class="pros">
+                                        <strong>✓ 優點：</strong>
+                                        <ul>
+                                            <li>統計檢定力較高</li>
+                                            <li>信賴區間較窄</li>
+                                            <li>計算簡單直接</li>
+                                        </ul>
+                                    </div>
+                                    <div class="cons">
+                                        <strong>✗ 缺點：</strong>
+                                        <ul>
+                                            <li>可能低估不確定性</li>
+                                            <li>不適用於異質性高的情況</li>
+                                            <li>推論僅限於納入的研究</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 不同變項類型的統計方法 -->
+                        <div class="outcome-methods">
+                            <h4><i class="fas fa-chart-bar"></i> 依結果變項類型選擇統計方法</h4>
+                            <div class="outcome-grid">
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-ruler"></i> 連續型變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>最常用方法，基於變異數倒數加權</p>
+                                            <p class="formula-small">w = 1/SE²</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>Mean Difference (MD)、Standardized MD
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-toggle-on"></i> 二分型變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>Mantel-Haenszel (M-H)：</strong>
+                                            <p>不需要連續性修正，適合樣本大、事件多</p>
+                                            <p class="formula-small">w = (b×c)/n</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>基於對數轉換，需要零事件處理</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>Peto Method：</strong>
+                                            <p>適合罕見事件，不需要零事件修正</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>OR, RR, Risk Difference
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-clock"></i> 存活時間變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>基於 log(HR) 及其標準誤</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>觀察事件數法：</strong>
+                                            <p>使用觀察到的事件數計算</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>Hazard Ratio (HR)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 效果量選擇指南 (Cochrane Chapter 6) -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-ruler-combined"></i> 效果量選擇指南 (Cochrane Chapter 6)</h3>
+                        <div class="effect-measures-guide">
+                            <div class="cochrane-principles">
+                                <h4><i class="fas fa-compass"></i> Cochrane 效果量選擇三大原則</h4>
+                                <div class="principles-grid">
+                                    <div class="principle-card">
+                                        <div class="principle-icon"><i class="fas fa-equals"></i></div>
+                                        <h5>一致性 (Consistency)</h5>
+                                        <p>效果量在不同研究中應該具有相似的臨床意義</p>
+                                        <ul>
+                                            <li>相同的測量單位</li>
+                                            <li>相同的效果方向</li>
+                                            <li>可比較的基線風險</li>
+                                        </ul>
+                                    </div>
+                                    <div class="principle-card">
+                                        <div class="principle-icon"><i class="fas fa-calculator"></i></div>
+                                        <h5>數學特性 (Mathematical Properties)</h5>
+                                        <p>效果量應具備良好的統計特性以進行統合分析</p>
+                                        <ul>
+                                            <li>對稱分布特性</li>
+                                            <li>獨立於基線風險</li>
+                                            <li>可進行有效加權</li>
+                                        </ul>
+                                    </div>
+                                    <div class="principle-card">
+                                        <div class="principle-icon"><i class="fas fa-lightbulb"></i></div>
+                                        <h5>可解釋性 (Interpretability)</h5>
+                                        <p>效果量對臨床醫師和患者應具有直觀的意義</p>
+                                        <ul>
+                                            <li>臨床意義明確</li>
+                                            <li>易於溝通和理解</li>
+                                            <li>便於決策制定</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 連續變項效果量詳解 -->
+                            <div class="continuous-effects">
+                                <h4><i class="fas fa-chart-line"></i> 連續變項效果量選擇</h4>
+                                <div class="effect-comparison">
+                                    <div class="effect-measure-card md-card">
+                                        <div class="effect-header">
+                                            <h5>Mean Difference (MD)</h5>
+                                            <span class="effect-symbol">MD = μ₁ - μ₂</span>
+                                        </div>
+                                        <div class="effect-details">
+                                            <div class="advantages">
+                                                <h6>✓ 優點：</h6>
+                                                <ul>
+                                                    <li>保持原始測量單位</li>
+                                                    <li>臨床解釋直觀</li>
+                                                    <li>便於計算 NNT</li>
+                                                </ul>
+                                            </div>
+                                            <div class="limitations">
+                                                <h6>✗ 限制：</h6>
+                                                <ul>
+                                                    <li>需要相同的測量工具</li>
+                                                    <li>不適用於不同量表</li>
+                                                </ul>
+                                            </div>
+                                            <div class="when-to-use">
+                                                <h6>使用時機：</h6>
+                                                <ul>
+                                                    <li>所有研究使用相同量表</li>
+                                                    <li>相同的測量單位 (如 mmHg, mg/dL)</li>
+                                                    <li>需要保持臨床意義</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="effect-measure-card smd-card">
+                                        <div class="effect-header">
+                                            <h5>Standardized Mean Difference (SMD)</h5>
+                                            <span class="effect-symbol">SMD = (μ₁ - μ₂) / σpooled</span>
+                                        </div>
+                                        <div class="effect-details">
+                                            <div class="advantages">
+                                                <h6>✓ 優點：</h6>
+                                                <ul>
+                                                    <li>無單位，可比較不同量表</li>
+                                                    <li>便於跨研究比較</li>
+                                                    <li>適用於異質量表研究</li>
+                                                </ul>
+                                            </div>
+                                            <div class="limitations">
+                                                <h6>✗ 限制：</h6>
+                                                <ul>
+                                                    <li>失去原始單位意義</li>
+                                                    <li>解釋較為抽象</li>
+                                                    <li>需要轉換回臨床意義</li>
+                                                </ul>
+                                            </div>
+                                            <div class="when-to-use">
+                                                <h6>使用時機：</h6>
+                                                <ul>
+                                                    <li>研究使用不同測量工具</li>
+                                                    <li>相同構念，不同量表</li>
+                                                    <li>需要標準化比較</li>
+                                                </ul>
+                                            </div>
+                                            <div class="interpretation-guide">
+                                                <h6>Cohen 解釋標準：</h6>
+                                                <div class="cohen-scale">
+                                                    <span class="scale-item small">小效果: 0.2</span>
+                                                    <span class="scale-item medium">中等效果: 0.5</span>
+                                                    <span class="scale-item large">大效果: 0.8</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 二分變項效果量詳解 -->
+                            <div class="binary-effects">
+                                <h4><i class="fas fa-toggle-on"></i> 二分變項效果量選擇</h4>
+                                <div class="binary-measures-grid">
+                                    <div class="binary-measure-card or-card">
+                                        <div class="measure-header">
+                                            <h5>Odds Ratio (OR)</h5>
+                                            <span class="measure-formula">OR = (a/b) / (c/d)</span>
+                                        </div>
+                                        <div class="measure-properties">
+                                            <div class="property-item">
+                                                <strong>數學特性：</strong>對稱性佳，log(OR) 呈常態分布
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>基線風險：</strong>獨立於基線風險（理論上）
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>適用情境：</strong>病例對照研究、低發生率事件
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>解釋：</strong>勝算比，較難直觀理解
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="binary-measure-card rr-card">
+                                        <div class="measure-header">
+                                            <h5>Risk Ratio (RR)</h5>
+                                            <span class="measure-formula">RR = [a/(a+b)] / [c/(c+d)]</span>
+                                        </div>
+                                        <div class="measure-properties">
+                                            <div class="property-item">
+                                                <strong>數學特性：</strong>非對稱，log(RR) 呈常態分布
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>基線風險：</strong>受基線風險影響
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>適用情境：</strong>前瞻性研究、隨機對照試驗
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>解釋：</strong>相對風險，臨床解釋直觀
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="binary-measure-card rd-card">
+                                        <div class="measure-header">
+                                            <h5>Risk Difference (RD)</h5>
+                                            <span class="measure-formula">RD = [a/(a+b)] - [c/(c+d)]</span>
+                                        </div>
+                                        <div class="measure-properties">
+                                            <div class="property-item">
+                                                <strong>數學特性：</strong>線性，直接加減
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>基線風險：</strong>高度依賴基線風險
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>適用情境：</strong>公共衛生決策、政策制定
+                                            </div>
+                                            <div class="property-item">
+                                                <strong>解釋：</strong>絕對風險差異，可計算 NNT
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 存活分析效果量 -->
+                            <div class="survival-effects">
+                                <h4><i class="fas fa-heartbeat"></i> 存活分析效果量</h4>
+                                <div class="survival-measure-card">
+                                    <div class="survival-header">
+                                        <h5>Hazard Ratio (HR)</h5>
+                                        <span class="survival-formula">HR = λ₁(t) / λ₂(t)</span>
+                                    </div>
+                                    <div class="survival-details">
+                                        <div class="survival-properties">
+                                            <h6>特性與應用：</h6>
+                                            <ul>
+                                                <li><strong>瞬時風險比：</strong>任意時點的風險函數比值</li>
+                                                <li><strong>比例風險假設：</strong>假設風險比在時間上恆定</li>
+                                                <li><strong>處理設限資料：</strong>可處理追蹤期間的失訪</li>
+                                                <li><strong>時間效應：</strong>考慮事件發生的時間因素</li>
+                                            </ul>
+                                        </div>
+                                        <div class="survival-interpretation">
+                                            <h6>解釋指引：</h6>
+                                            <div class="hr-examples">
+                                                <div class="hr-example">
+                                                    <span class="hr-value">HR = 0.5</span>
+                                                    <span class="hr-meaning">風險降低 50%</span>
+                                                </div>
+                                                <div class="hr-example">
+                                                    <span class="hr-value">HR = 2.0</span>
+                                                    <span class="hr-meaning">風險增加 100%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 效果量轉換指引 -->
+                            <div class="conversion-guide">
+                                <h4><i class="fas fa-exchange-alt"></i> 效果量轉換與應用</h4>
+                                <div class="conversion-scenarios">
+                                    <div class="scenario-card">
+                                        <h5>SMD 轉換為 MD</h5>
+                                        <div class="conversion-formula">
+                                            <code>MD = SMD × SD_reference</code>
+                                        </div>
+                                        <p>選擇具有代表性的研究或合併後的標準差作為參考</p>
+                                    </div>
+                                    <div class="scenario-card">
+                                        <h5>OR 轉換為 RR</h5>
+                                        <div class="conversion-formula">
+                                            <code>RR = OR / [(1-P₀) + (P₀×OR)]</code>
+                                        </div>
+                                        <p>需要已知對照組的基線風險 P₀</p>
+                                    </div>
+                                    <div class="scenario-card">
+                                        <h5>RR/OR 計算 NNT</h5>
+                                        <div class="conversion-formula">
+                                            <code>NNT = 1 / |RD| = 1 / |P₁ - P₀|</code>
+                                        </div>
+                                        <p>需要轉換為絕對風險差異</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 隨機效應模型 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-random"></i> 隨機效應模型 (Random Effects Model)</h3>
+                        <div class="model-grid">
+                            <div class="model-card">
+                                <h4>基本假設</h4>
+                                <ul>
+                                    <li>每個研究估計不同的真實效應</li>
+                                    <li>真實效應呈常態分布</li>
+                                    <li>研究間存在真實變異 (τ²)</li>
+                                </ul>
+                            </div>
+                            <div class="model-card">
+                                <h4>適用情境</h4>
+                                <ul>
+                                    <li>研究對象異質性高</li>
+                                    <li>研究設計有差異</li>
+                                    <li>I² > 40% 或 Q 檢定顯著</li>
+                                    <li>想推論到更廣泛的群體</li>
+                                </ul>
+                            </div>
+                            <div class="model-card">
+                                <h4>權重計算</h4>
+                                <div class="formula-box">
+                                    <p>權重 w<sub>i</sub> = 1 / (SE<sub>i</sub>² + τ²)</p>
+                                    <p class="formula-note">τ² = 研究間變異</p>
+                                </div>
+                            </div>
+                            <div class="model-card">
+                                <h4>優缺點</h4>
+                                <div class="pros-cons">
+                                    <div class="pros">
+                                        <strong>✓ 優點：</strong>
+                                        <ul>
+                                            <li>考慮研究間變異</li>
+                                            <li>更保守的估計</li>
+                                            <li>可推論至更廣群體</li>
+                                        </ul>
+                                    </div>
+                                    <div class="cons">
+                                        <strong>✗ 缺點：</strong>
+                                        <ul>
+                                            <li>統計檢定力較低</li>
+                                            <li>信賴區間較寬</li>
+                                            <li>需要更多研究數量</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- τ² 估計方法 -->
+                        <div class="tau-methods">
+                            <h4><i class="fas fa-calculator"></i> τ² (研究間變異) 估計方法</h4>
+                            <div class="tau-grid">
+                                <div class="tau-method-card">
+                                    <h5>DerSimonian-Laird (DL)</h5>
+                                    <ul>
+                                        <li><strong>最常用方法</strong>，計算簡單</li>
+                                        <li>基於 Q 統計量的矩估計</li>
+                                        <li>可能低估 τ²，特別是研究數少時</li>
+                                        <li>RevMan 預設方法</li>
+                                    </ul>
+                                </div>
+                                <div class="tau-method-card">
+                                    <h5>Restricted Maximum Likelihood (REML)</h5>
+                                    <ul>
+                                        <li><strong>統計性質較佳</strong>，無偏估計</li>
+                                        <li>考慮自由度修正</li>
+                                        <li>R 套件 metafor 預設方法</li>
+                                        <li>計算較複雜但更準確</li>
+                                    </ul>
+                                </div>
+                                <div class="tau-method-card">
+                                    <h5>其他方法</h5>
+                                    <ul>
+                                        <li><strong>Maximum Likelihood (ML)：</strong>最大概似估計</li>
+                                        <li><strong>Paule-Mandel：</strong>基於 Q 統計量的改良</li>
+                                        <li><strong>Hartung-Knapp：</strong>修正標準誤估計</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 不同變項類型的統計方法 -->
+                        <div class="outcome-methods">
+                            <h4><i class="fas fa-chart-bar"></i> 依結果變項類型選擇統計方法</h4>
+                            <div class="outcome-grid">
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-ruler"></i> 連續型變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>基於變異數倒數加權</p>
+                                            <p class="formula-small">w = 1/(SE² + τ²)</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>MD, SMD，所有研究設計
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>優點：</strong>適用性廣，統計理論完善
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-toggle-on"></i> 二分型變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>DerSimonian-Laird：</strong>
+                                            <p>傳統隨機效應方法，使用 DL 估計 τ²</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>基於對數轉換的隨機效應</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>注意：</strong>Peto 方法不適用於隨機效應
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>OR, RR, Risk Difference
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="outcome-card">
+                                    <div class="outcome-header">
+                                        <h5><i class="fas fa-clock"></i> 存活時間變項</h5>
+                                    </div>
+                                    <div class="method-list">
+                                        <div class="method-item-small">
+                                            <strong>Inverse Variance (IV)：</strong>
+                                            <p>基於 log(HR) 的隨機效應分析</p>
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>τ² 估計：</strong>使用 REML 或 DL 方法
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>適用於：</strong>Hazard Ratio (HR)
+                                        </div>
+                                        <div class="method-item-small">
+                                            <strong>注意：</strong>需考慮比例危險假設
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 異質性評估 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-chart-bar"></i> 異質性評估方法</h3>
+                        <div class="heterogeneity-grid">
+                            <div class="hetero-card">
+                                <div class="hetero-icon"><i class="fas fa-percentage"></i></div>
+                                <h4>I² 統計量</h4>
+                                <div class="hetero-content">
+                                    <p><strong>計算：</strong> I² = 100% × (Q - df) / Q</p>
+                                    <div class="interpretation">
+                                        <h5>解釋標準：</h5>
+                                        <ul>
+                                            <li><span class="badge low">0-25%</span> 低異質性</li>
+                                            <li><span class="badge moderate">25-50%</span> 中度異質性</li>
+                                            <li><span class="badge high">50-75%</span> 高異質性</li>
+                                            <li><span class="badge very-high">>75%</span> 非常高異質性</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hetero-card">
+                                <div class="hetero-icon"><i class="fas fa-square-root-alt"></i></div>
+                                <h4>Cochran's Q 檢定</h4>
+                                <div class="hetero-content">
+                                    <p><strong>虛無假設：</strong> 所有研究效應相同</p>
+                                    <p><strong>計算：</strong> Q = Σw<sub>i</sub>(ES<sub>i</sub> - ES<sub>pooled</sub>)²</p>
+                                    <div class="interpretation">
+                                        <h5>判斷：</h5>
+                                        <p>p < 0.10 → 拒絕虛無假設</p>
+                                        <p>存在顯著異質性</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hetero-card">
+                                <div class="hetero-icon"><i class="fas fa-sigma"></i></div>
+                                <h4>τ² (Tau-squared)</h4>
+                                <div class="hetero-content">
+                                    <p><strong>意義：</strong> 研究間真實變異量</p>
+                                    <p><strong>估計方法：</strong></p>
+                                    <ul>
+                                        <li>DerSimonian-Laird (DL)</li>
+                                        <li>Restricted ML (REML)</li>
+                                        <li>Maximum Likelihood (ML)</li>
+                                    </ul>
+                                    <p class="note">τ = 0 時等同固定效應</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 異質性評估 (Cochrane 標準) -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-chart-line"></i> 異質性評估 (Cochrane Handbook Ch.10)</h3>
+                        <div class="heterogeneity-guide">
+                            <div class="heterogeneity-card">
+                                <h4><i class="fas fa-info-circle"></i> I² 統計量解釋標準</h4>
+                                <div class="i-squared-scale">
+                                    <div class="scale-item low">
+                                        <div class="scale-range">0% - 40%</div>
+                                        <div class="scale-label">可能不重要</div>
+                                        <div class="scale-note">異質性可能不重要</div>
+                                    </div>
+                                    <div class="scale-item moderate">
+                                        <div class="scale-range">30% - 60%</div>
+                                        <div class="scale-label">中度異質性</div>
+                                        <div class="scale-note">代表中等程度的異質性</div>
+                                    </div>
+                                    <div class="scale-item substantial">
+                                        <div class="scale-range">50% - 90%</div>
+                                        <div class="scale-label">substantial 異質性</div>
+                                        <div class="scale-note">需要仔細探索原因</div>
+                                    </div>
+                                    <div class="scale-item considerable">
+                                        <div class="scale-range">75% - 100%</div>
+                                        <div class="scale-label">considerable 異質性</div>
+                                        <div class="scale-note">不建議進行統合分析</div>
+                                    </div>
+                                </div>
+                                <div class="cochrane-note">
+                                    <p><strong>重要提醒 (Cochrane)：</strong>閾值範圍重疊是刻意設計，因為異質性的重要性取決於：</p>
+                                    <ul>
+                                        <li>效果量大小與臨床重要性</li>
+                                        <li>效果方向的一致性</li>
+                                        <li>P 值的強度</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="heterogeneity-card">
+                                <h4><i class="fas fa-calculator"></i> 異質性統計指標</h4>
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-symbol">I²</div>
+                                        <div class="stat-desc">
+                                            <strong>描述：</strong>總變異中來自異質性的百分比
+                                            <br><strong>公式：</strong>I² = 100% × (Q-df)/Q
+                                            <br><strong>範圍：</strong>0% - 100%
+                                        </div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-symbol">τ²</div>
+                                        <div class="stat-desc">
+                                            <strong>描述：</strong>研究間變異 (Between-study variance)
+                                            <br><strong>單位：</strong>與效果量相同
+                                            <br><strong>用途：</strong>隨機效應模型權重計算
+                                        </div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-symbol">Q</div>
+                                        <div class="stat-desc">
+                                            <strong>描述：</strong>Cochran's Q 檢定統計量
+                                            <br><strong>H₀：</strong>各研究效果相同
+                                            <br><strong>限制：</strong>檢定力低，慎用於少數研究
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 其他統計方法 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-toolbox"></i> 其他重要統計方法</h3>
+                        <div class="method-accordion">
+                            <div class="method-item">
+                                <div class="method-header" onclick="toggleMethod('subgroup-analysis')">
+                                    <span><i class="fas fa-layer-group"></i> 次群組分析 (Subgroup Analysis)</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="method-content" id="subgroup-analysis">
+                                    <h5>目的：</h5>
+                                    <p>探索效應修飾因子，了解哪些特徵影響治療效果</p>
+                                    <h5>執行時機：</h5>
+                                    <ul>
+                                        <li>I² > 50% 顯示高異質性</li>
+                                        <li>事先計劃的假設檢定</li>
+                                        <li>臨床上有意義的分組</li>
+                                    </ul>
+                                    <h5>注意事項：</h5>
+                                    <ul>
+                                        <li>避免過度分析 (多重比較問題)</li>
+                                        <li>確保各組有足夠研究數 (≥ 4)</li>
+                                        <li>使用交互作用檢定評估差異</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="method-item">
+                                <div class="method-header" onclick="toggleMethod('meta-regression')">
+                                    <span><i class="fas fa-chart-line"></i> 統合迴歸 (Meta-Regression)</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="method-content" id="meta-regression">
+                                    <h5>目的：</h5>
+                                    <p>探討研究特徵與效應量的關係</p>
+                                    <h5>適用條件：</h5>
+                                    <ul>
+                                        <li>研究數量 ≥ 10 個</li>
+                                        <li>有連續型或類別型協變量</li>
+                                        <li>想解釋異質性來源</li>
+                                    </ul>
+                                    <h5>類型：</h5>
+                                    <ul>
+                                        <li><strong>簡單迴歸：</strong>單一預測變數</li>
+                                        <li><strong>多元迴歸：</strong>多個預測變數</li>
+                                        <li><strong>混合效應：</strong>結合固定與隨機效應</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="method-item">
+                                <div class="method-header" onclick="toggleMethod('sensitivity-analysis')">
+                                    <span><i class="fas fa-microscope"></i> 敏感性分析 (Sensitivity Analysis)</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="method-content" id="sensitivity-analysis">
+                                    <h5>目的：</h5>
+                                    <p>評估結果的穩健性</p>
+                                    <h5>常見方法：</h5>
+                                    <ul>
+                                        <li><strong>逐一排除法：</strong>每次排除一個研究</li>
+                                        <li><strong>品質分層：</strong>只納入高品質研究</li>
+                                        <li><strong>模型比較：</strong>固定 vs 隨機效應</li>
+                                        <li><strong>極端值處理：</strong>排除離群值</li>
+                                    </ul>
+                                    <h5>報告重點：</h5>
+                                    <p>結果是否因特定研究或方法改變而有重大差異</p>
+                                </div>
+                            </div>
+
+                            <div class="method-item">
+                                <div class="method-header" onclick="toggleMethod('publication-bias')">
+                                    <span><i class="fas fa-funnel-dollar"></i> 發表偏差評估 (Publication Bias)</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="method-content" id="publication-bias">
+                                    <h5>檢測方法：</h5>
+                                    <ul>
+                                        <li><strong>漏斗圖 (Funnel Plot)：</strong>以效應量對標準誤作圖，檢查對稱性</li>
+                                        <li><strong>Egger's Test：</strong>線性迴歸檢定漏斗圖不對稱性 (需 ≥ 10 研究)</li>
+                                        <li><strong>Begg's Test：</strong>使用 Kendall's tau 等級相關檢定</li>
+                                        <li><strong>Trim and Fill：</strong>估計並填補可能缺失的研究</li>
+                                        <li><strong>Peters' Test：</strong>適用於二分變項的偏差檢測</li>
+                                        <li><strong>Harbord Test：</strong>適用於 Odds Ratio 的偏差檢測</li>
+                                    </ul>
+                                    <h5>判斷標準：</h5>
+                                    <ul>
+                                        <li><strong>漏斗圖：</strong>研究點分布不對稱，底部缺少小樣本負向研究</li>
+                                        <li><strong>統計檢定：</strong>p < 0.10 提示可能存在發表偏差</li>
+                                        <li><strong>失效安全數：</strong>需要多少個無效研究才能使結果不顯著</li>
+                                    </ul>
+                                    <h5>處理方法：</h5>
+                                    <ul>
+                                        <li><strong>調整效應估計值：</strong>使用 Trim and Fill 方法調整</li>
+                                        <li><strong>報告可能的影響：</strong>討論偏差對結論的影響程度</li>
+                                        <li><strong>搜尋灰色文獻：</strong>主動尋找會議摘要、論文等未發表資料</li>
+                                        <li><strong>聯繫研究者：</strong>直接詢問是否有未發表的相關研究</li>
+                                    </ul>
+                                    <h5>注意事項：</h5>
+                                    <ul>
+                                        <li>研究數量少於 10 個時檢定力不足</li>
+                                        <li>漏斗圖不對稱不一定代表發表偏差</li>
+                                        <li>也可能因為研究品質差異、異質性等原因造成</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="method-item">
+                                <div class="method-header" onclick="toggleMethod('network-meta-analysis')">
+                                    <span><i class="fas fa-project-diagram"></i> 網絡統合分析 (Network Meta-Analysis)</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="method-content" id="network-meta-analysis">
+                                    <h5>基本概念：</h5>
+                                    <p>網絡統合分析允許同時比較多種介入措施，即使某些介入從未直接比較過</p>
+                                    <h5>前提假設：</h5>
+                                    <ul>
+                                        <li><strong>傳遞性 (Transitivity)：</strong>間接比較的有效性</li>
+                                        <li><strong>一致性 (Consistency)：</strong>直接與間接證據的一致性</li>
+                                        <li><strong>同質性：</strong>研究間的可比較性</li>
+                                    </ul>
+                                    <h5>分析方法：</h5>
+                                    <ul>
+                                        <li><strong>頻率學派：</strong>使用一般化線性混合模型 (如 netmeta 套件)</li>
+                                        <li><strong>貝氏方法：</strong>使用 MCMC 方法 (如 BUGS, JAGS)</li>
+                                        <li><strong>圖論方法：</strong>基於網絡圖的分析</li>
+                                    </ul>
+                                    <h5>結果解釋：</h5>
+                                    <ul>
+                                        <li><strong>SUCRA 值：</strong>治療效果排序的機率</li>
+                                        <li><strong>排名機率：</strong>各介入措施的效果排名</li>
+                                        <li><strong>一致性檢定：</strong>評估網絡的一致性</li>
+                                    </ul>
+                                    <h5>優點：</h5>
+                                    <ul>
+                                        <li>可同時比較多種介入措施</li>
+                                        <li>提供治療排名信息</li>
+                                        <li>最大化利用現有證據</li>
+                                    </ul>
+                                    <h5>限制：</h5>
+                                    <ul>
+                                        <li>假設條件較嚴格</li>
+                                        <li>分析複雜度高</li>
+                                        <li>需要專門軟體</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRADE 證據品質評估系統 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-star-half-alt"></i> GRADE 證據品質評估系統</h3>
+                        <div class="grade-overview">
+                            <div class="grade-intro">
+                                <p><strong>GRADE (Grading of Recommendations Assessment, Development and Evaluation)</strong> 是國際公認的證據品質評估和建議等級制定系統，廣泛應用於臨床指引制定。</p>
+                            </div>
+                            
+                            <!-- GRADE 證據品質等級 -->
+                            <div class="grade-levels">
+                                <h4><i class="fas fa-layer-group"></i> 證據品質等級</h4>
+                                <div class="grade-scale">
+                                    <div class="grade-item very-high">
+                                        <div class="grade-circle">⊕⊕⊕⊕</div>
+                                        <div class="grade-content">
+                                            <h5>極高品質 (Very High)</h5>
+                                            <p>我們對效果估計值非常有信心</p>
+                                            <p class="grade-note">真實效果接近估計值的可能性很高</p>
+                                        </div>
+                                    </div>
+                                    <div class="grade-item high">
+                                        <div class="grade-circle">⊕⊕⊕⊝</div>
+                                        <div class="grade-content">
+                                            <h5>高品質 (High)</h5>
+                                            <p>我們對效果估計值有信心</p>
+                                            <p class="grade-note">真實效果接近估計值的可能性高</p>
+                                        </div>
+                                    </div>
+                                    <div class="grade-item moderate">
+                                        <div class="grade-circle">⊕⊕⊝⊝</div>
+                                        <div class="grade-content">
+                                            <h5>中等品質 (Moderate)</h5>
+                                            <p>我們對效果估計值有中等程度信心</p>
+                                            <p class="grade-note">真實效果可能接近估計值，但也可能有顯著差異</p>
+                                        </div>
+                                    </div>
+                                    <div class="grade-item low">
+                                        <div class="grade-circle">⊕⊝⊝⊝</div>
+                                        <div class="grade-content">
+                                            <h5>低品質 (Low)</h5>
+                                            <p>我們對效果估計值信心有限</p>
+                                            <p class="grade-note">真實效果可能與估計值有重要差異</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GRADE 評估因子 -->
+                            <div class="grade-factors">
+                                <h4><i class="fas fa-balance-scale-right"></i> 證據品質調整因子</h4>
+                                <div class="factors-grid">
+                                    <div class="factor-group downgrade">
+                                        <h5><i class="fas fa-arrow-down"></i> 降級因子 (Downgrade)</h5>
+                                        <div class="factor-list">
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>風險偏差 (Risk of Bias)</h6>
+                                                    <ul>
+                                                        <li>隨機序列產生不當</li>
+                                                        <li>分配隱藏不充分</li>
+                                                        <li>盲法措施不完善</li>
+                                                        <li>結果數據不完整</li>
+                                                        <li>選擇性報告</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-random"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>不一致性 (Inconsistency)</h6>
+                                                    <ul>
+                                                        <li>I² > 50-60%</li>
+                                                        <li>Chi² 檢定 p < 0.10</li>
+                                                        <li>效果方向不一致</li>
+                                                        <li>信賴區間重疊少</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-question-circle"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>間接性 (Indirectness)</h6>
+                                                    <ul>
+                                                        <li>PICO 差異</li>
+                                                        <li>替代終點指標</li>
+                                                        <li>間接比較</li>
+                                                        <li>次群組分析</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-ruler"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>不精確性 (Imprecision)</h6>
+                                                    <ul>
+                                                        <li>樣本數不足</li>
+                                                        <li>信賴區間過寬</li>
+                                                        <li>跨越無效果線</li>
+                                                        <li>事件數過少</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-eye-slash"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>發表偏差 (Publication Bias)</h6>
+                                                    <ul>
+                                                        <li>漏斗圖不對稱</li>
+                                                        <li>統計檢定顯著</li>
+                                                        <li>小研究效應</li>
+                                                        <li>灰色文獻缺失</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="factor-group upgrade">
+                                        <h5><i class="fas fa-arrow-up"></i> 升級因子 (Upgrade)</h5>
+                                        <div class="factor-list">
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-chart-line"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>大效果 (Large Effect)</h6>
+                                                    <ul>
+                                                        <li>RR > 2 或 < 0.5</li>
+                                                        <li>OR > 5 或 < 0.2</li>
+                                                        <li>Cohen's d > 0.8</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-chart-area"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>劑量效應關係 (Dose-Response)</h6>
+                                                    <ul>
+                                                        <li>明確的劑量反應關係</li>
+                                                        <li>生物學機轉合理</li>
+                                                        <li>時間效應關係</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="factor-item">
+                                                <div class="factor-icon"><i class="fas fa-shield-alt"></i></div>
+                                                <div class="factor-content">
+                                                    <h6>殘餘混擾 (Residual Confounding)</h6>
+                                                    <ul>
+                                                        <li>所有合理的混擾因子都會減弱效果</li>
+                                                        <li>但觀察到的效果仍然顯著</li>
+                                                        <li>主要適用於觀察性研究</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GRADE 決策樹 -->
+                            <div class="grade-decision-tree">
+                                <h4><i class="fas fa-sitemap"></i> GRADE 評估決策流程</h4>
+                                <div class="decision-tree">
+                                    <div class="tree-step">
+                                        <div class="tree-box start">
+                                            <h5>步驟 1: 初始等級</h5>
+                                            <div class="tree-branches">
+                                                <div class="branch">
+                                                    <span>隨機對照試驗 (RCT)</span>
+                                                    <span class="initial-grade high">⊕⊕⊕⊕</span>
+                                                </div>
+                                                <div class="branch">
+                                                    <span>觀察性研究</span>
+                                                    <span class="initial-grade low">⊕⊕⊝⊝</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tree-arrow">↓</div>
+                                    <div class="tree-step">
+                                        <div class="tree-box evaluation">
+                                            <h5>步驟 2: 評估降級因子</h5>
+                                            <p>檢查五個降級因子，每個因子可降級 1-2 級</p>
+                                        </div>
+                                    </div>
+                                    <div class="tree-arrow">↓</div>
+                                    <div class="tree-step">
+                                        <div class="tree-box upgrade">
+                                            <h5>步驟 3: 評估升級因子</h5>
+                                            <p>觀察性研究可考慮升級因子</p>
+                                        </div>
+                                    </div>
+                                    <div class="tree-arrow">↓</div>
+                                    <div class="tree-step">
+                                        <div class="tree-box final">
+                                            <h5>步驟 4: 最終等級</h5>
+                                            <p>確定最終證據品質等級</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 方法選擇建議 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-compass"></i> 統計方法基本指引</h3>
+                        <div class="recommendation-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>情境</th>
+                                        <th>建議方法</th>
+                                        <th>理由</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>研究數 < 5</td>
+                                        <td>固定效應模型</td>
+                                        <td>τ² 估計不可靠</td>
+                                    </tr>
+                                    <tr>
+                                        <td>I² > 75%</td>
+                                        <td>不建議合併</td>
+                                        <td>異質性過高，探索原因</td>
+                                    </tr>
+                                    <tr>
+                                        <td>不同研究設計</td>
+                                        <td>隨機效應 + 次群組</td>
+                                        <td>分別分析不同設計</td>
+                                    </tr>
+                                    <tr>
+                                        <td>時間跨度大</td>
+                                        <td>累積統合分析</td>
+                                        <td>觀察效應隨時間變化</td>
+                                    </tr>
+                                    <tr>
+                                        <td>罕見事件</td>
+                                        <td>Peto OR 或 Mantel-Haenszel</td>
+                                        <td>處理零事件較佳</td>
+                                    </tr>
+                                    <tr>
+                                        <td>網絡統合分析</td>
+                                        <td>貝氏或頻率學派 NMA</td>
+                                        <td>間接比較多種介入</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 檢查清單 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-clipboard-check"></i> Meta-Analysis 執行檢查清單</h3>
+                        <div class="checklist-container">
+                            <div class="checklist-column">
+                                <h4>分析前檢查</h4>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>研究品質評估完成</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>資料擷取一致性確認</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>效應量選擇合理</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>統計假設符合</span>
+                                </label>
+                            </div>
+                            <div class="checklist-column">
+                                <h4>分析中檢查</h4>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>異質性評估 (I², Q)</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>模型選擇適當</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>敏感性分析執行</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>發表偏差檢測</span>
+                                </label>
+                            </div>
+                            <div class="checklist-column">
+                                <h4>報告檢查</h4>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>森林圖呈現</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>異質性來源討論</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>限制性說明</span>
+                                </label>
+                                <label class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>PRISMA 指引遵循</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module E: 參考資料 -->
+            <div id="module-e" class="tab-content">
+                <div class="module-header">
+                    <h2>參考資料與計算依據</h2>
+                    <p>本工具所使用的所有公式、參考文獻、網站資源與演算法說明</p>
+                </div>
+
+                <div class="formula-reference">
+                    <div class="reference-grid">
+                        <div class="reference-card">
+                            <h3><i class="fas fa-book"></i> 主要參考文獻</h3>
+                            <div class="reference-list">
+                                <div class="reference-item">
+                                    <strong>Luo, D., et al. (2018):</strong> Optimally estimating the sample mean from the sample size, median, mid-range, and/or mid-quartile range. <em>Statistical Methods in Medical Research</em>, 27(6), 1785-1805.
+                                    <br><small>DOI: 10.1177/0962280216669183</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Wan, X., et al. (2014):</strong> Estimating the sample mean and standard deviation from the sample size, median, range and/or interquartile range. <em>BMC Medical Research Methodology</em>, 14, 135.
+                                    <br><small>DOI: 10.1186/1471-2288-14-135</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Hozo, S. P., et al. (2005):</strong> Estimating the mean and variance from the median, range, and the size of a sample. <em>BMC Medical Research Methodology</em>, 5, 13.
+                                    <br><small>DOI: 10.1186/1471-2288-5-13</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Shi, J., et al. (2020):</strong> Optimally estimating the sample standard deviation from the five-number summary. <em>Research Synthesis Methods</em>, 11(5), 641-654.
+                                    <br><small>DOI: 10.1002/jrsm.1429</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Hedges, L. V., & Olkin, I. (1985):</strong> Statistical methods for meta-analysis. Academic Press.
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Cohen, J. (1988):</strong> Statistical power analysis for the behavioral sciences (2nd ed.). Lawrence Erlbaum Associates.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="reference-card">
+                            <h3><i class="fas fa-globe"></i> 參考網站與資源</h3>
+                            <div class="reference-list">
+                                <div class="reference-item">
+                                    <strong>Cochrane Handbook for Systematic Reviews:</strong>
+                                    <br><a href="https://handbook.cochrane.org/" target="_blank">https://handbook.cochrane.org/</a>
+                                    <br><small>系統性文獻回顧方法學指南</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>Review Manager (RevMan):</strong>
+                                    <br><a href="https://revman.cochrane.org/" target="_blank">https://revman.cochrane.org/</a>
+                                    <br><small>Cochrane 官方統合分析軟體</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>PRISMA Statement:</strong>
+                                    <br><a href="http://www.prisma-statement.org/" target="_blank">http://www.prisma-statement.org/</a>
+                                    <br><small>系統性文獻回顧報告標準</small>
+                                </div>
+                                <div class="reference-item">
+                                    <strong>BMJ Meta-analysis Guidelines:</strong>
+                                    <br><small>統合分析報告與方法學準則</small>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="reference-card">
+                            <h3><i class="fas fa-cog"></i> 工具資訊</h3>
+                            <div class="tool-info">
+                                <p><strong>版本：</strong> 測試版</p>
+                                <p><strong>開發日期：</strong> 2025</p>
+                                <p><strong>開發者：</strong> 運動醫學科吳易澄醫師</p>
+                                <p><strong>網站：</strong> <a href="https://wycswimming.blogspot.com/" target="_blank">https://wycswimming.blogspot.com/</a></p>
+                                <p><strong>適用範圍：</strong> 系統性文獻回顧與統合分析</p>
+                                <p><strong>授權：</strong> 教學與練習示範</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Formula Modal -->
+    <div id="formula-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">計算公式</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Formula content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Meta-Analysis Calculator. 用於教學與練習。</p>
+        </div>
+    </footer>
+
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas for converting charts to images in PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="profile-modal.js"></script>
+    <script src="calculator.js"></script>
+</body>
+</html>

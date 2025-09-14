@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>管理員面板 - 用戶管理</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .admin-header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: #64748b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            color: #14b8a6;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .users-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            color: #1e293b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0f766e;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .users-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .users-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #14b8a6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-details h4 {
+            margin: 0;
+            color: #1e293b;
+        }
+
+        .user-details p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .registration-code {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .date-badge {
+            background: #e0f2fe;
+            color: #0891b2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            margin: 20px 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .export-section {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .users-table {
+                font-size: 14px;
+            }
+
+            .users-table th,
+            .users-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-shield-alt"></i> 管理員面板</h1>
+            <p>管理 Meta-Analysis Calculator 的註冊用戶</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number" id="total-users">0</div>
+                <div class="stat-label">總註冊用戶</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-number" id="today-registrations">0</div>
+                <div class="stat-label">今日註冊</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="stat-number" id="week-registrations">0</div>
+                <div class="stat-label">本週註冊</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-key"></i></div>
+                <div class="stat-number" id="registration-codes">4</div>
+                <div class="stat-label">有效註冊碼</div>
+            </div>
+        </div>
+
+        <div class="users-panel">
+            <div class="panel-header">
+                <h2>註冊用戶列表</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="refreshUsers()">
+                        <i class="fas fa-sync"></i> 重新整理
+                    </button>
+                    <button class="btn btn-primary" onclick="exportUsers()">
+                        <i class="fas fa-download"></i> 匯出資料
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="搜尋用戶名稱或電子郵件..." onkeyup="filterUsers()">
+            </div>
+
+            <div id="users-content">
+                <!-- 用戶列表將在這裡動態載入 -->
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3><i class="fas fa-file-export"></i> 資料匯出</h3>
+            <p style="margin: 10px 0 20px 0; color: #64748b;">匯出用戶資料為不同格式</p>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="exportAsJSON()">
+                    <i class="fas fa-code"></i> JSON 格式
+                </button>
+                <button class="btn btn-primary" onclick="exportAsCSV()">
+                    <i class="fas fa-table"></i> CSV 格式
+                </button>
+                <button class="btn btn-secondary" onclick="clearAllUsers()">
+                    <i class="fas fa-trash"></i> 清除所有資料
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認對話框 -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <h3>確認操作</h3>
+            <p id="confirm-message">您確定要執行此操作嗎？</p>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-danger" id="confirm-yes">確認</button>
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+        let filteredUsers = [];
+        const ADMIN_PASSWORD = 'admin123'; // 簡單的管理員密碼
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAdminAccess()) {
+                loadUsers();
+                updateStats();
+            } else {
+                showLoginPrompt();
+            }
+        });
+
+        function checkAdminAccess() {
+            const adminAuth = sessionStorage.getItem('admin_authenticated');
+            return adminAuth === 'true';
+        }
+
+        function showLoginPrompt() {
+            document.body.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f8fafc;">
+                    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 90%;">
+                        <i class="fas fa-shield-alt" style="font-size: 3rem; color: #14b8a6; margin-bottom: 20px;"></i>
+                        <h2 style="margin-bottom: 20px; color: #1e293b;">管理員登入</h2>
+                        <p style="color: #64748b; margin-bottom: 30px;">請輸入管理員密碼存取面板</p>
+
+                        <input type="password" id="admin-password"
+                               style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 16px;"
+                               placeholder="管理員密碼"
+                               onkeypress="handleEnterKey(event)">
+
+                        <button onclick="authenticateAdmin()"
+                                style="width: 100%; padding: 12px; background: #14b8a6; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 15px;">
+                            <i class="fas fa-sign-in-alt"></i> 登入
+                        </button>
+
+                        <p style="font-size: 0.9rem; color: #94a3b8;">
+                            預設密碼：<code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">admin123</code>
+                        </p>
+
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                            <h4 style="color: #1e293b; margin-bottom: 10px;">其他查看方式：</h4>
+                            <p style="font-size: 0.85rem; color: #64748b; line-height: 1.5;">
+                                按F12打開開發者工具，在Console輸入：<br>
+                                <code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; display: block; margin-top: 8px;">
+                                console.table(JSON.parse(localStorage.getItem('meta_calculator_users')))
+                                </code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                authenticateAdmin();
+            }
+        }
+
+        function authenticateAdmin() {
+            const inputPassword = document.getElementById('admin-password').value;
+
+            if (inputPassword === ADMIN_PASSWORD) {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                location.reload();
+            } else {
+                alert('密碼錯誤，請重新輸入');
+                document.getElementById('admin-password').value = '';
+                document.getElementById('admin-password').focus();
+            }
+        }
+
+        function loadUsers() {
+            try {
+                const usersData = localStorage.getItem('meta_calculator_users');
+                allUsers = usersData ? JSON.parse(usersData) : [];
+                filteredUsers = [...allUsers];
+                renderUsers();
+                updateStats();
+            } catch (e) {
+                console.error('載入用戶資料失敗:', e);
+                allUsers = [];
+                filteredUsers = [];
+                renderUsers();
+            }
+        }
+
+        function renderUsers() {
+            const container = document.getElementById('users-content');
+
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>暫無用戶資料</h3>
+                        <p>目前沒有註冊用戶，或搜尋無符合結果</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const table = `
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>用戶</th>
+                            <th>註冊碼</th>
+                            <th>註冊時間</th>
+                            <th>用戶ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredUsers.map(user => `
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            ${user.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div class="user-details">
+                                            <h4>${user.name}</h4>
+                                            <p>${user.email}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="registration-code">${user.registrationCode || 'N/A'}</span>
+                                </td>
+                                <td>
+                                    <span class="date-badge">${formatDate(user.createdAt)}</span>
+                                </td>
+                                <td style="font-family: monospace; font-size: 0.8rem;">
+                                    ${user.id}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = table;
+        }
+
+        function updateStats() {
+            document.getElementById('total-users').textContent = allUsers.length;
+
+            const today = new Date();
+            const todayStr = today.toDateString();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            const todayCount = allUsers.filter(user => {
+                const userDate = new Date(user.createdAt);
+                return userDate.toDateString() === todayStr;
+            }).length;
+
+            const weekCount = allUsers.filter(user => {
+                const userDate = new Date(user.createdAt);
+                return userDate >= weekAgo;
+            }).length;
+
+            document.getElementById('today-registrations').textContent = todayCount;
+            document.getElementById('week-registrations').textContent = weekCount;
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            filteredUsers = allUsers.filter(user =>
+                user.name.toLowerCase().includes(searchTerm) ||
+                user.email.toLowerCase().includes(searchTerm) ||
+                (user.registrationCode && user.registrationCode.toLowerCase().includes(searchTerm))
+            );
+            renderUsers();
+        }
+
+        function refreshUsers() {
+            loadUsers();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            try {
+                return new Date(dateString).toLocaleDateString('zh-TW', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Invalid Date';
+            }
+        }
+
+        function exportAsJSON() {
+            const dataStr = JSON.stringify(allUsers, null, 2);
+            downloadFile(dataStr, 'users-export.json', 'application/json');
+        }
+
+        function exportAsCSV() {
+            const headers = ['姓名', '電子郵件', '註冊碼', '註冊時間', '用戶ID'];
+            const csvContent = [
+                headers.join(','),
+                ...allUsers.map(user => [
+                    `"${user.name}"`,
+                    `"${user.email}"`,
+                    `"${user.registrationCode || ''}"`,
+                    `"${formatDate(user.createdAt)}"`,
+                    `"${user.id}"`
+                ].join(','))
+            ].join('\n');
+
+            downloadFile(csvContent, 'users-export.csv', 'text/csv');
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function clearAllUsers() {
+            showConfirmModal(
+                '您確定要清除所有用戶資料嗎？此操作無法復原！',
+                () => {
+                    localStorage.removeItem('meta_calculator_users');
+                    localStorage.removeItem('meta_calculator_auth');
+                    sessionStorage.removeItem('meta_calculator_auth');
+                    loadUsers();
+                    closeModal();
+                    alert('所有用戶資料已清除');
+                }
+            );
+        }
+
+        function showConfirmModal(message, onConfirm) {
+            document.getElementById('confirm-message').textContent = message;
+            document.getElementById('confirm-yes').onclick = onConfirm;
+            document.getElementById('confirm-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+
+        // 點擊模態框背景關閉
+        document.getElementById('confirm-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

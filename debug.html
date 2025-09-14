@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Debug</title>
+</head>
+<body>
+    <h1>檢查 JavaScript 錯誤</h1>
+    <button onclick="testAuth()">測試 AuthManager</button>
+    <div id="result"></div>
+
+    <script>
+        // 捕獲所有錯誤
+        window.addEventListener('error', (e) => {
+            document.getElementById('result').innerHTML +=
+                '<p style="color:red">錯誤: ' + e.message + ' (行 ' + e.lineno + ')</p>';
+        });
+    </script>
+
+    <script src="auth.js"></script>
+
+    <script>
+        function testAuth() {
+            try {
+                console.log('測試 AuthManager...');
+                console.log('AuthManager:', AuthManager);
+                AuthManager.showLoginModal();
+                document.getElementById('result').innerHTML += '<p style="color:green">成功!</p>';
+            } catch(e) {
+                document.getElementById('result').innerHTML += '<p style="color:red">錯誤: ' + e.message + '</p>';
+                console.error(e);
+            }
+        }
+
+        // 自動測試
+        setTimeout(testAuth, 1000);
+    </script>
+</body>
+</html>

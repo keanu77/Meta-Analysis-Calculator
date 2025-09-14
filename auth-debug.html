@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>認證除錯工具</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .debug-btn {
+            margin: 10px 5px;
+            padding: 12px 20px;
+            background: #14b8a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .debug-btn:hover {
+            background: #0f766e;
+        }
+        .debug-btn.secondary {
+            background: #6b7280;
+        }
+        .debug-btn.secondary:hover {
+            background: #4b5563;
+        }
+        #debug-output {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-line;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status-box {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .status-logged-in {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .status-logged-out {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1><i class="fas fa-bug"></i> 認證系統除錯工具</h1>
+
+        <div id="status-display" class="status-box">
+            <strong>載入中...</strong>
+        </div>
+
+        <div class="button-group">
+            <h3>狀態檢查</h3>
+            <button class="debug-btn" onclick="checkAuthStatus()">檢查登入狀態</button>
+            <button class="debug-btn" onclick="checkLocalStorage()">檢查 LocalStorage</button>
+            <button class="debug-btn" onclick="checkSessionStorage()">檢查 SessionStorage</button>
+            <button class="debug-btn" onclick="listAllUsers()">列出所有用戶</button>
+        </div>
+
+        <div class="button-group">
+            <h3>認證操作</h3>
+            <button class="debug-btn" onclick="showLogin()">顯示登入視窗</button>
+            <button class="debug-btn" onclick="showRegister()">顯示註冊視窗</button>
+            <button class="debug-btn" onclick="forceUIUpdate()">強制更新UI</button>
+            <button class="debug-btn secondary" onclick="clearAllAuth()">清除所有認證資料</button>
+        </div>
+
+        <div class="button-group">
+            <h3>測試功能</h3>
+            <button class="debug-btn" onclick="testTabAccess()">測試頁籤存取控制</button>
+            <button class="debug-btn" onclick="testProfileModal()">測試個人資料視窗</button>
+            <button class="debug-btn" onclick="goToMainPage()">前往主頁面</button>
+        </div>
+
+        <div id="debug-output"></div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="profile-modal.js"></script>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('debug-output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatusDisplay() {
+            const statusDiv = document.getElementById('status-display');
+            if (typeof AuthManager !== 'undefined' && AuthManager.currentUser) {
+                statusDiv.className = 'status-box status-logged-in';
+                statusDiv.innerHTML = `
+                    <strong><i class="fas fa-check-circle"></i> 已登入</strong><br>
+                    用戶名稱: ${AuthManager.currentUser.name}<br>
+                    電子郵件: ${AuthManager.currentUser.email}<br>
+                    用戶ID: ${AuthManager.currentUser.id}
+                `;
+            } else {
+                statusDiv.className = 'status-box status-logged-out';
+                statusDiv.innerHTML = '<strong><i class="fas fa-times-circle"></i> 未登入</strong>';
+            }
+        }
+
+        function checkAuthStatus() {
+            log('檢查認證狀態...');
+            try {
+                log('AuthManager 存在: ' + (typeof AuthManager !== 'undefined'));
+                if (typeof AuthManager !== 'undefined') {
+                    log('當前用戶: ' + JSON.stringify(AuthManager.currentUser));
+                    AuthManager.checkAuthStatus();
+                    updateStatusDisplay();
+                    log('認證狀態檢查完成');
+                } else {
+                    log('錯誤: AuthManager 未載入');
+                }
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function checkLocalStorage() {
+            log('檢查 LocalStorage...');
+            const authData = localStorage.getItem('meta_calculator_auth');
+            const usersData = localStorage.getItem('meta_calculator_users');
+
+            log('認證資料: ' + (authData || '無'));
+            log('用戶資料: ' + (usersData || '無'));
+
+            if (authData) {
+                try {
+                    const parsed = JSON.parse(authData);
+                    log('解析後的認證資料: ' + JSON.stringify(parsed, null, 2));
+                } catch (e) {
+                    log('解析認證資料失敗: ' + e.message);
+                }
+            }
+        }
+
+        function checkSessionStorage() {
+            log('檢查 SessionStorage...');
+            const authData = sessionStorage.getItem('meta_calculator_auth');
+            log('認證資料: ' + (authData || '無'));
+        }
+
+        function listAllUsers() {
+            log('列出所有用戶...');
+            if (typeof AuthManager !== 'undefined') {
+                const users = AuthManager.getUsers();
+                log('用戶數量: ' + users.length);
+                users.forEach((user, index) => {
+                    log(`用戶 ${index + 1}: ${user.name} (${user.email}) - ID: ${user.id}`);
+                });
+            } else {
+                log('錯誤: AuthManager 未載入');
+            }
+        }
+
+        function showLogin() {
+            if (typeof AuthManager !== 'undefined') {
+                AuthManager.showLoginModal();
+                log('已顯示登入視窗');
+            } else {
+                log('錯誤: AuthManager 未載入');
+            }
+        }
+
+        function showRegister() {
+            if (typeof AuthManager !== 'undefined') {
+                AuthManager.showRegisterModal();
+                log('已顯示註冊視窗');
+            } else {
+                log('錯誤: AuthManager 未載入');
+            }
+        }
+
+        function forceUIUpdate() {
+            log('強制更新UI...');
+            if (typeof AuthManager !== 'undefined') {
+                AuthManager.checkAuthStatus();
+                updateStatusDisplay();
+                log('UI更新完成');
+            } else {
+                log('錯誤: AuthManager 未載入');
+            }
+        }
+
+        function clearAllAuth() {
+            log('清除所有認證資料...');
+            localStorage.removeItem('meta_calculator_auth');
+            sessionStorage.removeItem('meta_calculator_auth');
+            if (typeof AuthManager !== 'undefined') {
+                AuthManager.currentUser = null;
+                AuthManager.checkAuthStatus();
+            }
+            updateStatusDisplay();
+            log('認證資料已清除');
+        }
+
+        function testTabAccess() {
+            log('測試頁籤存取控制...');
+            const tabs = ['module-guide', 'module-stats', 'module-a', 'module-b', 'module-c', 'module-rob', 'module-e'];
+            tabs.forEach(tab => {
+                // This would need the calculator.js functions to be loaded
+                log(`頁籤 ${tab}: 需要載入主頁面才能測試`);
+            });
+        }
+
+        function testProfileModal() {
+            if (typeof ProfileManager !== 'undefined') {
+                ProfileManager.showProfileModal();
+                log('已顯示個人資料視窗');
+            } else {
+                log('錯誤: ProfileManager 未載入');
+            }
+        }
+
+        function goToMainPage() {
+            window.location.href = 'index.html';
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            log('除錯工具載入完成');
+            setTimeout(() => {
+                checkAuthStatus();
+            }, 500);
+        });
+
+        // 監聽認證狀態變化
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'meta_calculator_auth') {
+                log('偵測到認證狀態變化');
+                updateStatusDisplay();
+            }
+        });
+    </script>
+</body>
+</html>

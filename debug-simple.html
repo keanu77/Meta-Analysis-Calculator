@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>簡化測試</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .test-btn {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #14b8a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-btn:hover { background: #0f766e; }
+        #log {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            white-space: pre-line;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>JavaScript 測試頁面</h1>
+
+    <button class="test-btn" onclick="testBasicFunction()">測試基本功能</button>
+    <button class="test-btn" onclick="testAuthManagerExists()">檢查 AuthManager</button>
+    <button class="test-btn" onclick="testShowLogin()">測試顯示登入</button>
+    <button class="test-btn" onclick="testShowRegister()">測試顯示註冊</button>
+
+    <div id="subscription-status">狀態區域</div>
+    <div id="log">準備測試...\n</div>
+
+    <!-- 只載入 auth.js -->
+    <script>
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.textContent += new Date().toLocaleTimeString() + ': ' + msg + '\n';
+            console.log(msg);
+        }
+
+        function testBasicFunction() {
+            log('測試基本 JavaScript 功能...');
+            log('Document ready: ' + (document.readyState === 'complete'));
+        }
+
+        function testAuthManagerExists() {
+            log('檢查 AuthManager...');
+            log('AuthManager 存在: ' + (typeof AuthManager !== 'undefined'));
+            if (typeof AuthManager !== 'undefined') {
+                log('AuthManager.showLoginModal: ' + (typeof AuthManager.showLoginModal === 'function'));
+                log('AuthManager.showRegisterModal: ' + (typeof AuthManager.showRegisterModal === 'function'));
+            }
+        }
+
+        function testShowLogin() {
+            log('嘗試顯示登入視窗...');
+            try {
+                if (typeof AuthManager !== 'undefined') {
+                    AuthManager.showLoginModal();
+                    log('登入視窗呼叫成功');
+                } else {
+                    log('AuthManager 未定義');
+                }
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        function testShowRegister() {
+            log('嘗試顯示註冊視窗...');
+            try {
+                if (typeof AuthManager !== 'undefined') {
+                    AuthManager.showRegisterModal();
+                    log('註冊視窗呼叫成功');
+                } else {
+                    log('AuthManager 未定義');
+                }
+            } catch (e) {
+                log('錯誤: ' + e.message);
+            }
+        }
+
+        // 捕獲錯誤
+        window.addEventListener('error', (e) => {
+            log('全域錯誤: ' + e.message + ' (' + e.filename + ':' + e.lineno + ')');
+        });
+
+        // 載入完成後測試
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM 載入完成');
+            setTimeout(() => {
+                testBasicFunction();
+                testAuthManagerExists();
+            }, 500);
+        });
+    </script>
+
+    <script src="auth.js"></script>
+</body>
+</html>

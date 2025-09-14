@@ -1,0 +1,31 @@
+{
+  "name": "meta-analysis-calculator",
+  "version": "0.1.0-beta",
+  "description": "Meta-Analysis Calculator - 系統性文獻回顧／統合分析一站式換算工具（測試版）",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -o",
+    "serve": "npx serve ."
+  },
+  "keywords": [
+    "meta-analysis",
+    "statistics",
+    "calculator",
+    "systematic-review",
+    "medical-research",
+    "effect-size",
+    "confidence-interval",
+    "education",
+    "sports-medicine"
+  ],
+  "author": "運動醫學科吳易澄醫師",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wycswimming/meta-analysis-calculator.git"
+  },
+  "homepage": "https://wycswimming.blogspot.com/",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
