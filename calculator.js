@@ -1757,22 +1757,6 @@ function initializeHelp() {
     // This would be expanded based on UI requirements
 }
 
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // ESC to close modal
-    if (e.key === 'Escape') {
-        closeModal();
-    }
-    
-    // Ctrl+Enter to calculate in active tab
-    if (e.ctrlKey && e.key === 'Enter') {
-        const activeTab = document.querySelector('.tab-content.active');
-        const calcButton = activeTab?.querySelector('.calc-btn');
-        if (calcButton) {
-            calcButton.click();
-        }
-    }
-});
 
 // Method accordion toggle function for statistics module
 function toggleMethod(methodId) {

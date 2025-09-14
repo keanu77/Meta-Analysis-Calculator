@@ -1575,38 +1575,6 @@ html {
     font-weight: bold;
 }
 
-/* Shortcut Table */
-.shortcut-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 0.5rem;
-}
-
-.shortcut-table tr {
-    background: var(--gray-50);
-    border-radius: 8px;
-}
-
-.shortcut-table td {
-    padding: 0.75rem 1rem;
-}
-
-.shortcut-table td:first-child {
-    border-radius: 8px 0 0 8px;
-}
-
-.shortcut-table td:last-child {
-    border-radius: 0 8px 8px 0;
-}
-
-.shortcut-key {
-    background: var(--gray-600);
-    color: white;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    text-align: center;
-    min-width: 120px;
-}
 
 /* Module Overview Cards */
 .module-overview {
