@@ -715,6 +715,14 @@ p {
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    /* 預設隱藏，有結果時才顯示 */
+    display: none;
+}
+
+.result-box.has-result,
+.result-box.has-error,
+.result-box.loading {
+    display: block;
 }
 
 .result-box::before {
