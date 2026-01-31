@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFormulas();
     initializeMobileOptimization();
     initializeEventHandlers();
+    initializeAccordionAccessibility();
 
     // 等待AuthManager載入後再檢查UI狀態
     setTimeout(() => {
@@ -308,14 +309,121 @@ function checkAndUpdateAuthUI() {
 // Unified Event Handling System
 function initializeEventHandlers() {
     console.log('Initializing unified event handlers...');
-    
+
     // Remove any existing listeners to avoid duplicates
     document.removeEventListener('click', handleGlobalClick);
-    
+
     // Add global event delegation for all data-action buttons
     document.addEventListener('click', handleGlobalClick);
-    
+
+    // Initialize input validation
+    initializeInputValidation();
+
     console.log('Event handlers initialized successfully');
+}
+
+// Input validation for calculator forms
+function initializeInputValidation() {
+    // Get all calculator inputs
+    const calculatorInputs = document.querySelectorAll('.calculator-card input[type="number"]');
+
+    calculatorInputs.forEach(input => {
+        // Mark required fields (all calculator number inputs are typically required)
+        const label = input.parentElement.querySelector('label');
+        if (label && !label.querySelector('.required-indicator')) {
+            // Don't add required indicator to optional fields (those with "optional" in placeholder)
+            if (!input.placeholder.toLowerCase().includes('optional')) {
+                label.insertAdjacentHTML('beforeend', '<span class="required-indicator">*</span>');
+            }
+        }
+
+        // Add blur event for validation
+        input.addEventListener('blur', function() {
+            validateInput(this);
+        });
+
+        // Add input event for real-time feedback when correcting errors
+        input.addEventListener('input', function() {
+            if (this.classList.contains('invalid')) {
+                validateInput(this);
+            }
+        });
+    });
+}
+
+function validateInput(input) {
+    const value = input.value.trim();
+    const inputGroup = input.parentElement;
+    let validationMessage = inputGroup.querySelector('.validation-message');
+
+    // Create validation message element if not exists
+    if (!validationMessage) {
+        validationMessage = document.createElement('div');
+        validationMessage.className = 'validation-message';
+        inputGroup.appendChild(validationMessage);
+    }
+
+    // Check for specific validations
+    let isValid = true;
+    let message = '';
+
+    if (value === '') {
+        // Empty is OK for now (validation happens on calculation)
+        input.classList.remove('invalid', 'valid');
+        validationMessage.classList.remove('show');
+        return true;
+    }
+
+    const numValue = parseFloat(value);
+
+    // Check if it's a valid number
+    if (isNaN(numValue)) {
+        isValid = false;
+        message = '請輸入有效的數值';
+    }
+
+    // Check for specific field validations
+    const fieldId = input.id.toLowerCase();
+
+    // Sample size must be positive integer
+    if (fieldId.includes('-n') && !fieldId.includes('mean')) {
+        if (numValue <= 0 || !Number.isInteger(numValue)) {
+            isValid = false;
+            message = '樣本數必須為正整數';
+        }
+    }
+
+    // Standard deviation must be positive
+    if (fieldId.includes('-sd') || fieldId.includes('-se')) {
+        if (numValue < 0) {
+            isValid = false;
+            message = '標準差/標準誤不能為負值';
+        }
+    }
+
+    // Events/cases must be non-negative integer
+    if (fieldId.includes('-events') || fieldId.includes('-cases')) {
+        if (numValue < 0 || !Number.isInteger(numValue)) {
+            isValid = false;
+            message = '事件數必須為非負整數';
+        }
+    }
+
+    // Update UI
+    if (isValid) {
+        input.classList.remove('invalid');
+        input.classList.add('valid');
+        input.setAttribute('aria-invalid', 'false');
+        validationMessage.classList.remove('show');
+    } else {
+        input.classList.remove('valid');
+        input.classList.add('invalid');
+        input.setAttribute('aria-invalid', 'true');
+        validationMessage.textContent = message;
+        validationMessage.classList.add('show');
+    }
+
+    return isValid;
 }
 
 function handleGlobalClick(event) {
@@ -1695,15 +1803,74 @@ function normalCDF(x) {
 
 // Display and utility functions
 function displayResult(resultDiv, text) {
+    // Create wrapper if not exists for copy button
+    let wrapper = resultDiv.parentElement;
+    if (!wrapper.classList.contains('result-box-wrapper')) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'result-box-wrapper';
+        resultDiv.parentElement.insertBefore(wrapper, resultDiv);
+        wrapper.appendChild(resultDiv);
+    }
+
+    // Remove existing copy button
+    const existingCopyBtn = wrapper.querySelector('.copy-btn');
+    if (existingCopyBtn) {
+        existingCopyBtn.remove();
+    }
+
     resultDiv.textContent = text;
     resultDiv.classList.add('has-result');
     resultDiv.classList.remove('has-error');
+
+    // Add copy button
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerHTML = '<i class="fas fa-copy"></i> 複製';
+    copyBtn.onclick = function() {
+        copyResultToClipboard(text, copyBtn);
+    };
+    wrapper.appendChild(copyBtn);
+}
+
+function copyResultToClipboard(text, button) {
+    navigator.clipboard.writeText(text).then(function() {
+        button.innerHTML = '<i class="fas fa-check"></i> 已複製';
+        button.classList.add('copied');
+        setTimeout(function() {
+            button.innerHTML = '<i class="fas fa-copy"></i> 複製';
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('複製失敗:', err);
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        button.innerHTML = '<i class="fas fa-check"></i> 已複製';
+        button.classList.add('copied');
+        setTimeout(function() {
+            button.innerHTML = '<i class="fas fa-copy"></i> 複製';
+            button.classList.remove('copied');
+        }, 2000);
+    });
 }
 
 function showError(resultDiv, message) {
     resultDiv.textContent = message;
     resultDiv.classList.add('has-error');
     resultDiv.classList.remove('has-result');
+
+    // Remove copy button if exists
+    const wrapper = resultDiv.parentElement;
+    if (wrapper && wrapper.classList.contains('result-box-wrapper')) {
+        const copyBtn = wrapper.querySelector('.copy-btn');
+        if (copyBtn) {
+            copyBtn.remove();
+        }
+    }
 }
 
 function addToHistory(result) {
@@ -1734,24 +1901,24 @@ function initializeHelp() {
 // Method accordion toggle function for statistics module
 function toggleMethod(methodId) {
     const content = document.getElementById(methodId);
-    
+
     if (!content) {
         console.error('Method content not found:', methodId);
         return;
     }
-    
+
     const header = content.previousElementSibling;
     if (!header) {
         console.error('Method header not found for:', methodId);
         return;
     }
-    
+
     const icon = header.querySelector('i:last-child');
     if (!icon) {
         console.error('Method icon not found for:', methodId);
         return;
     }
-    
+
     // Close all other method contents in the same container
     const container = content.closest('.tab-content') || document;
     container.querySelectorAll('.method-content').forEach(function(el) {
@@ -1759,6 +1926,7 @@ function toggleMethod(methodId) {
             el.classList.remove('active');
             const otherHeader = el.previousElementSibling;
             if (otherHeader) {
+                otherHeader.setAttribute('aria-expanded', 'false');
                 const otherIcon = otherHeader.querySelector('i:last-child');
                 if (otherIcon) {
                     otherIcon.classList.remove('fa-chevron-up');
@@ -1767,18 +1935,49 @@ function toggleMethod(methodId) {
             }
         }
     });
-    
+
     // Toggle current content
+    const isExpanding = !content.classList.contains('active');
     content.classList.toggle('active');
-    
+
+    // Update ARIA attributes
+    header.setAttribute('aria-expanded', isExpanding ? 'true' : 'false');
+
     // Toggle icon
-    if (content.classList.contains('active')) {
+    if (isExpanding) {
         icon.classList.remove('fa-chevron-down');
         icon.classList.add('fa-chevron-up');
     } else {
         icon.classList.remove('fa-chevron-up');
         icon.classList.add('fa-chevron-down');
     }
+}
+
+// Initialize accordion accessibility on page load
+function initializeAccordionAccessibility() {
+    document.querySelectorAll('.method-header').forEach(function(header) {
+        const content = header.nextElementSibling;
+        if (content && content.classList.contains('method-content')) {
+            // Set ARIA attributes
+            header.setAttribute('role', 'button');
+            header.setAttribute('tabindex', '0');
+            header.setAttribute('aria-expanded', content.classList.contains('active') ? 'true' : 'false');
+            header.setAttribute('aria-controls', content.id);
+            content.setAttribute('role', 'region');
+            content.setAttribute('aria-labelledby', header.id || content.id + '-header');
+
+            // Add keyboard support
+            header.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const methodId = content.id;
+                    if (methodId) {
+                        toggleMethod(methodId);
+                    }
+                }
+            });
+        }
+    });
 }
 
 // Risk of Bias 2.0 Assessment System - Complete Implementation

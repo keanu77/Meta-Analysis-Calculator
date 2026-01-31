@@ -29,6 +29,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">跳過導航，直接前往主要內容</a>
+
     <!-- 未登入遮罩層 -->
     <div id="auth-overlay" class="auth-overlay" style="display: none;">
         <div class="auth-prompt">
@@ -93,7 +96,7 @@
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <div class="container">
             <!-- Module Guide: 使用指南 -->
             <div id="module-guide" class="tab-content active">
@@ -461,6 +464,136 @@
                     </div>
                 </div>
 
+                <!-- 效果量解釋指南 -->
+                <div class="effect-size-guide">
+                    <h3><i class="fas fa-chart-bar"></i> 效果量大小解釋指南</h3>
+                    <p class="guide-intro">根據 Cohen (1988) 的慣用標準，效果量可分為小、中、大三個等級。以下為各種效果量的解釋標準：</p>
+
+                    <div class="effect-size-cards">
+                        <!-- SMD/Cohen's d -->
+                        <div class="es-card">
+                            <div class="es-card-header smd-header">
+                                <i class="fas fa-ruler-horizontal"></i>
+                                <h4>SMD / Cohen's d / Hedges' g</h4>
+                            </div>
+                            <div class="es-card-body">
+                                <div class="es-scale">
+                                    <div class="es-level small">
+                                        <span class="es-value">0.2</span>
+                                        <span class="es-label">小效果</span>
+                                        <span class="es-desc">差異存在但不明顯</span>
+                                    </div>
+                                    <div class="es-level medium">
+                                        <span class="es-value">0.5</span>
+                                        <span class="es-label">中效果</span>
+                                        <span class="es-desc">肉眼可見的差異</span>
+                                    </div>
+                                    <div class="es-level large">
+                                        <span class="es-value">0.8</span>
+                                        <span class="es-label">大效果</span>
+                                        <span class="es-desc">明顯且重要的差異</span>
+                                    </div>
+                                </div>
+                                <p class="es-note"><i class="fas fa-info-circle"></i> 負值表示對照組優於實驗組</p>
+                            </div>
+                        </div>
+
+                        <!-- Odds Ratio -->
+                        <div class="es-card">
+                            <div class="es-card-header or-header">
+                                <i class="fas fa-balance-scale"></i>
+                                <h4>Odds Ratio (OR)</h4>
+                            </div>
+                            <div class="es-card-body">
+                                <div class="es-scale">
+                                    <div class="es-level small">
+                                        <span class="es-value">1.5 / 0.67</span>
+                                        <span class="es-label">小效果</span>
+                                        <span class="es-desc">風險增加/減少 ~50%</span>
+                                    </div>
+                                    <div class="es-level medium">
+                                        <span class="es-value">2.5 / 0.40</span>
+                                        <span class="es-label">中效果</span>
+                                        <span class="es-desc">風險增加/減少 ~150%</span>
+                                    </div>
+                                    <div class="es-level large">
+                                        <span class="es-value">4.0 / 0.25</span>
+                                        <span class="es-label">大效果</span>
+                                        <span class="es-desc">風險增加/減少 ~300%</span>
+                                    </div>
+                                </div>
+                                <p class="es-note"><i class="fas fa-info-circle"></i> OR = 1 表示無差異；OR > 1 表示實驗組風險較高</p>
+                            </div>
+                        </div>
+
+                        <!-- Risk Ratio -->
+                        <div class="es-card">
+                            <div class="es-card-header rr-header">
+                                <i class="fas fa-percentage"></i>
+                                <h4>Risk Ratio (RR) / Relative Risk</h4>
+                            </div>
+                            <div class="es-card-body">
+                                <div class="es-scale">
+                                    <div class="es-level small">
+                                        <span class="es-value">1.2 / 0.83</span>
+                                        <span class="es-label">小效果</span>
+                                        <span class="es-desc">風險變化 ~20%</span>
+                                    </div>
+                                    <div class="es-level medium">
+                                        <span class="es-value">2.0 / 0.50</span>
+                                        <span class="es-label">中效果</span>
+                                        <span class="es-desc">風險倍增/減半</span>
+                                    </div>
+                                    <div class="es-level large">
+                                        <span class="es-value">3.0 / 0.33</span>
+                                        <span class="es-label">大效果</span>
+                                        <span class="es-desc">風險三倍/降至1/3</span>
+                                    </div>
+                                </div>
+                                <p class="es-note"><i class="fas fa-info-circle"></i> RR = 1 表示無差異；RR 更直觀地反映實際風險變化</p>
+                            </div>
+                        </div>
+
+                        <!-- Correlation -->
+                        <div class="es-card">
+                            <div class="es-card-header corr-header">
+                                <i class="fas fa-link"></i>
+                                <h4>相關係數 (r)</h4>
+                            </div>
+                            <div class="es-card-body">
+                                <div class="es-scale">
+                                    <div class="es-level small">
+                                        <span class="es-value">0.10</span>
+                                        <span class="es-label">小效果</span>
+                                        <span class="es-desc">微弱相關</span>
+                                    </div>
+                                    <div class="es-level medium">
+                                        <span class="es-value">0.30</span>
+                                        <span class="es-label">中效果</span>
+                                        <span class="es-desc">中度相關</span>
+                                    </div>
+                                    <div class="es-level large">
+                                        <span class="es-value">0.50</span>
+                                        <span class="es-label">大效果</span>
+                                        <span class="es-desc">強相關</span>
+                                    </div>
+                                </div>
+                                <p class="es-note"><i class="fas fa-info-circle"></i> r² 可解釋為共同變異量的比例</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interpretation-tips">
+                        <h4><i class="fas fa-exclamation-triangle"></i> 解釋注意事項</h4>
+                        <ul>
+                            <li><strong>臨床意義優先：</strong>統計上的效果量標準僅供參考，應根據臨床情境判斷實際意義</li>
+                            <li><strong>領域差異：</strong>不同研究領域對效果量大小的期望不同（如藥物試驗 vs 心理學研究）</li>
+                            <li><strong>信賴區間：</strong>除了點估計值，也需考慮 CI 的寬度來評估精確度</li>
+                            <li><strong>樣本量影響：</strong>大樣本可能使微小效果達到統計顯著，但未必有臨床意義</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div class="calculator-grid">
                     <!-- Mean Difference -->
                     <div class="calculator-card">
@@ -634,6 +767,14 @@
                 <div class="calculator-grid">
                     <div class="calculator-card">
                         <h3><i class="fas fa-exchange-alt"></i> Effect Size ↔ CI ↔ SE</h3>
+                        <div class="es-usage-hint">
+                            <strong><i class="fas fa-lightbulb"></i> 使用說明</strong>
+                            <ul>
+                                <li>至少填寫 <strong>2 個已知項目</strong>，系統會自動計算其他數值</li>
+                                <li>可填組合：ES + CI、ES + SE、CI 上下界等</li>
+                                <li>留空不知道的欄位即可</li>
+                            </ul>
+                        </div>
                         <div class="input-group">
                             <label for="es-type">Effect Size Type:</label>
                             <select id="es-type">
@@ -2295,6 +2436,183 @@
                         </div>
                     </div>
 
+                    <!-- 森林圖解讀教學 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-tree"></i> 森林圖解讀教學 (Forest Plot)</h3>
+                        <div class="forest-plot-guide">
+                            <div class="forest-intro">
+                                <p>森林圖是 meta-analysis 最重要的視覺化工具，能夠清晰呈現各研究的效果量及其信賴區間，以及統合後的整體效果。</p>
+                            </div>
+
+                            <!-- 森林圖組成元素 -->
+                            <div class="forest-elements">
+                                <h4><i class="fas fa-puzzle-piece"></i> 森林圖的組成元素</h4>
+                                <div class="elements-grid">
+                                    <div class="element-card">
+                                        <div class="element-icon">
+                                            <i class="fas fa-square"></i>
+                                        </div>
+                                        <div class="element-content">
+                                            <h5>方塊 (Square)</h5>
+                                            <p>代表各研究的點估計值（效果量）</p>
+                                            <p class="element-note"><strong>方塊大小</strong>與研究權重成正比</p>
+                                        </div>
+                                    </div>
+                                    <div class="element-card">
+                                        <div class="element-icon">
+                                            <i class="fas fa-arrows-alt-h"></i>
+                                        </div>
+                                        <div class="element-content">
+                                            <h5>橫線 (Horizontal Line)</h5>
+                                            <p>代表 95% 信賴區間 (CI)</p>
+                                            <p class="element-note"><strong>線越短</strong>表示研究精確度越高</p>
+                                        </div>
+                                    </div>
+                                    <div class="element-card">
+                                        <div class="element-icon">
+                                            <i class="fas fa-gem"></i>
+                                        </div>
+                                        <div class="element-content">
+                                            <h5>菱形 (Diamond)</h5>
+                                            <p>代表統合後的整體效果量</p>
+                                            <p class="element-note"><strong>菱形寬度</strong>表示統合效果的 95% CI</p>
+                                        </div>
+                                    </div>
+                                    <div class="element-card">
+                                        <div class="element-icon">
+                                            <i class="fas fa-grip-lines-vertical"></i>
+                                        </div>
+                                        <div class="element-content">
+                                            <h5>無效果線 (Line of No Effect)</h5>
+                                            <p>垂直參考線</p>
+                                            <p class="element-note">SMD/MD = 0；OR/RR/HR = 1</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 解讀步驟 -->
+                            <div class="interpretation-steps">
+                                <h4><i class="fas fa-list-ol"></i> 森林圖解讀步驟</h4>
+                                <div class="steps-container">
+                                    <div class="step-item">
+                                        <div class="step-number">1</div>
+                                        <div class="step-content">
+                                            <h5>檢視個別研究分布</h5>
+                                            <ul>
+                                                <li>各研究的效果方向是否一致？</li>
+                                                <li>是否有明顯的離群值？</li>
+                                                <li>方塊大小分布（權重分配）是否合理？</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">2</div>
+                                        <div class="step-content">
+                                            <h5>評估統計顯著性</h5>
+                                            <ul>
+                                                <li>菱形是否跨越無效果線？</li>
+                                                <li>跨越 → 無統計顯著差異 (p > 0.05)</li>
+                                                <li>未跨越 → 有統計顯著差異 (p ≤ 0.05)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">3</div>
+                                        <div class="step-content">
+                                            <h5>評估精確度</h5>
+                                            <ul>
+                                                <li>CI 越窄，估計越精確</li>
+                                                <li>注意 CI 是否過寬而臨床意義不明</li>
+                                                <li>考慮最佳與最差情境解釋</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-number">4</div>
+                                        <div class="step-content">
+                                            <h5>評估異質性</h5>
+                                            <ul>
+                                                <li>研究 CI 是否有大量重疊？</li>
+                                                <li>配合 I²、Q 統計量判斷</li>
+                                                <li>視覺上散布是否過於分散？</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 常見解讀情境 -->
+                            <div class="interpretation-scenarios">
+                                <h4><i class="fas fa-binoculars"></i> 常見解讀情境</h4>
+                                <div class="scenarios-grid">
+                                    <div class="scenario-box favorable">
+                                        <div class="scenario-header">
+                                            <i class="fas fa-check-circle"></i>
+                                            <h5>理想情境</h5>
+                                        </div>
+                                        <ul>
+                                            <li>所有研究在無效果線同側</li>
+                                            <li>CI 彼此有良好重疊</li>
+                                            <li>菱形未跨越無效果線</li>
+                                            <li>I² < 40%</li>
+                                        </ul>
+                                        <p class="scenario-result">→ 強力支持介入效果</p>
+                                    </div>
+                                    <div class="scenario-box mixed">
+                                        <div class="scenario-header">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <h5>需謹慎解讀</h5>
+                                        </div>
+                                        <ul>
+                                            <li>研究分散在無效果線兩側</li>
+                                            <li>CI 重疊度低</li>
+                                            <li>菱形接近或跨越無效果線</li>
+                                            <li>I² > 50%</li>
+                                        </ul>
+                                        <p class="scenario-result">→ 需探討異質性來源</p>
+                                    </div>
+                                    <div class="scenario-box problematic">
+                                        <div class="scenario-header">
+                                            <i class="fas fa-times-circle"></i>
+                                            <h5>統合可能不適當</h5>
+                                        </div>
+                                        <ul>
+                                            <li>研究效果方向完全相反</li>
+                                            <li>CI 幾乎無重疊</li>
+                                            <li>I² > 75%</li>
+                                            <li>臨床/方法學差異過大</li>
+                                        </ul>
+                                        <p class="scenario-result">→ 考慮不進行統合</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 注意事項 -->
+                            <div class="forest-warnings">
+                                <h4><i class="fas fa-exclamation-circle"></i> 解讀注意事項</h4>
+                                <div class="warnings-list">
+                                    <div class="warning-item">
+                                        <i class="fas fa-check"></i>
+                                        <p><strong>臨床顯著 ≠ 統計顯著：</strong>即使統計上顯著，效果量也可能臨床上不重要</p>
+                                    </div>
+                                    <div class="warning-item">
+                                        <i class="fas fa-check"></i>
+                                        <p><strong>注意對數尺度：</strong>OR、RR、HR 使用對數尺度，無效果線在 1 而非 0</p>
+                                    </div>
+                                    <div class="warning-item">
+                                        <i class="fas fa-check"></i>
+                                        <p><strong>小研究效應：</strong>小型研究通常 CI 較寬，權重較低</p>
+                                    </div>
+                                    <div class="warning-item">
+                                        <i class="fas fa-check"></i>
+                                        <p><strong>預測區間：</strong>除 95% CI 外，也應考慮預測區間 (PI) 了解未來研究可能範圍</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 異質性評估 -->
                     <div class="stats-section">
                         <h3><i class="fas fa-chart-bar"></i> 異質性評估方法</h3>
@@ -2417,6 +2735,163 @@
                         </div>
                     </div>
 
+                    <!-- 異質性處理決策樹 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-project-diagram"></i> 異質性處理決策樹</h3>
+                        <p class="section-intro">當發現高度異質性 (I² > 75%) 時，應系統性地評估並處理，而非直接忽略或放棄統合分析。</p>
+
+                        <div class="heterogeneity-decision-tree">
+                            <!-- 第一層：評估問題 -->
+                            <div class="decision-level">
+                                <div class="decision-start">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <h4>發現高度異質性 (I² > 75%)</h4>
+                                </div>
+                            </div>
+
+                            <div class="decision-arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+                            <!-- 第二層：檢查方向 -->
+                            <div class="decision-level">
+                                <div class="decision-question">
+                                    <h5>步驟 1：效果方向是否一致？</h5>
+                                </div>
+                            </div>
+
+                            <div class="decision-branches">
+                                <div class="decision-branch left">
+                                    <div class="branch-header yes">是：方向一致</div>
+                                    <div class="branch-content">
+                                        <p>所有研究都指向同一方向（如都顯示有益）</p>
+                                        <div class="branch-action">
+                                            <i class="fas fa-arrow-right"></i>
+                                            <span>探索效果量「大小」差異的原因</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="decision-branch right">
+                                    <div class="branch-header no">否：方向不一致</div>
+                                    <div class="branch-content">
+                                        <p>部分研究顯示有益，部分顯示有害</p>
+                                        <div class="branch-action warning">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span>需審慎考慮是否適合統合</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="decision-arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+                            <!-- 第三層：探索來源 -->
+                            <div class="decision-level">
+                                <div class="decision-question">
+                                    <h5>步驟 2：系統性探索異質性來源</h5>
+                                </div>
+                            </div>
+
+                            <div class="source-exploration">
+                                <div class="source-category">
+                                    <div class="source-header clinical">
+                                        <i class="fas fa-user-md"></i>
+                                        <h6>臨床異質性</h6>
+                                    </div>
+                                    <ul>
+                                        <li>研究人群差異（年齡、嚴重度、共病）</li>
+                                        <li>介入措施差異（劑量、頻率、時間）</li>
+                                        <li>對照組差異（安慰劑 vs 主動對照）</li>
+                                        <li>結果測量差異（追蹤時間、評估工具）</li>
+                                    </ul>
+                                </div>
+                                <div class="source-category">
+                                    <div class="source-header methodological">
+                                        <i class="fas fa-flask"></i>
+                                        <h6>方法學異質性</h6>
+                                    </div>
+                                    <ul>
+                                        <li>研究設計差異（RCT vs 觀察性）</li>
+                                        <li>偏差風險差異（高 vs 低風險）</li>
+                                        <li>盲法設計（雙盲 vs 開放標籤）</li>
+                                        <li>追蹤完整性（低 vs 高流失率）</li>
+                                    </ul>
+                                </div>
+                                <div class="source-category">
+                                    <div class="source-header statistical">
+                                        <i class="fas fa-chart-line"></i>
+                                        <h6>統計異質性</h6>
+                                    </div>
+                                    <ul>
+                                        <li>離群值研究</li>
+                                        <li>效果量估計方法差異</li>
+                                        <li>發表偏差影響</li>
+                                        <li>小研究效應</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="decision-arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+                            <!-- 第四層：處理策略 -->
+                            <div class="decision-level">
+                                <div class="decision-question">
+                                    <h5>步驟 3：選擇處理策略</h5>
+                                </div>
+                            </div>
+
+                            <div class="strategy-options">
+                                <div class="strategy-card">
+                                    <div class="strategy-icon">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <h6>次群組分析</h6>
+                                    <p>依預先設定的臨床特徵分組</p>
+                                    <div class="strategy-when">
+                                        <strong>適用：</strong>有明確的分組假設
+                                    </div>
+                                </div>
+                                <div class="strategy-card">
+                                    <div class="strategy-icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <h6>統合迴歸</h6>
+                                    <p>探索連續型變項與效果的關係</p>
+                                    <div class="strategy-when">
+                                        <strong>適用：</strong>≥ 10 個研究
+                                    </div>
+                                </div>
+                                <div class="strategy-card">
+                                    <div class="strategy-icon">
+                                        <i class="fas fa-microscope"></i>
+                                    </div>
+                                    <h6>敏感性分析</h6>
+                                    <p>排除離群值或高風險研究</p>
+                                    <div class="strategy-when">
+                                        <strong>適用：</strong>測試結果穩健性
+                                    </div>
+                                </div>
+                                <div class="strategy-card">
+                                    <div class="strategy-icon">
+                                        <i class="fas fa-book-open"></i>
+                                    </div>
+                                    <h6>敘述性回顧</h6>
+                                    <p>不進行量化統合，改為質性描述</p>
+                                    <div class="strategy-when">
+                                        <strong>適用：</strong>異質性無法解釋
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 重要提醒 -->
+                            <div class="heterogeneity-reminder">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="reminder-content">
+                                    <h6>Cochrane 建議</h6>
+                                    <p>異質性不應視為「問題」，而是反映真實世界研究的多樣性。關鍵是透過事前規劃的分析來「解釋」異質性，而非試圖消除它。報告時應清楚說明異質性的程度、可能原因，以及對結論的影響。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 其他統計方法 -->
                     <div class="stats-section">
                         <h3><i class="fas fa-toolbox"></i> 其他重要統計方法</h3>
@@ -2474,16 +2949,41 @@
                                 </div>
                                 <div class="method-content" id="sensitivity-analysis">
                                     <h5>目的：</h5>
-                                    <p>評估結果的穩健性</p>
-                                    <h5>常見方法：</h5>
+                                    <p>評估結果的穩健性，了解特定決策對結論的影響程度</p>
+
+                                    <h5>Leave-One-Out 分析 (逐一排除法)：</h5>
                                     <ul>
-                                        <li><strong>逐一排除法：</strong>每次排除一個研究</li>
-                                        <li><strong>品質分層：</strong>只納入高品質研究</li>
-                                        <li><strong>模型比較：</strong>固定 vs 隨機效應</li>
-                                        <li><strong>極端值處理：</strong>排除離群值</li>
+                                        <li><strong>執行方式：</strong>每次排除一個研究，重新計算整體效應</li>
+                                        <li><strong>解釋：</strong>若排除某研究後效應顯著改變，該研究為「影響力研究」</li>
+                                        <li><strong>視覺化：</strong>可使用 leave-one-out 森林圖呈現</li>
+                                        <li><strong>軟體：</strong>RevMan、R (metafor::leave1out)</li>
                                     </ul>
+
+                                    <h5>影響力分析 (Influence Analysis)：</h5>
+                                    <ul>
+                                        <li><strong>Cook's Distance：</strong>測量單一研究對整體估計的影響</li>
+                                        <li><strong>外部標準化殘差：</strong>識別離群值研究</li>
+                                        <li><strong>DFBETAS：</strong>評估各研究對效應估計的影響</li>
+                                        <li><strong>Hat Values：</strong>測量研究的槓桿效果</li>
+                                    </ul>
+
+                                    <h5>常見敏感性分析策略：</h5>
+                                    <ul>
+                                        <li><strong>偏差風險分層：</strong>只納入低風險研究，比較結果差異</li>
+                                        <li><strong>模型選擇：</strong>比較固定效應 vs 隨機效應結果</li>
+                                        <li><strong>效應量指標：</strong>比較 OR vs RR 結果 (二分變項)</li>
+                                        <li><strong>相關性假設：</strong>測試不同相關係數對結果的影響</li>
+                                        <li><strong>離群值排除：</strong>排除統計上的離群研究</li>
+                                        <li><strong>時間分層：</strong>比較早期 vs 近期研究</li>
+                                    </ul>
+
                                     <h5>報告重點：</h5>
-                                    <p>結果是否因特定研究或方法改變而有重大差異</p>
+                                    <ul>
+                                        <li>明確說明進行了哪些敏感性分析及其理由</li>
+                                        <li>比較敏感性分析前後的效應估計值和信賴區間</li>
+                                        <li>若結果改變，討論可能的原因及對結論的影響</li>
+                                        <li>結果穩健時需明確說明，增強證據可信度</li>
+                                    </ul>
                                 </div>
                             </div>
 
@@ -2771,6 +3271,169 @@
                         </div>
                     </div>
 
+                    <!-- PRISMA 2020 流程圖教學 -->
+                    <div class="stats-section">
+                        <h3><i class="fas fa-stream"></i> PRISMA 2020 流程圖教學</h3>
+                        <div class="prisma-guide">
+                            <div class="prisma-intro">
+                                <p><strong>PRISMA 2020</strong>（Preferred Reporting Items for Systematic reviews and Meta-Analyses）是系統性文獻回顧報告的國際標準。流程圖用於透明呈現文獻篩選過程，是系統性回顧的必要組成部分。</p>
+                            </div>
+
+                            <div class="prisma-flowchart">
+                                <h4><i class="fas fa-project-diagram"></i> PRISMA 2020 流程圖四階段</h4>
+
+                                <!-- Identification -->
+                                <div class="prisma-stage identification">
+                                    <div class="stage-header">
+                                        <span class="stage-number">1</span>
+                                        <h5>辨識 (Identification)</h5>
+                                    </div>
+                                    <div class="stage-content">
+                                        <div class="stage-boxes">
+                                            <div class="stage-box">
+                                                <h6>資料庫搜尋記錄</h6>
+                                                <ul>
+                                                    <li>PubMed、Embase、Cochrane Library 等</li>
+                                                    <li>記錄各資料庫檢索筆數</li>
+                                                </ul>
+                                            </div>
+                                            <div class="stage-box">
+                                                <h6>其他來源記錄</h6>
+                                                <ul>
+                                                    <li>手工搜尋、參考文獻追蹤</li>
+                                                    <li>灰色文獻、專家推薦</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="stage-action">
+                                            <i class="fas fa-arrow-down"></i>
+                                            <span>合併後移除重複文獻</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Screening -->
+                                <div class="prisma-stage screening">
+                                    <div class="stage-header">
+                                        <span class="stage-number">2</span>
+                                        <h5>篩選 (Screening)</h5>
+                                    </div>
+                                    <div class="stage-content">
+                                        <div class="screening-steps">
+                                            <div class="screening-step">
+                                                <div class="step-main">
+                                                    <strong>標題/摘要篩選</strong>
+                                                    <p>根據納入/排除標準快速篩選</p>
+                                                </div>
+                                                <div class="step-excluded">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <span>記錄排除數量</span>
+                                                </div>
+                                            </div>
+                                            <div class="screening-step">
+                                                <div class="step-main">
+                                                    <strong>全文評估</strong>
+                                                    <p>詳細閱讀全文，確認符合標準</p>
+                                                </div>
+                                                <div class="step-excluded">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <span>記錄排除原因</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Included -->
+                                <div class="prisma-stage included">
+                                    <div class="stage-header">
+                                        <span class="stage-number">3</span>
+                                        <h5>納入 (Included)</h5>
+                                    </div>
+                                    <div class="stage-content">
+                                        <div class="included-details">
+                                            <div class="included-box">
+                                                <h6>納入質性合成的研究</h6>
+                                                <p>所有符合標準的研究</p>
+                                            </div>
+                                            <div class="included-arrow"><i class="fas fa-arrow-down"></i></div>
+                                            <div class="included-box highlight">
+                                                <h6>納入量化合成的研究</h6>
+                                                <p>可進行統合分析的研究子集</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2020 更新重點 -->
+                            <div class="prisma-updates">
+                                <h4><i class="fas fa-sync-alt"></i> PRISMA 2020 更新重點</h4>
+                                <div class="updates-grid">
+                                    <div class="update-item">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <div>
+                                            <strong>新增「之前研究」選項</strong>
+                                            <p>可納入更新版系統性回顧的先前搜尋結果</p>
+                                        </div>
+                                    </div>
+                                    <div class="update-item">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <div>
+                                            <strong>自動化工具整合</strong>
+                                            <p>可報告使用自動化工具（如 AI）輔助篩選的情況</p>
+                                        </div>
+                                    </div>
+                                    <div class="update-item">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <div>
+                                            <strong>詳細排除原因</strong>
+                                            <p>全文篩選階段需記錄具體排除理由及數量</p>
+                                        </div>
+                                    </div>
+                                    <div class="update-item">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <div>
+                                            <strong>區分新舊研究</strong>
+                                            <p>更新版回顧需區分先前與新納入的研究</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 報告要點 -->
+                            <div class="prisma-tips">
+                                <h4><i class="fas fa-clipboard-check"></i> 流程圖報告要點</h4>
+                                <ul>
+                                    <li><strong>清楚記錄數字：</strong>每個階段的文獻數量必須清楚標示</li>
+                                    <li><strong>說明排除原因：</strong>全文排除需列出具體理由（如：非 RCT、無相關結果等）</li>
+                                    <li><strong>區分資料來源：</strong>明確區分資料庫搜尋與其他來源</li>
+                                    <li><strong>數字邏輯一致：</strong>各階段數字應能追蹤且邏輯一致</li>
+                                    <li><strong>使用官方模板：</strong>建議使用 PRISMA 官方提供的流程圖模板</li>
+                                </ul>
+                            </div>
+
+                            <!-- 資源連結 -->
+                            <div class="prisma-resources">
+                                <h4><i class="fas fa-external-link-alt"></i> 官方資源</h4>
+                                <div class="resource-links">
+                                    <a href="https://www.prisma-statement.org/" target="_blank" class="resource-link">
+                                        <i class="fas fa-globe"></i>
+                                        <span>PRISMA 官方網站</span>
+                                    </a>
+                                    <a href="https://www.prisma-statement.org/PRISMAStatement/FlowDiagram" target="_blank" class="resource-link">
+                                        <i class="fas fa-project-diagram"></i>
+                                        <span>流程圖生成工具</span>
+                                    </a>
+                                    <a href="https://www.prisma-statement.org/PRISMAStatement/Checklist" target="_blank" class="resource-link">
+                                        <i class="fas fa-list-alt"></i>
+                                        <span>PRISMA 2020 檢核表</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 方法選擇建議 -->
                     <div class="stats-section">
                         <h3><i class="fas fa-compass"></i> 統計方法基本指引</h3>
@@ -2936,9 +3599,9 @@
                                     <br><small>Cochrane 官方統合分析軟體</small>
                                 </div>
                                 <div class="reference-item">
-                                    <strong>PRISMA Statement:</strong>
-                                    <br><a href="http://www.prisma-statement.org/" target="_blank">http://www.prisma-statement.org/</a>
-                                    <br><small>系統性文獻回顧報告標準</small>
+                                    <strong>PRISMA 2020 Statement:</strong>
+                                    <br><a href="https://www.prisma-statement.org/" target="_blank">https://www.prisma-statement.org/</a>
+                                    <br><small>系統性文獻回顧報告標準（2020 更新版）</small>
                                 </div>
                                 <div class="reference-item">
                                     <strong>BMJ Meta-analysis Guidelines:</strong>
