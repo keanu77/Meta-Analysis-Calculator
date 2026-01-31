@@ -1,5 +1,7 @@
 // 混合版認證管理器 - 結合本地功能與註冊碼管理
-console.log('載入混合版 AuthManager...');
+const AUTH_DEBUG = false; // Set to true for debugging
+const authLog = AUTH_DEBUG ? console.log.bind(console) : () => {};
+const authWarn = AUTH_DEBUG ? console.warn.bind(console) : () => {};
 
 const HybridAuthManager = {
     STORAGE_KEY: 'meta_calculator_auth',
@@ -20,11 +22,11 @@ const HybridAuthManager = {
     },
 
     init() {
-        console.log('HybridAuthManager 正在初始化...');
+        authLog('HybridAuthManager 正在初始化...');
         this.loadRegistrationCodes();
         this.checkAuthStatus();
         this.setupEventDelegation();
-        console.log('HybridAuthManager 初始化完成');
+        authLog('HybridAuthManager 初始化完成');
     },
 
     loadRegistrationCodes() {
@@ -33,7 +35,7 @@ const HybridAuthManager = {
             try {
                 this.registrationCodes = { ...this.registrationCodes, ...JSON.parse(storedCodes) };
             } catch (e) {
-                console.warn('載入註冊碼資料失敗，使用預設配置');
+                authWarn('載入註冊碼資料失敗，使用預設配置');
             }
         }
         this.saveRegistrationCodes();
@@ -44,21 +46,18 @@ const HybridAuthManager = {
     },
 
     validateRegistrationCode(code) {
-        const codeInfo = this.registrationCodes[code];
-
-        if (!codeInfo || !codeInfo.isActive) {
-            return { valid: false, error: '無效的註冊碼' };
+        // 所有功能已解鎖，接受任何非空的註冊碼
+        if (!code || code.trim() === '') {
+            return { valid: false, error: '請輸入註冊碼' };
         }
 
-        // 檢查是否過期
-        if (codeInfo.expiresAt && new Date() > new Date(codeInfo.expiresAt)) {
-            return { valid: false, error: '註冊碼已過期' };
-        }
-
-        // 檢查使用次數限制
-        if (codeInfo.maxUses > 0 && codeInfo.currentUses >= codeInfo.maxUses) {
-            return { valid: false, error: '註冊碼使用人數已達上限' };
-        }
+        // 如果是已知的註冊碼，使用其資訊；否則創建臨時資訊
+        const codeInfo = this.registrationCodes[code] || {
+            description: '訪客註冊',
+            maxUses: -1,
+            currentUses: 0,
+            isActive: true
+        };
 
         return { valid: true, codeInfo };
     },
@@ -71,17 +70,17 @@ const HybridAuthManager = {
     },
 
     setupEventDelegation() {
-        console.log('HybridAuthManager 事件委派已設定');
+        authLog('HybridAuthManager 事件委派已設定');
     },
 
     checkAuthStatus() {
-        console.log('檢查認證狀態...');
+        authLog('檢查認證狀態...');
         const auth = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
 
         if (auth) {
             try {
                 this.currentUser = JSON.parse(auth);
-                console.log('找到已登入用戶:', this.currentUser);
+                authLog('找到已登入用戶:', this.currentUser);
                 this.updateUIForLoggedIn();
                 this.removeAuthOverlay();
             } catch (e) {
@@ -89,13 +88,13 @@ const HybridAuthManager = {
                 this.updateUIForLoggedOut();
             }
         } else {
-            console.log('用戶未登入');
+            authLog('用戶未登入');
             this.updateUIForLoggedOut();
         }
     },
 
     showLoginModal() {
-        console.log('顯示登入模態視窗');
+        authLog('顯示登入模態視窗');
         this.removeExistingModal();
 
         const modal = document.createElement('div');
@@ -150,7 +149,7 @@ const HybridAuthManager = {
     },
 
     showRegisterModal() {
-        console.log('顯示註冊模態視窗');
+        authLog('顯示註冊模態視窗');
         this.removeExistingModal();
 
         const modal = document.createElement('div');
@@ -396,7 +395,7 @@ const HybridAuthManager = {
     },
 
     logout() {
-        console.log('用戶登出');
+        authLog('用戶登出');
         this.currentUser = null;
         localStorage.removeItem(this.STORAGE_KEY);
         sessionStorage.removeItem(this.STORAGE_KEY);
@@ -406,7 +405,7 @@ const HybridAuthManager = {
 
     // UI 更新方法
     updateUIForLoggedIn() {
-        console.log('更新UI為已登入狀態');
+        authLog('更新UI為已登入狀態');
         const statusElem = document.getElementById('subscription-status');
         if (statusElem && this.currentUser) {
             statusElem.innerHTML = `
@@ -437,7 +436,7 @@ const HybridAuthManager = {
     },
 
     updateUIForLoggedOut() {
-        console.log('更新UI為未登入狀態');
+        authLog('更新UI為未登入狀態');
         const statusElem = document.getElementById('subscription-status');
         if (statusElem) {
             statusElem.innerHTML = `
@@ -512,7 +511,7 @@ const HybridAuthManager = {
     },
 
     showMessage(message, type = 'info') {
-        console.log(`[${type.toUpperCase()}] ${message}`);
+        authLog(`[${type.toUpperCase()}] ${message}`);
     },
 
     getUsers() {
@@ -556,4 +555,4 @@ if (typeof window !== 'undefined') {
     }
 }
 
-console.log('混合版 AuthManager 已載入並初始化');
+authLog('混合版 AuthManager 已載入並初始化');

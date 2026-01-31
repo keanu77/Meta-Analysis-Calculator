@@ -3,7 +3,7 @@
 
 // Configuration
 const DEV_MODE = false; // Set to true for development mode with demo data
-const DEBUG_EVENTS = true; // Set to true to enable event debugging
+const DEBUG_EVENTS = false; // Set to false for production
 
 // Global variables
 let currentTab = 'module-guide';  // Start with guide tab
