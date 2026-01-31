@@ -56,35 +56,35 @@
         </div>
     </header>
 
-    <nav class="nav-tabs">
+    <nav class="nav-tabs" role="tablist" aria-label="功能模組導航">
         <div class="container">
-            <button class="tab-btn active" data-tab="module-guide">
-                <i class="fas fa-book-open"></i>
+            <button class="tab-btn active" data-tab="module-guide" role="tab" aria-selected="true" aria-controls="module-guide" title="了解如何使用此計算工具">
+                <i class="fas fa-book-open" aria-hidden="true"></i>
                 使用指南
             </button>
-            <button class="tab-btn" data-tab="module-stats">
-                <i class="fas fa-chart-pie"></i>
+            <button class="tab-btn" data-tab="module-stats" role="tab" aria-selected="false" aria-controls="module-stats" title="Meta分析的基本統計概念介紹">
+                <i class="fas fa-chart-pie" aria-hidden="true"></i>
                 MA基本概念
             </button>
-            <button class="tab-btn" data-tab="module-a">
-                <i class="fas fa-chart-bar"></i>
+            <button class="tab-btn" data-tab="module-a" role="tab" aria-selected="false" aria-controls="module-a" title="SE轉SD、CI轉Mean&SD、分位數轉換">
+                <i class="fas fa-chart-bar" aria-hidden="true"></i>
                 單組內統計轉換
             </button>
-            <button class="tab-btn" data-tab="module-b">
-                <i class="fas fa-balance-scale"></i>
+            <button class="tab-btn" data-tab="module-b" role="tab" aria-selected="false" aria-controls="module-b" title="計算MD、SMD、OR、RR等效果量">
+                <i class="fas fa-balance-scale" aria-hidden="true"></i>
                 兩組比較效果量
             </button>
-            <button class="tab-btn" data-tab="module-c">
-                <i class="fas fa-exchange-alt"></i>
+            <button class="tab-btn" data-tab="module-c" role="tab" aria-selected="false" aria-controls="module-c" title="信賴區間與標準誤的相互轉換">
+                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
                 CI/SE互轉
             </button>
-            <button class="tab-btn tab-disabled" data-tab="module-rob" disabled title="此功能開發中">
-                <i class="fas fa-shield-alt"></i>
+            <button class="tab-btn tab-disabled" data-tab="module-rob" role="tab" aria-selected="false" aria-controls="module-rob" disabled title="此功能開發中">
+                <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 風險偏差評估 (RoB 2.0)
                 <span class="badge-dev">開發中</span>
             </button>
-            <button class="tab-btn" data-tab="module-e">
-                <i class="fas fa-info-circle"></i>
+            <button class="tab-btn" data-tab="module-e" role="tab" aria-selected="false" aria-controls="module-e" title="相關文獻與參考資料">
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 參考資料
             </button>
         </div>
@@ -227,17 +227,17 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> SE → SD</h3>
                         <div class="input-group">
-                            <label>Standard Error (SE):</label>
+                            <label for="se-input">Standard Error (SE):</label>
                             <input type="number" id="se-input" step="any" placeholder="輸入 SE 值">
                         </div>
                         <div class="input-group">
-                            <label>Sample Size (n):</label>
+                            <label for="se-n-input">Sample Size (n):</label>
                             <input type="number" id="se-n-input" step="1" min="1" placeholder="輸入樣本數">
                         </div>
                         <button class="calc-btn" onclick="calculateSEtoSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="se-sd-result"></div>
+                        <div class="result-box" id="se-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('se-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -247,15 +247,15 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> CI → Mean & SD</h3>
                         <div class="input-group">
-                            <label>Lower CI:</label>
+                            <label for="ci-lower">Lower CI:</label>
                             <input type="number" id="ci-lower" step="any" placeholder="下界">
                         </div>
                         <div class="input-group">
-                            <label>Upper CI:</label>
+                            <label for="ci-upper">Upper CI:</label>
                             <input type="number" id="ci-upper" step="any" placeholder="上界">
                         </div>
                         <div class="input-group">
-                            <label>Confidence Level (%):</label>
+                            <label for="ci-level">Confidence Level (%):</label>
                             <select id="ci-level">
                                 <option value="95">95%</option>
                                 <option value="90">90%</option>
@@ -263,11 +263,11 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label>Sample Size (n):</label>
+                            <label for="ci-n">Sample Size (n):</label>
                             <input type="number" id="ci-n" step="1" min="1" placeholder="樣本數">
                         </div>
                         <div class="input-group">
-                            <label>Distribution:</label>
+                            <label for="ci-distribution">Distribution:</label>
                             <select id="ci-distribution">
                                 <option value="auto" selected>自動選擇 (建議)</option>
                                 <option value="t">t-distribution</option>
@@ -280,7 +280,7 @@
                         <button class="calc-btn" onclick="calculateCItoMeanSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="ci-mean-sd-result"></div>
+                        <div class="result-box" id="ci-mean-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('ci-mean-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -290,7 +290,7 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> 次序統計 → Mean & SD</h3>
                         <div class="input-group">
-                            <label>Method:</label>
+                            <label for="quantile-method">Method:</label>
                             <select id="quantile-method">
                                 <option value="luo">Luo et al. (2018)</option>
                                 <option value="wan">Wan et al. (2014)</option>
@@ -299,33 +299,33 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label>Min:</label>
+                            <label for="q-min">Min:</label>
                             <input type="number" id="q-min" step="any" placeholder="最小值">
                         </div>
                         <div class="input-group">
-                            <label>Q1:</label>
+                            <label for="q-q1">Q1:</label>
                             <input type="number" id="q-q1" step="any" placeholder="第一四分位數 (可選)">
                         </div>
                         <div class="input-group">
-                            <label>Median:</label>
+                            <label for="q-median">Median:</label>
                             <input type="number" id="q-median" step="any" placeholder="中位數">
                         </div>
                         <div class="input-group">
-                            <label>Q3:</label>
+                            <label for="q-q3">Q3:</label>
                             <input type="number" id="q-q3" step="any" placeholder="第三四分位數 (可選)">
                         </div>
                         <div class="input-group">
-                            <label>Max:</label>
+                            <label for="q-max">Max:</label>
                             <input type="number" id="q-max" step="any" placeholder="最大值">
                         </div>
                         <div class="input-group">
-                            <label>Sample Size (n):</label>
+                            <label for="q-n">Sample Size (n):</label>
                             <input type="number" id="q-n" step="1" min="1" placeholder="樣本數">
                         </div>
                         <button class="calc-btn" onclick="calculateQuantilesToMeanSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="quantiles-result"></div>
+                        <div class="result-box" id="quantiles-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('quantiles')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -339,25 +339,25 @@
                             <strong>專用於 Hozo (2005) 方法：</strong>當文獻只報告中位數、最小值、最大值時使用
                         </div>
                         <div class="input-group">
-                            <label>Minimum (a):</label>
+                            <label for="hozo-min">Minimum (a):</label>
                             <input type="number" id="hozo-min" step="any" placeholder="最小值">
                         </div>
                         <div class="input-group">
-                            <label>Median (m):</label>
+                            <label for="hozo-median">Median (m):</label>
                             <input type="number" id="hozo-median" step="any" placeholder="中位數">
                         </div>
                         <div class="input-group">
-                            <label>Maximum (b):</label>
+                            <label for="hozo-max">Maximum (b):</label>
                             <input type="number" id="hozo-max" step="any" placeholder="最大值">
                         </div>
                         <div class="input-group">
-                            <label>Sample Size (n):</label>
+                            <label for="hozo-n">Sample Size (n):</label>
                             <input type="number" id="hozo-n" step="1" min="1" placeholder="樣本數">
                         </div>
                         <button class="calc-btn" onclick="calculateHozoOnly()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="hozo-only-result"></div>
+                        <div class="result-box" id="hozo-only-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('hozo-method')">
                             <i class="fas fa-eye"></i> 查看 Hozo 公式
                         </button>
@@ -377,25 +377,25 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Pooled SD</h3>
                         <div class="input-group">
-                            <label>SD1:</label>
+                            <label for="pooled-sd1">SD1:</label>
                             <input type="number" id="pooled-sd1" step="any" placeholder="第一組標準差">
                         </div>
                         <div class="input-group">
-                            <label>n1:</label>
+                            <label for="pooled-n1">n1:</label>
                             <input type="number" id="pooled-n1" step="1" min="1" placeholder="第一組樣本數">
                         </div>
                         <div class="input-group">
-                            <label>SD2:</label>
+                            <label for="pooled-sd2">SD2:</label>
                             <input type="number" id="pooled-sd2" step="any" placeholder="第二組標準差">
                         </div>
                         <div class="input-group">
-                            <label>n2:</label>
+                            <label for="pooled-n2">n2:</label>
                             <input type="number" id="pooled-n2" step="1" min="1" placeholder="第二組樣本數">
                         </div>
                         <button class="calc-btn" onclick="calculatePooledSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="pooled-sd-result"></div>
+                        <div class="result-box" id="pooled-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('pooled-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -405,21 +405,21 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Change Score SD</h3>
                         <div class="input-group">
-                            <label>SD Pre:</label>
+                            <label for="change-sd-pre">SD Pre:</label>
                             <input type="number" id="change-sd-pre" step="any" placeholder="前測標準差">
                         </div>
                         <div class="input-group">
-                            <label>SD Post:</label>
+                            <label for="change-sd-post">SD Post:</label>
                             <input type="number" id="change-sd-post" step="any" placeholder="後測標準差">
                         </div>
                         <div class="input-group">
-                            <label>Correlation (r):</label>
+                            <label for="change-r">Correlation (r):</label>
                             <input type="number" id="change-r" step="any" min="-1" max="1" placeholder="相關係數 (-1 to 1)">
                         </div>
                         <button class="calc-btn" onclick="calculateChangeSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="change-sd-result"></div>
+                        <div class="result-box" id="change-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('change-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -474,36 +474,36 @@
                         <h3><i class="fas fa-arrow-right"></i> Mean Difference (MD)</h3>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 1 Mean:</label>
+                                <label for="md-mean1">Group 1 Mean:</label>
                                 <input type="number" id="md-mean1" step="any" placeholder="實驗組平均">
                             </div>
                             <div class="input-group">
-                                <label>Group 1 SD:</label>
+                                <label for="md-sd1">Group 1 SD:</label>
                                 <input type="number" id="md-sd1" step="any" placeholder="實驗組標準差">
                             </div>
                             <div class="input-group">
-                                <label>Group 1 n:</label>
+                                <label for="md-n1">Group 1 n:</label>
                                 <input type="number" id="md-n1" step="1" min="1" placeholder="實驗組樣本數">
                             </div>
                         </div>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 2 Mean:</label>
+                                <label for="md-mean2">Group 2 Mean:</label>
                                 <input type="number" id="md-mean2" step="any" placeholder="對照組平均">
                             </div>
                             <div class="input-group">
-                                <label>Group 2 SD:</label>
+                                <label for="md-sd2">Group 2 SD:</label>
                                 <input type="number" id="md-sd2" step="any" placeholder="對照組標準差">
                             </div>
                             <div class="input-group">
-                                <label>Group 2 n:</label>
+                                <label for="md-n2">Group 2 n:</label>
                                 <input type="number" id="md-n2" step="1" min="1" placeholder="對照組樣本數">
                             </div>
                         </div>
                         <button class="calc-btn" onclick="calculateMD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="md-result"></div>
+                        <div class="result-box" id="md-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('md')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -514,29 +514,29 @@
                         <h3><i class="fas fa-arrow-right"></i> Standardized Mean Difference (SMD)</h3>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 1 Mean:</label>
+                                <label for="smd-mean1">Group 1 Mean:</label>
                                 <input type="number" id="smd-mean1" step="any" placeholder="實驗組平均">
                             </div>
                             <div class="input-group">
-                                <label>Group 1 SD:</label>
+                                <label for="smd-sd1">Group 1 SD:</label>
                                 <input type="number" id="smd-sd1" step="any" placeholder="實驗組標準差">
                             </div>
                             <div class="input-group">
-                                <label>Group 1 n:</label>
+                                <label for="smd-n1">Group 1 n:</label>
                                 <input type="number" id="smd-n1" step="1" min="1" placeholder="實驗組樣本數">
                             </div>
                         </div>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 2 Mean:</label>
+                                <label for="smd-mean2">Group 2 Mean:</label>
                                 <input type="number" id="smd-mean2" step="any" placeholder="對照組平均">
                             </div>
                             <div class="input-group">
-                                <label>Group 2 SD:</label>
+                                <label for="smd-sd2">Group 2 SD:</label>
                                 <input type="number" id="smd-sd2" step="any" placeholder="對照組標準差">
                             </div>
                             <div class="input-group">
-                                <label>Group 2 n:</label>
+                                <label for="smd-n2">Group 2 n:</label>
                                 <input type="number" id="smd-n2" step="1" min="1" placeholder="對照組樣本數">
                             </div>
                         </div>
@@ -549,7 +549,7 @@
                         <button class="calc-btn" onclick="calculateSMD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="smd-result"></div>
+                        <div class="result-box" id="smd-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('smd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -560,26 +560,26 @@
                         <h3><i class="fas fa-arrow-right"></i> Binary Outcomes (OR/RR/RD)</h3>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 1 Events:</label>
+                                <label for="bin-events1">Group 1 Events:</label>
                                 <input type="number" id="bin-events1" step="1" min="0" placeholder="實驗組事件數">
                             </div>
                             <div class="input-group">
-                                <label>Group 1 Total:</label>
+                                <label for="bin-total1">Group 1 Total:</label>
                                 <input type="number" id="bin-total1" step="1" min="1" placeholder="實驗組總數">
                             </div>
                         </div>
                         <div class="input-row">
                             <div class="input-group">
-                                <label>Group 2 Events:</label>
+                                <label for="bin-events2">Group 2 Events:</label>
                                 <input type="number" id="bin-events2" step="1" min="0" placeholder="對照組事件數">
                             </div>
                             <div class="input-group">
-                                <label>Group 2 Total:</label>
+                                <label for="bin-total2">Group 2 Total:</label>
                                 <input type="number" id="bin-total2" step="1" min="1" placeholder="對照組總數">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Zero Event Correction:</label>
+                            <label for="bin-correction">Zero Event Correction:</label>
                             <select id="bin-correction">
                                 <option value="haldane">Haldane-Anscombe (0.5)</option>
                                 <option value="continuity">Continuity Correction</option>
@@ -589,7 +589,7 @@
                         <button class="calc-btn" onclick="calculateBinaryOutcomes()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="binary-result"></div>
+                        <div class="result-box" id="binary-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('binary')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -642,7 +642,7 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-exchange-alt"></i> Effect Size ↔ CI ↔ SE</h3>
                         <div class="input-group">
-                            <label>Effect Size Type:</label>
+                            <label for="es-type">Effect Size Type:</label>
                             <select id="es-type">
                                 <option value="mean">Mean/MD</option>
                                 <option value="smd">SMD</option>
@@ -652,23 +652,23 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label>Effect Size:</label>
+                            <label for="es-value">Effect Size:</label>
                             <input type="number" id="es-value" step="any" placeholder="效果量值">
                         </div>
                         <div class="input-group">
-                            <label>Lower CI:</label>
+                            <label for="es-ci-lower">Lower CI:</label>
                             <input type="number" id="es-ci-lower" step="any" placeholder="下界">
                         </div>
                         <div class="input-group">
-                            <label>Upper CI:</label>
+                            <label for="es-ci-upper">Upper CI:</label>
                             <input type="number" id="es-ci-upper" step="any" placeholder="上界">
                         </div>
                         <div class="input-group">
-                            <label>Standard Error:</label>
+                            <label for="es-se">Standard Error:</label>
                             <input type="number" id="es-se" step="any" placeholder="標準誤">
                         </div>
                         <div class="input-group">
-                            <label>Confidence Level (%):</label>
+                            <label for="es-ci-level">Confidence Level (%):</label>
                             <select id="es-ci-level">
                                 <option value="95">95%</option>
                                 <option value="90">90%</option>
@@ -678,7 +678,7 @@
                         <button class="calc-btn" onclick="calculateESConversion()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
-                        <div class="result-box" id="es-conversion-result"></div>
+                        <div class="result-box" id="es-conversion-result" role="status" aria-live="polite" aria-atomic="true"></div>
                         <button class="formula-btn" onclick="showFormula('es-conversion')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
@@ -2267,6 +2267,57 @@
           window.AuthManager.init();
         }
       }
+    </script>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="back-to-top" aria-label="返回頂部" title="返回頂部">
+        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </button>
+
+    <script>
+    // Back to Top functionality
+    (function() {
+        const backToTop = document.getElementById('back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Copy result functionality
+        document.querySelectorAll('.result-box').forEach(box => {
+            box.style.position = 'relative';
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.title = '複製結果';
+            copyBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const text = box.textContent.replace('複製結果', '').trim();
+                if (text && text !== '計算中...') {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                        }, 2000);
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+                    }
+                }
+            });
+            box.appendChild(copyBtn);
+        });
+    })();
     </script>
 </body>
 </html>
