@@ -78,10 +78,13 @@
                 <i class="fas fa-exchange-alt" aria-hidden="true"></i>
                 CI/SE互轉
             </button>
-            <button class="tab-btn tab-disabled" data-tab="module-rob" role="tab" aria-selected="false" aria-controls="module-rob" disabled title="此功能開發中">
+            <button class="tab-btn" data-tab="module-rob" role="tab" aria-selected="false" aria-controls="module-rob" title="Cochrane RoB 2.0 風險偏差評估工具">
                 <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 風險偏差評估 (RoB 2.0)
-                <span class="badge-dev">開發中</span>
+            </button>
+            <button class="tab-btn" data-tab="module-grade" role="tab" aria-selected="false" aria-controls="module-grade" title="GRADE 證據品質評估系統">
+                <i class="fas fa-star-half-alt" aria-hidden="true"></i>
+                GRADE 證據品質
             </button>
             <button class="tab-btn" data-tab="module-e" role="tab" aria-selected="false" aria-controls="module-e" title="相關文獻與參考資料">
                 <i class="fas fa-info-circle" aria-hidden="true"></i>
@@ -690,30 +693,97 @@
                         <div class="rob-intro">
                             <div class="intro-card">
                                 <div class="intro-content">
-                                    <p><strong>Risk of Bias 2.0 (RoB 2.0)</strong> 是 Cochrane 開發的修訂版偏差風險評估工具，專門用於評估隨機對照試驗 (RCT) 的方法學品質。</p>
+                                    <p><strong>Risk of Bias 2.0 (RoB 2.0)</strong> 是 Cochrane 於 2019 年發布的修訂版偏差風險評估工具，專門用於評估隨機對照試驗 (RCT) 中特定結果的方法學品質。這是系統性文獻回顧中評估證據品質的關鍵步驟。</p>
                                     <div class="intro-highlights">
                                         <div class="highlight-item">
-                                            <i class="fas fa-target"></i>
+                                            <i class="fas fa-bullseye"></i>
                                             <div>
                                                 <strong>結果導向評估</strong>
-                                                <p>針對特定結果進行評估，而非整體研究</p>
+                                                <p>針對特定結果進行評估，同一研究中不同結果可能有不同的風險評級</p>
                                             </div>
                                         </div>
                                         <div class="highlight-item">
                                             <i class="fas fa-sitemap"></i>
                                             <div>
                                                 <strong>五個偏差領域</strong>
-                                                <p>系統性評估各類型偏差風險</p>
+                                                <p>系統性評估隨機化、介入偏離、缺失數據、測量方法、選擇性報告</p>
                                             </div>
                                         </div>
                                         <div class="highlight-item">
                                             <i class="fas fa-question-circle"></i>
                                             <div>
                                                 <strong>信號問題引導</strong>
-                                                <p>透過標準化問題進行客觀評估</p>
+                                                <p>透過標準化信號問題 (Signalling Questions) 進行客觀、系統性評估</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-robot"></i>
+                                            <div>
+                                                <strong>內建判斷算法</strong>
+                                                <p>工具內嵌算法根據信號問題答案提供偏差風險判斷建議</p>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- 判斷標準說明 -->
+                            <div class="intro-card judgment-criteria">
+                                <h4><i class="fas fa-balance-scale"></i> 偏差風險判斷標準</h4>
+                                <div class="judgment-levels">
+                                    <div class="judgment-item low-risk">
+                                        <div class="judgment-icon"><i class="fas fa-check-circle"></i></div>
+                                        <div class="judgment-content">
+                                            <strong>低風險 (Low Risk)</strong>
+                                            <p>試驗的判斷結果可能存在偏差，但可信度高。需要有明確證據支持方法學的適當性。</p>
+                                        </div>
+                                    </div>
+                                    <div class="judgment-item some-concerns">
+                                        <div class="judgment-icon"><i class="fas fa-exclamation-circle"></i></div>
+                                        <div class="judgment-content">
+                                            <strong>有些疑慮 (Some Concerns)</strong>
+                                            <p>試驗在某些方面存在疑慮，但不足以達到高風險。這是不確定時的保守選擇。</p>
+                                        </div>
+                                    </div>
+                                    <div class="judgment-item high-risk">
+                                        <div class="judgment-icon"><i class="fas fa-times-circle"></i></div>
+                                        <div class="judgment-content">
+                                            <strong>高風險 (High Risk)</strong>
+                                            <p>試驗在一個或多個領域存在高偏差風險，結果的可信度明顯降低。若任一領域評為高風險，整體判斷即為高風險。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 效果類型說明 -->
+                            <div class="intro-card effect-types">
+                                <h4><i class="fas fa-code-branch"></i> 兩種評估路徑</h4>
+                                <p>RoB 2.0 根據研究目的提供兩種評估路徑，這會影響「領域二：偏離預期介入」的評估方式：</p>
+                                <div class="effect-type-options">
+                                    <div class="effect-type-item">
+                                        <strong><i class="fas fa-arrow-right"></i> 分配效果 (Effect of Assignment)</strong>
+                                        <p>評估被分配至介入措施的效果（意向治療分析, ITT）—— 研究「如果建議某介入會發生什麼」</p>
+                                    </div>
+                                    <div class="effect-type-item">
+                                        <strong><i class="fas fa-check-double"></i> 依從效果 (Effect of Adhering)</strong>
+                                        <p>評估依從介入措施的效果（符合方案分析, PP）—— 研究「如果完全依從介入會發生什麼」</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 官方資源連結 -->
+                            <div class="intro-card resources">
+                                <h4><i class="fas fa-external-link-alt"></i> 官方資源</h4>
+                                <div class="resource-links">
+                                    <a href="https://www.riskofbias.info" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                        <i class="fas fa-globe"></i> riskofbias.info - 官方指南與 Excel 工具
+                                    </a>
+                                    <a href="https://www.cochrane.org/learn/courses-and-resources/cochrane-methodology/risk-bias/about-risk-bias-2-rob-2" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                        <i class="fas fa-graduation-cap"></i> Cochrane 學習資源
+                                    </a>
+                                    <a href="https://mcguinlu.shinyapps.io/robvis" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                        <i class="fas fa-chart-bar"></i> robvis - 圖表視覺化工具
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -721,213 +791,897 @@
 
                     <!-- 五個偏差領域概覽 -->
                     <div class="rob-section">
-                        <h3><i class="fas fa-list-ol"></i> 五個偏差風險領域</h3>
+                        <h3><i class="fas fa-list-ol"></i> 五個偏差風險領域詳解</h3>
                         <div class="domains-overview">
                             <div class="domain-card domain-1">
+                                <div class="domain-number">D1</div>
                                 <div class="domain-icon"><i class="fas fa-random"></i></div>
                                 <div class="domain-content">
                                     <h4>隨機化過程偏差</h4>
-                                    <p>Bias arising from the randomization process</p>
-                                    <ul>
-                                        <li>隨機序列產生</li>
-                                        <li>分配隱藏</li>
-                                        <li>基線特徵差異</li>
-                                    </ul>
+                                    <p class="domain-en">Bias arising from the randomization process</p>
+                                    <div class="domain-description">
+                                        <p>評估隨機分配過程是否能確保各組間的可比性：</p>
+                                        <ul>
+                                            <li><strong>隨機序列產生</strong>：分配序列是否真正隨機？（電腦生成、隨機數表等）</li>
+                                            <li><strong>分配隱藏</strong>：分配序列是否在納入前對研究人員隱藏？（中央隨機、密封信封等）</li>
+                                            <li><strong>基線差異</strong>：各組基線特徵是否相似？明顯差異可能暗示隨機化問題</li>
+                                        </ul>
+                                    </div>
+                                    <div class="domain-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：單純敘述「隨機分配」不足以判斷為低風險，需要描述具體隨機化方法</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="domain-card domain-2">
+                                <div class="domain-number">D2</div>
                                 <div class="domain-icon"><i class="fas fa-route"></i></div>
                                 <div class="domain-content">
                                     <h4>偏離預定介入偏差</h4>
-                                    <p>Bias due to deviations from intended interventions</p>
-                                    <ul>
-                                        <li>參與者盲法</li>
-                                        <li>介入措施偏離</li>
-                                        <li>分析方法適當性</li>
-                                    </ul>
+                                    <p class="domain-en">Bias due to deviations from intended interventions</p>
+                                    <div class="domain-description">
+                                        <p>評估實際接受的介入是否與分配的介入一致：</p>
+                                        <ul>
+                                            <li><strong>盲法狀態</strong>：參與者、照護者、研究人員是否知道分組情況？</li>
+                                            <li><strong>介入偏離</strong>：是否發生因知道分組而產生的額外介入或行為改變？</li>
+                                            <li><strong>分析方法</strong>：是否採用適當的分析方法（ITT 或 PP）？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="domain-tip">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>注意：此領域根據評估「分配效果」或「依從效果」有不同的信號問題</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="domain-card domain-3">
+                                <div class="domain-number">D3</div>
                                 <div class="domain-icon"><i class="fas fa-database"></i></div>
                                 <div class="domain-content">
                                     <h4>結果數據缺失偏差</h4>
-                                    <p>Bias due to missing outcome data</p>
-                                    <ul>
-                                        <li>數據可得性</li>
-                                        <li>缺失數據處理</li>
-                                        <li>缺失機制評估</li>
-                                    </ul>
+                                    <p class="domain-en">Bias due to missing outcome data</p>
+                                    <div class="domain-description">
+                                        <p>評估結果數據的完整性及缺失對結果的影響：</p>
+                                        <ul>
+                                            <li><strong>數據完整性</strong>：結果數據是否對所有（或幾乎所有）參與者可得？</li>
+                                            <li><strong>缺失原因</strong>：缺失是否與真實結果相關？（非隨機缺失更令人擔憂）</li>
+                                            <li><strong>處理方法</strong>：是否使用敏感度分析評估缺失數據的影響？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="domain-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：若流失率高且各組不平衡，且流失原因可能與結果相關，則風險較高</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="domain-card domain-4">
+                                <div class="domain-number">D4</div>
                                 <div class="domain-icon"><i class="fas fa-ruler"></i></div>
                                 <div class="domain-content">
                                     <h4>結果測量偏差</h4>
-                                    <p>Bias in measurement of the outcome</p>
-                                    <ul>
-                                        <li>測量方法適當性</li>
-                                        <li>評估者盲法</li>
-                                        <li>測量誤差影響</li>
-                                    </ul>
+                                    <p class="domain-en">Bias in measurement of the outcome</p>
+                                    <div class="domain-description">
+                                        <p>評估結果測量方法的適當性與客觀性：</p>
+                                        <ul>
+                                            <li><strong>測量方法</strong>：測量方法是否有效且適當？</li>
+                                            <li><strong>組間差異</strong>：各組的測量方法或時間點是否一致？</li>
+                                            <li><strong>評估者盲法</strong>：結果評估者是否知道分組情況？知情是否影響評估？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="domain-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：客觀結果（如死亡率）較不易受評估者偏見影響；主觀結果需特別注意盲法</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="domain-card domain-5">
+                                <div class="domain-number">D5</div>
                                 <div class="domain-icon"><i class="fas fa-file-alt"></i></div>
                                 <div class="domain-content">
                                     <h4>選擇性報告偏差</h4>
-                                    <p>Bias in selection of the reported result</p>
+                                    <p class="domain-en">Bias in selection of the reported result</p>
+                                    <div class="domain-description">
+                                        <p>評估報告的結果是否經過選擇性篩選：</p>
+                                        <ul>
+                                            <li><strong>預先註冊</strong>：分析是否按照預先指定的計劃進行？（試驗註冊、統計分析計劃）</li>
+                                            <li><strong>結果選擇</strong>：報告的結果是否從多個測量方式、時間點、分析方法中挑選？</li>
+                                            <li><strong>選擇依據</strong>：結果的選擇是否基於統計顯著性或效果方向？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="domain-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：比較試驗註冊與最終報告，查看是否有未報告的預設結果或新增的結果</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 評估要訣 -->
+                    <div class="rob-section">
+                        <h3><i class="fas fa-question-circle"></i> 評估要訣</h3>
+                        <div class="tips-container">
+                            <div class="help-tips-grid">
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-search"></i></div>
+                                    <div class="tip-content">
+                                        <strong>仔細閱讀原文</strong>
+                                        <p>基於研究的方法學描述進行判斷，而非結果或結論</p>
+                                    </div>
+                                </div>
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-check-double"></i></div>
+                                    <div class="tip-content">
+                                        <strong>低風險需有證據</strong>
+                                        <p>判定為「低風險」需要有明確證據支持，而非僅因為沒有提到問題</p>
+                                    </div>
+                                </div>
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-shield-alt"></i></div>
+                                    <div class="tip-content">
+                                        <strong>保守選擇原則</strong>
+                                        <p>不確定時選擇「有些疑慮」較為保守，避免高估證據品質</p>
+                                    </div>
+                                </div>
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-pen"></i></div>
+                                    <div class="tip-content">
+                                        <strong>詳細記錄理由</strong>
+                                        <p>在判斷理由中詳細記錄評估依據，增加評估透明度與可重複性</p>
+                                    </div>
+                                </div>
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-users"></i></div>
+                                    <div class="tip-content">
+                                        <strong>雙人獨立評估</strong>
+                                        <p>建議由兩位評估者獨立評估後討論，達成一致意見以減少主觀偏差</p>
+                                    </div>
+                                </div>
+                                <div class="tip-card">
+                                    <div class="tip-icon"><i class="fas fa-graduation-cap"></i></div>
+                                    <div class="tip-content">
+                                        <strong>校準練習</strong>
+                                        <p>在正式評估前進行校準練習，確保評估者之間的一致性</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module GRADE: GRADE 證據品質評估 -->
+            <div id="module-grade" class="tab-content">
+                <div class="module-header">
+                    <h2>GRADE 證據品質評估</h2>
+                    <p>系統性評估證據確定性的國際標準方法</p>
+                </div>
+
+                <div class="grade-content">
+                    <!-- GRADE 介紹 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-info-circle"></i> 什麼是 GRADE？</h3>
+                        <div class="grade-intro">
+                            <div class="intro-card">
+                                <div class="intro-content">
+                                    <p><strong>GRADE (Grading of Recommendations, Assessment, Development and Evaluation)</strong> 是由國際 GRADE 工作小組開發的系統性方法，用於評估證據品質並制定健康照護建議。此方法為系統性文獻回顧、健康技術評估及臨床指南提供透明且結構化的評估流程。</p>
+                                    <div class="intro-highlights">
+                                        <div class="highlight-item">
+                                            <i class="fas fa-layer-group"></i>
+                                            <div>
+                                                <strong>四個證據等級</strong>
+                                                <p>高、中、低、極低四個等級反映對效果估計的信心程度</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-arrow-down"></i>
+                                            <div>
+                                                <strong>五個降級因素</strong>
+                                                <p>偏差風險、不一致性、間接性、不精確、發表偏差</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-arrow-up"></i>
+                                            <div>
+                                                <strong>三個升級因素</strong>
+                                                <p>大效應量、劑量反應關係、殘餘混淆影響</p>
+                                            </div>
+                                        </div>
+                                        <div class="highlight-item">
+                                            <i class="fas fa-globe"></i>
+                                            <div>
+                                                <strong>國際認可標準</strong>
+                                                <p>被 Cochrane、WHO、各國指南制定機構廣泛採用</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 選擇與評估結果重要性 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-bullseye"></i> 選擇與評估結果重要性</h3>
+                        <div class="outcome-importance">
+                            <div class="outcome-intro">
+                                <p>在進行 GRADE 評估之前，必須先確定要評估哪些結果 (Outcomes)。GRADE 強調應選擇<strong>以病人為中心的結果</strong>，並根據其對決策的重要性進行分級。這是 GRADE 方法的基礎步驟。</p>
+                            </div>
+
+                            <!-- 1-9 分評分系統 -->
+                            <div class="rating-scale-section">
+                                <h4><i class="fas fa-star"></i> 結果重要性評分系統 (1-9 分)</h4>
+                                <p>GRADE 使用 1-9 分量表來評估每個結果對決策的重要性，並將結果分為三個類別：</p>
+
+                                <div class="importance-scale">
+                                    <div class="scale-category critical">
+                                        <div class="scale-header">
+                                            <div class="scale-range">7-9 分</div>
+                                            <div class="scale-label">關鍵性結果</div>
+                                        </div>
+                                        <div class="scale-content">
+                                            <h5>Critical for Decision-Making</h5>
+                                            <p>對決策至關重要的結果。這些結果是制定建議的主要考量因素，將用於決定支持建議的整體證據品質。</p>
+                                            <div class="scale-note">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                <span>整體證據品質以所有關鍵性結果中<strong>最低的證據品質</strong>為準</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="scale-category important">
+                                        <div class="scale-header">
+                                            <div class="scale-range">4-6 分</div>
+                                            <div class="scale-label">重要但非關鍵</div>
+                                        </div>
+                                        <div class="scale-content">
+                                            <h5>Important but Not Critical</h5>
+                                            <p>對決策重要但非關鍵的結果。這些結果應納入證據概況表 (Evidence Profile) 和發現摘要表 (SoF Table)，但不是決定整體證據品質的主要因素。</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="scale-category limited">
+                                        <div class="scale-header">
+                                            <div class="scale-range">1-3 分</div>
+                                            <div class="scale-label">重要性有限</div>
+                                        </div>
+                                        <div class="scale-content">
+                                            <h5>Limited Importance / Not Important</h5>
+                                            <p>對決策重要性有限的結果。這些結果通常不納入證據概況表，不應影響建議的制定。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 病人重要結果 -->
+                            <div class="patient-outcomes-section">
+                                <h4><i class="fas fa-user-check"></i> 以病人為中心的結果 (Patient-Important Outcomes)</h4>
+                                <div class="outcomes-grid">
+                                    <div class="outcome-type desired">
+                                        <div class="outcome-icon"><i class="fas fa-smile"></i></div>
+                                        <div class="outcome-content">
+                                            <h5>期望效果 (Desirable Effects)</h5>
+                                            <ul>
+                                                <li>死亡率降低</li>
+                                                <li>症狀改善</li>
+                                                <li>生活品質提升</li>
+                                                <li>功能狀態改善</li>
+                                                <li>疾病預防</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="outcome-type undesired">
+                                        <div class="outcome-icon"><i class="fas fa-frown"></i></div>
+                                        <div class="outcome-content">
+                                            <h5>非期望效果 (Undesirable Effects)</h5>
+                                            <ul>
+                                                <li>不良反應</li>
+                                                <li>併發症</li>
+                                                <li>負擔（時間、費用）</li>
+                                                <li>疼痛或不適</li>
+                                                <li>生活品質下降</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="outcome-tip">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span><strong>重要原則：</strong>結果應代表「受益人在決定是否採取特定行動時會權衡的內容」。建議至少包含一項非期望效果。</span>
+                                </div>
+                            </div>
+
+                            <!-- 替代結果 -->
+                            <div class="surrogate-outcomes-section">
+                                <h4><i class="fas fa-exchange-alt"></i> 替代結果 vs 臨床結果</h4>
+                                <div class="surrogate-comparison">
+                                    <div class="surrogate-item clinical">
+                                        <h5><i class="fas fa-heartbeat"></i> 臨床結果 (Clinical Outcomes)</h5>
+                                        <p>直接反映病人健康狀態的結果</p>
+                                        <div class="example-box">
+                                            <strong>範例：</strong>
+                                            <ul>
+                                                <li>心肌梗塞發生率</li>
+                                                <li>中風發生率</li>
+                                                <li>死亡率</li>
+                                                <li>住院天數</li>
+                                            </ul>
+                                        </div>
+                                        <div class="preference-badge preferred">優先選擇</div>
+                                    </div>
+                                    <div class="surrogate-arrow"><i class="fas fa-arrows-alt-h"></i></div>
+                                    <div class="surrogate-item surrogate">
+                                        <h5><i class="fas fa-flask"></i> 替代結果 (Surrogate Outcomes)</h5>
+                                        <p>間接衡量臨床意義的指標</p>
+                                        <div class="example-box">
+                                            <strong>範例：</strong>
+                                            <ul>
+                                                <li>血壓數值</li>
+                                                <li>膽固醇濃度</li>
+                                                <li>抗體效價</li>
+                                                <li>腫瘤大小</li>
+                                            </ul>
+                                        </div>
+                                        <div class="preference-badge caution">需謹慎使用</div>
+                                    </div>
+                                </div>
+                                <div class="surrogate-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div>
+                                        <strong>使用替代結果的注意事項：</strong>
+                                        <p>替代結果與臨床結果之間的關聯性必須經過驗證。若使用未經充分驗證的替代結果，可能需要因「間接性」(Indirectness) 而降低證據品質等級。</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 評分流程 -->
+                            <div class="rating-process-section">
+                                <h4><i class="fas fa-tasks"></i> 結果重要性評分流程</h4>
+                                <div class="process-steps">
+                                    <div class="process-step">
+                                        <div class="process-number">1</div>
+                                        <div class="process-content">
+                                            <strong>列出所有相關結果</strong>
+                                            <p>在協議開發階段，列出所有可能與臨床問題相關的結果（包括期望與非期望效果）</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="process-number">2</div>
+                                        <div class="process-content">
+                                            <strong>進行重要性評分</strong>
+                                            <p>使用修正德爾菲法 (Modified Delphi)，由工作小組成員獨立進行 1-9 分評分</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="process-number">3</div>
+                                        <div class="process-content">
+                                            <strong>計算與討論</strong>
+                                            <p>計算平均分與分數範圍，針對差異較大的結果進行討論以達成共識</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="process-number">4</div>
+                                        <div class="process-content">
+                                            <strong>選擇納入結果</strong>
+                                            <p>選擇評分最高的 5-7 項結果納入證據審查，確保至少包含一項非期望效果</p>
+                                        </div>
+                                    </div>
+                                    <div class="process-step">
+                                        <div class="process-number">5</div>
+                                        <div class="process-content">
+                                            <strong>適時更新</strong>
+                                            <p>評分可在三個時間點更新：協議開發後、證據檢索後、制定建議時</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 四個證據等級 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-layer-group"></i> 四個證據品質等級</h3>
+                        <div class="evidence-levels">
+                            <div class="level-card level-high">
+                                <div class="level-header">
+                                    <div class="level-icon"><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i></div>
+                                    <div class="level-badge">⊕⊕⊕⊕</div>
+                                </div>
+                                <div class="level-content">
+                                    <h4>高品質 (High)</h4>
+                                    <p class="level-meaning">我們非常有信心，真實效果接近效果估計值</p>
+                                    <p class="level-implication"><strong>意涵：</strong>進一步的研究不太可能改變我們對效果估計的信心</p>
+                                    <p class="level-start"><strong>起始點：</strong>隨機對照試驗 (RCT)</p>
+                                </div>
+                            </div>
+                            <div class="level-card level-moderate">
+                                <div class="level-header">
+                                    <div class="level-icon"><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="far fa-circle"></i></div>
+                                    <div class="level-badge">⊕⊕⊕○</div>
+                                </div>
+                                <div class="level-content">
+                                    <h4>中品質 (Moderate)</h4>
+                                    <p class="level-meaning">我們對效果估計有中等信心，真實效果可能接近估計值，但也可能有實質差異</p>
+                                    <p class="level-implication"><strong>意涵：</strong>進一步的研究可能對效果估計的信心產生重要影響，並可能改變估計值</p>
+                                </div>
+                            </div>
+                            <div class="level-card level-low">
+                                <div class="level-header">
+                                    <div class="level-icon"><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="far fa-circle"></i><i class="far fa-circle"></i></div>
+                                    <div class="level-badge">⊕⊕○○</div>
+                                </div>
+                                <div class="level-content">
+                                    <h4>低品質 (Low)</h4>
+                                    <p class="level-meaning">我們對效果估計的信心有限，真實效果可能與估計值有實質差異</p>
+                                    <p class="level-implication"><strong>意涵：</strong>進一步的研究很可能對效果估計的信心產生重要影響，且很可能改變估計值</p>
+                                    <p class="level-start"><strong>起始點：</strong>觀察性研究</p>
+                                </div>
+                            </div>
+                            <div class="level-card level-very-low">
+                                <div class="level-header">
+                                    <div class="level-icon"><i class="fas fa-circle"></i><i class="far fa-circle"></i><i class="far fa-circle"></i><i class="far fa-circle"></i></div>
+                                    <div class="level-badge">⊕○○○</div>
+                                </div>
+                                <div class="level-content">
+                                    <h4>極低品質 (Very Low)</h4>
+                                    <p class="level-meaning">我們對效果估計幾乎沒有信心，真實效果很可能與估計值有實質差異</p>
+                                    <p class="level-implication"><strong>意涵：</strong>任何效果估計都非常不確定</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GRADE 評估流程 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-project-diagram"></i> GRADE 評估流程</h3>
+                        <div class="grade-flow">
+                            <div class="flow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>確定初始品質等級</h4>
+                                    <p>根據研究設計決定起始點：</p>
                                     <ul>
-                                        <li>結果選擇適當性</li>
-                                        <li>分析計劃一致性</li>
-                                        <li>多重檢定處理</li>
+                                        <li><strong>隨機對照試驗 (RCT)</strong>：從「高」開始</li>
+                                        <li><strong>觀察性研究</strong>：從「低」開始</li>
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- 研究管理系統 -->
-                    <div class="rob-section">
-                        <h3><i class="fas fa-tasks"></i> 研究管理系統</h3>
-                        <div class="study-management">
-                            <div class="management-controls">
-                                <button class="rob-btn primary" data-action="add-new-study">
-                                    <i class="fas fa-plus"></i> 新增研究
-                                </button>
-                                <button class="rob-btn secondary" data-action="import-studies">
-                                    <i class="fas fa-upload"></i> 批次匯入
-                                </button>
-                                <button class="rob-btn info" data-action="export-studies">
-                                    <i class="fas fa-download"></i> 匯出清單
-                                </button>
-                                <button class="rob-btn danger" data-action="clear-all-studies">
-                                    <i class="fas fa-trash-alt"></i> 清空全部
-                                </button>
-                                <button class="rob-btn secondary" data-action="load-demo-data">
-                                    <i class="fas fa-flask"></i> 載入示範資料
-                                </button>
+                            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                            <div class="flow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>評估五個降級因素</h4>
+                                    <p>檢視是否需要因以下原因降級：</p>
+                                    <ul>
+                                        <li>偏差風險 (Risk of Bias)</li>
+                                        <li>不一致性 (Inconsistency)</li>
+                                        <li>間接性 (Indirectness)</li>
+                                        <li>不精確 (Imprecision)</li>
+                                        <li>發表偏差 (Publication Bias)</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="studies-container" id="studies-container">
-                                <div class="empty-state" id="empty-state">
-                                    <i class="fas fa-clipboard-list"></i>
-                                    <h4>尚未新增任何研究</h4>
-                                    <p>點擊「新增研究」開始您的 RoB 2.0 評估</p>
+                            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>考慮三個升級因素</h4>
+                                    <p>對觀察性研究，考慮是否可升級：</p>
+                                    <ul>
+                                        <li>大效應量 (Large Effect)</li>
+                                        <li>劑量反應關係 (Dose-Response)</li>
+                                        <li>殘餘混淆影響 (Residual Confounding)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+                            <div class="flow-step final">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h4>整合得出最終證據品質</h4>
+                                    <p>綜合所有因素，確定該結果的整體證據確定性等級</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RoB 評估界面 -->
-                    <div class="rob-section" id="rob-assessment-section" style="display: none;">
-                        <h3><i class="fas fa-clipboard-check"></i> 偏差風險評估</h3>
-                        <div class="assessment-container">
-                            <div class="assessment-header">
-                                <div class="study-info" id="current-study-info">
-                                    <!-- 動態顯示當前評估的研究資訊 -->
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="assessment-progress"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- 五個領域的評估區塊 -->
-                            <div class="domains-assessment" id="domains-assessment">
-                                <!-- 這裡將動態生成五個領域的評估表單 -->
-                            </div>
-
-                            <!-- 整體風險判斷 -->
-                            <div class="overall-risk">
-                                <h4><i class="fas fa-balance-scale"></i> 整體偏差風險</h4>
-                                <div class="risk-summary" id="risk-summary">
-                                    <!-- 動態顯示整體風險判斷 -->
-                                </div>
-                            </div>
-
-                            <!-- 評估控制按鈕 -->
-                            <div class="assessment-controls">
-                                <button class="rob-btn secondary" onclick="saveAssessment()">
-                                    <i class="fas fa-save"></i> 儲存評估
-                                </button>
-                                <button class="rob-btn success" onclick="completeAssessment()">
-                                    <i class="fas fa-check"></i> 完成評估
-                                </button>
-                                <button class="rob-btn info" onclick="previewResults()">
-                                    <i class="fas fa-eye"></i> 預覽結果
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 結果視覺化 -->
-                    <div class="rob-section">
-                        <h3><i class="fas fa-chart-bar"></i> RoB2.0 圖表生成</h3>
-                        <div class="visualization-controls">
-                            <div class="chart-options">
-                                <button class="chart-btn active" data-chart="traffic-light" onclick="selectChart('traffic-light')">
-                                    <i class="fas fa-traffic-light"></i> Traffic Light Plot
-                                </button>
-                                <button class="chart-btn" data-chart="weighted-bar" onclick="selectChart('weighted-bar')">
-                                    <i class="fas fa-chart-bar"></i> Weighted Bar Plot
-                                </button>
-                            </div>
-                            <div class="export-options">
-                                <button class="export-btn" onclick="exportChart('svg')">
-                                    <i class="fas fa-file-code"></i> 匯出 SVG
-                                </button>
-                                <button class="export-btn" onclick="exportChart('png')">
-                                    <i class="fas fa-file-image"></i> 匯出 PNG
-                                </button>
-                                <button class="export-btn" onclick="exportPDF()">
-                                    <i class="fas fa-file-pdf"></i> 匯出 PDF 報告
-                                </button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <div id="rob-chart-table" style="display: none;"></div>
-                            <canvas id="rob-chart" style="display: none;"></canvas>
-                            <div class="chart-placeholder" id="chart-placeholder">
-                                <i class="fas fa-chart-bar"></i>
-                                <p>完成研究評估後，這裡將顯示 RoB 圖表</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 使用說明 -->
-                    <div class="rob-section">
-                        <h3><i class="fas fa-question-circle"></i> 使用說明</h3>
-                        <div class="help-content">
-                            <div class="help-accordion">
-                                <div class="help-item">
-                                    <div class="help-header" onclick="toggleHelp('getting-started')">
-                                        <span><i class="fas fa-play"></i> 開始使用</span>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-                                    <div class="help-content" id="getting-started">
-                                        <ol>
-                                            <li>點擊「新增研究」創建評估項目</li>
-                                            <li>輸入研究基本資訊（標題、作者、年份）</li>
-                                            <li>依序評估五個偏差領域</li>
-                                            <li>查看整體風險判斷結果</li>
-                                            <li>生成並匯出 RoB 圖表</li>
-                                        </ol>
+                    <!-- 五個降級因素詳解 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-arrow-circle-down"></i> 五個降級因素詳解</h3>
+                        <div class="downgrade-factors">
+                            <!-- 1. Risk of Bias -->
+                            <div class="factor-card downgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number">1</div>
+                                    <div class="factor-title">
+                                        <h4>偏差風險 (Risk of Bias / Study Limitations)</h4>
+                                        <p class="factor-subtitle">研究設計或執行的系統性缺陷</p>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-header" onclick="toggleHelp('assessment-tips')">
-                                        <span><i class="fas fa-lightbulb"></i> 評估要訣</span>
-                                        <i class="fas fa-chevron-down"></i>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>研究設計或執行中的缺陷可能導致對干預措施效果的偏誤估計，降低結果的可信度。
                                     </div>
-                                    <div class="help-content" id="assessment-tips">
+                                    <div class="factor-assess">
+                                        <strong>評估要點：</strong>
                                         <ul>
-                                            <li>仔細閱讀每個信號問題，基於研究描述進行判斷</li>
-                                            <li>「低風險」需要有明確證據支持</li>
-                                            <li>不確定時選擇「部分擔憂」較為保守</li>
-                                            <li>在判斷理由中詳細記錄評估依據</li>
-                                            <li>建議雙人獨立評估後討論一致</li>
+                                            <li><strong>隨機化過程</strong>：序列產生與分配隱藏是否適當？</li>
+                                            <li><strong>盲法實施</strong>：參與者、研究人員、結果評估者是否設盲？</li>
+                                            <li><strong>數據完整性</strong>：流失率是否可接受？ITT 分析是否執行？</li>
+                                            <li><strong>選擇性報告</strong>：是否報告所有預設結果？</li>
+                                            <li><strong>其他偏差</strong>：是否有提前終止、基線不平衡等問題？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-criteria">
+                                        <div class="criteria-item serious">
+                                            <span class="criteria-label">降一級</span>
+                                            <span class="criteria-desc">大多數研究存在重要限制，可能影響結果估計</span>
+                                        </div>
+                                        <div class="criteria-item very-serious">
+                                            <span class="criteria-label">降兩級</span>
+                                            <span class="criteria-desc">大多數研究存在非常嚴重的限制，大幅降低對效果的信心</span>
+                                        </div>
+                                    </div>
+                                    <div class="factor-tip">
+                                        <i class="fas fa-tools"></i>
+                                        <span>評估工具：RCT 使用 RoB 2.0，觀察性研究使用 ROBINS-I</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Inconsistency -->
+                            <div class="factor-card downgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number">2</div>
+                                    <div class="factor-title">
+                                        <h4>不一致性 (Inconsistency)</h4>
+                                        <p class="factor-subtitle">跨研究結果的異質性</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>不同研究間的效應估計存在未能解釋的變異，表現為結果方向或大小的顯著差異。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>評估要點：</strong>
+                                        <ul>
+                                            <li><strong>視覺檢查</strong>：森林圖中點估計與信賴區間的重疊程度</li>
+                                            <li><strong>I² 統計量</strong>：&lt;30% 低度、30-60% 中度、&gt;60% 高度異質性</li>
+                                            <li><strong>Chi² 檢驗</strong>：p &lt; 0.10 表示存在顯著異質性</li>
+                                            <li><strong>臨床意義</strong>：即使統計一致，效應大小差異是否有臨床意義？</li>
+                                            <li><strong>解釋嘗試</strong>：是否能透過亞組分析解釋異質性來源？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-criteria">
+                                        <div class="criteria-item serious">
+                                            <span class="criteria-label">降一級</span>
+                                            <span class="criteria-desc">I² 較高（50-75%）或信賴區間不完全重疊，但結論方向一致</span>
+                                        </div>
+                                        <div class="criteria-item very-serious">
+                                            <span class="criteria-label">降兩級</span>
+                                            <span class="criteria-desc">I² 很高（&gt;75%）、結果方向相反、或無法解釋的顯著異質性</span>
+                                        </div>
+                                    </div>
+                                    <div class="factor-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：只有一項研究時，通常不考慮不一致性（因無法比較）</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Indirectness -->
+                            <div class="factor-card downgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number">3</div>
+                                    <div class="factor-title">
+                                        <h4>間接性 (Indirectness)</h4>
+                                        <p class="factor-subtitle">證據與臨床問題的適用性</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>現有證據無法直接回答所關注的臨床問題，包括人群、介入、對照或結果與目標問題存在差異。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>四個面向的間接性：</strong>
+                                        <ul>
+                                            <li><strong>人群 (Population)</strong>：研究人群與目標人群特徵不同（如年齡、疾病嚴重度、共病）</li>
+                                            <li><strong>介入 (Intervention)</strong>：劑量、給藥途徑、療程與實際應用不同</li>
+                                            <li><strong>對照 (Comparison)</strong>：缺乏直接比較（如 A vs 安慰劑 + B vs 安慰劑，而非 A vs B）</li>
+                                            <li><strong>結果 (Outcome)</strong>：使用替代指標而非以病人為中心的結果（如抗體效價 vs 實際感染率）</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-criteria">
+                                        <div class="criteria-item serious">
+                                            <span class="criteria-label">降一級</span>
+                                            <span class="criteria-desc">單一面向存在中度間接性，或多個面向有輕度間接性</span>
+                                        </div>
+                                        <div class="criteria-item very-serious">
+                                            <span class="criteria-label">降兩級</span>
+                                            <span class="criteria-desc">多個面向存在嚴重間接性，或使用的替代結果缺乏驗證的相關性</span>
+                                        </div>
+                                    </div>
+                                    <div class="factor-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：間接性評估需要臨床專業判斷，考量差異是否足以影響效果估計</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Imprecision -->
+                            <div class="factor-card downgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number">4</div>
+                                    <div class="factor-title">
+                                        <h4>不精確 (Imprecision)</h4>
+                                        <p class="factor-subtitle">效果估計的隨機誤差</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>由於樣本量不足或事件數太少導致的隨機誤差，表現為寬廣的信賴區間，無法區分臨床上重要的益處與傷害。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>評估要點：</strong>
+                                        <ul>
+                                            <li><strong>信賴區間寬度</strong>：95% CI 是否同時包含臨床上重要的益處和傷害？</li>
+                                            <li><strong>最優資訊量 (OIS)</strong>：總樣本量是否達到單一適當研究所需的樣本量？</li>
+                                            <li><strong>事件數</strong>：二分結果需至少 300 個事件，連續結果需 400 個參與者</li>
+                                            <li><strong>臨床決策閾值</strong>：CI 是否跨越預設的臨床重要差異閾值？</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-criteria">
+                                        <div class="criteria-item serious">
+                                            <span class="criteria-label">降一級</span>
+                                            <span class="criteria-desc">CI 寬但大致可接受；或 CI 跨越臨床決策閾值但未達 OIS</span>
+                                        </div>
+                                        <div class="criteria-item very-serious">
+                                            <span class="criteria-label">降兩級</span>
+                                            <span class="criteria-desc">CI 極寬，同時包含重要益處和重要傷害；樣本量極小</span>
+                                        </div>
+                                    </div>
+                                    <div class="factor-tip">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>提示：即使 p &lt; 0.05，若 CI 很寬仍可能需要降級；反之，若 CI 完全落在重要效應範圍內則不需降級</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. Publication Bias -->
+                            <div class="factor-card downgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number">5</div>
+                                    <div class="factor-title">
+                                        <h4>發表偏差 (Publication Bias)</h4>
+                                        <p class="factor-subtitle">選擇性發表導致的系統性偏誤</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>具有正向或顯著結果的研究更容易被發表，導致整體證據對真實效果的系統性高估或低估。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>評估要點：</strong>
+                                        <ul>
+                                            <li><strong>漏斗圖 (Funnel Plot)</strong>：檢查圖形是否對稱，非對稱提示可能存在發表偏差</li>
+                                            <li><strong>統計檢驗</strong>：Egger's test 或 Begg's test（需至少 10 項研究）</li>
+                                            <li><strong>試驗註冊比對</strong>：檢查已註冊但未發表的試驗</li>
+                                            <li><strong>資助來源</strong>：全部由廠商資助的小型研究特別需要警惕</li>
+                                            <li><strong>研究規模</strong>：多個小型研究均為正向結果令人擔憂</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-criteria">
+                                        <div class="criteria-item serious">
+                                            <span class="criteria-label">降一級</span>
+                                            <span class="criteria-desc">強烈懷疑存在發表偏差（通常最多降一級）</span>
+                                        </div>
+                                    </div>
+                                    <div class="factor-tip">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>注意：發表偏差難以直接證實，GRADE 建議最多降一級；若無法評估則標註為「未檢測」</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 三個升級因素 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-arrow-circle-up"></i> 三個升級因素（適用於觀察性研究）</h3>
+                        <div class="upgrade-intro">
+                            <p><i class="fas fa-info-circle"></i> 升級因素主要適用於觀察性研究。升級前提是研究沒有其他嚴重問題（如偏差風險、不精確等），且通常最多升級至「高」品質。</p>
+                        </div>
+                        <div class="upgrade-factors">
+                            <!-- 1. Large Effect -->
+                            <div class="factor-card upgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number up">1</div>
+                                    <div class="factor-title">
+                                        <h4>大效應量 (Large Magnitude of Effect)</h4>
+                                        <p class="factor-subtitle">效果估計值很大且一致</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>當效應量大到不太可能僅由殘餘混淆或偏差解釋時，可考慮升級。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>升級標準：</strong>
+                                        <div class="effect-size-criteria">
+                                            <div class="effect-item">
+                                                <div class="effect-label">升一級</div>
+                                                <div class="effect-value">RR &gt; 2 或 RR &lt; 0.5</div>
+                                                <div class="effect-desc">相對風險增加或減少至少 2 倍</div>
+                                            </div>
+                                            <div class="effect-item">
+                                                <div class="effect-label">升兩級</div>
+                                                <div class="effect-value">RR &gt; 5 或 RR &lt; 0.2</div>
+                                                <div class="effect-desc">相對風險增加或減少至少 5 倍</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-requirements">
+                                        <strong>必要條件：</strong>
+                                        <ul>
+                                            <li>至少 2 項獨立研究顯示一致的大效應</li>
+                                            <li>沒有嚴重的偏差風險問題</li>
+                                            <li>信賴區間不跨越 1（即統計顯著）</li>
+                                            <li>沒有合理的混淆因素可解釋此效應</li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- 2. Dose-Response -->
+                            <div class="factor-card upgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number up">2</div>
+                                    <div class="factor-title">
+                                        <h4>劑量反應關係 (Dose-Response Gradient)</h4>
+                                        <p class="factor-subtitle">存在明確的劑量-效應梯度</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>當觀察到隨著暴露量（劑量、持續時間、強度）增加，結果發生率呈現系統性變化時，支持因果關係推論。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>評估要點：</strong>
+                                        <ul>
+                                            <li>暴露量與效應之間存在明確的梯度關係</li>
+                                            <li>較高劑量/暴露 → 較大效應（或較低效應，取決於方向）</li>
+                                            <li>這種關係在生物學上合理</li>
+                                            <li>劑量反應關係不能被混淆因素解釋</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-requirements">
+                                        <strong>升級條件：</strong>
+                                        <ul>
+                                            <li>存在可信的劑量反應梯度</li>
+                                            <li>通常升一級（因殘餘混淆仍可能存在）</li>
+                                            <li>若同時具有大效應量，可考慮升兩級</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Residual Confounding -->
+                            <div class="factor-card upgrade">
+                                <div class="factor-header">
+                                    <div class="factor-number up">3</div>
+                                    <div class="factor-title">
+                                        <h4>殘餘混淆影響 (Plausible Residual Confounding)</h4>
+                                        <p class="factor-subtitle">混淆因素應減弱但效應仍明顯</p>
+                                    </div>
+                                </div>
+                                <div class="factor-body">
+                                    <div class="factor-definition">
+                                        <strong>定義：</strong>當所有合理的殘餘混淆因素的預期方向應該減弱觀察到的效應（或產生虛假效應），但實際上效應仍然明顯時，增加對因果關係的信心。
+                                    </div>
+                                    <div class="factor-assess">
+                                        <strong>兩種情況：</strong>
+                                        <ul>
+                                            <li><strong>情況一：</strong>所有合理的混淆因素應減弱效應 → 但效應仍然顯著 → 真實效應可能更大</li>
+                                            <li><strong>情況二：</strong>所有合理的混淆因素應產生虛假效應 → 但未觀察到效應 → 增加對「無效應」結論的信心</li>
+                                        </ul>
+                                    </div>
+                                    <div class="factor-requirements">
+                                        <strong>升級條件：</strong>
+                                        <ul>
+                                            <li>能清楚識別混淆因素的預期影響方向</li>
+                                            <li>觀察到的效應與混淆預期方向相反</li>
+                                            <li>通常升一級</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 實用決策表 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-table"></i> GRADE 評估快速參考表</h3>
+                        <div class="grade-table-container">
+                            <table class="grade-reference-table">
+                                <thead>
+                                    <tr>
+                                        <th>因素</th>
+                                        <th>評估問題</th>
+                                        <th>降/升一級</th>
+                                        <th>降/升兩級</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="downgrade-row">
+                                        <td><strong>偏差風險</strong></td>
+                                        <td>研究設計或執行是否有缺陷？</td>
+                                        <td>嚴重限制</td>
+                                        <td>非常嚴重限制</td>
+                                    </tr>
+                                    <tr class="downgrade-row">
+                                        <td><strong>不一致性</strong></td>
+                                        <td>研究間結果是否有顯著差異？</td>
+                                        <td>I² 50-75%；方向一致</td>
+                                        <td>I² &gt;75%；方向相反</td>
+                                    </tr>
+                                    <tr class="downgrade-row">
+                                        <td><strong>間接性</strong></td>
+                                        <td>證據是否直接適用於目標問題？</td>
+                                        <td>單一面向中度間接</td>
+                                        <td>多面向嚴重間接</td>
+                                    </tr>
+                                    <tr class="downgrade-row">
+                                        <td><strong>不精確</strong></td>
+                                        <td>效果估計是否足夠精確？</td>
+                                        <td>CI 寬；跨越決策閾值</td>
+                                        <td>CI 極寬；樣本極小</td>
+                                    </tr>
+                                    <tr class="downgrade-row">
+                                        <td><strong>發表偏差</strong></td>
+                                        <td>是否懷疑選擇性發表？</td>
+                                        <td>強烈懷疑</td>
+                                        <td>（通常最多降一級）</td>
+                                    </tr>
+                                    <tr class="upgrade-row">
+                                        <td><strong>大效應量</strong></td>
+                                        <td>效應是否大到難以被偏差解釋？</td>
+                                        <td>RR &gt;2 或 &lt;0.5</td>
+                                        <td>RR &gt;5 或 &lt;0.2</td>
+                                    </tr>
+                                    <tr class="upgrade-row">
+                                        <td><strong>劑量反應</strong></td>
+                                        <td>是否存在劑量-效應梯度？</td>
+                                        <td>可信的梯度關係</td>
+                                        <td>（合併大效應可升兩級）</td>
+                                    </tr>
+                                    <tr class="upgrade-row">
+                                        <td><strong>殘餘混淆</strong></td>
+                                        <td>混淆應減弱效應但效應仍明顯？</td>
+                                        <td>效應與混淆方向相反</td>
+                                        <td>—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 官方資源 -->
+                    <div class="grade-section">
+                        <h3><i class="fas fa-external-link-alt"></i> 官方資源與工具</h3>
+                        <div class="grade-resources">
+                            <a href="https://www.gradeworkinggroup.org/" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                <i class="fas fa-globe"></i> GRADE Working Group 官方網站
+                            </a>
+                            <a href="https://gdt.gradepro.org/" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                <i class="fas fa-tools"></i> GRADEpro GDT - 線上評估工具
+                            </a>
+                            <a href="https://gdt.gradepro.org/app/handbook/handbook.html" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                <i class="fas fa-book"></i> GRADE Handbook - 完整指南
+                            </a>
+                            <a href="https://www.cdc.gov/acip-grade-handbook/" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                <i class="fas fa-hospital"></i> CDC ACIP GRADE Handbook
+                            </a>
+                            <a href="https://training.cochrane.org/grade-approach" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                <i class="fas fa-graduation-cap"></i> Cochrane GRADE 培訓資源
+                            </a>
                         </div>
                     </div>
                 </div>
