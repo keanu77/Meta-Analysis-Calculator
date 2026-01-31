@@ -247,6 +247,33 @@ body {
     transform: scale(1.1);
 }
 
+/* Disabled Tab */
+.tab-btn.tab-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    position: relative;
+}
+
+.tab-btn.tab-disabled:hover {
+    background: transparent;
+    transform: none;
+}
+
+.badge-dev {
+    display: inline-block;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
 /* Main Content */
 .main-content {
     padding: var(--space-8) 0;
