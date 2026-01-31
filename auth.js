@@ -35,7 +35,8 @@ const AuthManager = {
             } catch (e) {
                 console.error('解析用戶資料失敗:', e);
                 this.updateUIForLoggedOut();
-                this.showAuthOverlay();
+                // 不顯示遮罩，讓用戶可以正常使用所有功能
+                // this.showAuthOverlay();
             }
         } else {
             console.log('用戶未登入');

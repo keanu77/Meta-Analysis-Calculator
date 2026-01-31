@@ -214,16 +214,8 @@ function switchTab(tabId) {
 
 // Tab Access Control Functions
 function checkTabAccess(tabId) {
-    // Define public tabs that don't require login
-    const publicTabs = ['module-guide', 'module-stats'];
-
-    // If it's a public tab, always allow access
-    if (publicTabs.includes(tabId)) {
-        return true;
-    }
-
-    // For restricted tabs, check if user is logged in
-    return isUserLoggedIn();
+    // 所有功能已解鎖，不需要登入
+    return true;
 }
 
 function isUserLoggedIn() {
@@ -235,33 +227,14 @@ function isUserLoggedIn() {
 }
 
 function updateTabAccessStates() {
+    // 所有功能已解鎖，移除所有鎖定樣式
     const tabButtons = document.querySelectorAll('.tab-btn');
-
     tabButtons.forEach(button => {
-        const targetTab = button.getAttribute('data-tab');
-        const hasAccess = checkTabAccess(targetTab);
-
-        if (!hasAccess) {
-            button.classList.add('restricted-tab');
-            button.setAttribute('title', '請登入以使用此功能');
-
-            // Add a lock icon
-            if (!button.querySelector('.lock-icon')) {
-                const lockIcon = document.createElement('i');
-                lockIcon.className = 'fas fa-lock lock-icon';
-                lockIcon.style.marginLeft = '5px';
-                lockIcon.style.fontSize = '0.8em';
-                button.appendChild(lockIcon);
-            }
-        } else {
-            button.classList.remove('restricted-tab');
-            button.removeAttribute('title');
-
-            // Remove lock icon if it exists
-            const lockIcon = button.querySelector('.lock-icon');
-            if (lockIcon) {
-                lockIcon.remove();
-            }
+        button.classList.remove('restricted-tab');
+        button.removeAttribute('title');
+        const lockIcon = button.querySelector('.lock-icon');
+        if (lockIcon) {
+            lockIcon.remove();
         }
     });
 }
