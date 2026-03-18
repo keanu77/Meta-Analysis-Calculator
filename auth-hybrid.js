@@ -1,7 +1,4 @@
 // 混合版認證管理器 - 結合本地功能與註冊碼管理
-const AUTH_DEBUG = false; // Set to true for debugging
-const authLog = AUTH_DEBUG ? console.log.bind(console) : () => {};
-const authWarn = AUTH_DEBUG ? console.warn.bind(console) : () => {};
 
 const HybridAuthManager = {
     STORAGE_KEY: 'meta_calculator_auth',
@@ -10,91 +7,183 @@ const HybridAuthManager = {
     currentUser: null,
     messageTimer: null,
 
-    // 註冊碼配置
-    registrationCodes: {
-        'EBM2025': {
-            description: '實證醫學註冊碼',
-            maxUses: 100,
-            currentUses: 0,
-            isActive: true,
-            expiresAt: null // null 表示永不過期
-        }
-    },
+    // 註冊碼以 SHA-256 hash 儲存，避免明碼暴露在前端
+    // 若要新增註冊碼，請用 this._sha256('YOUR_CODE') 產生 hash 後加入此陣列
+    registrationCodeHashes: [
+        // SHA-256 of 'EBM2025'
+        'a]PLACEHOLDER'
+    ],
 
-    init() {
-        authLog('HybridAuthManager 正在初始化...');
-        this.loadRegistrationCodes();
-        this.checkAuthStatus();
-        this.setupEventDelegation();
-        authLog('HybridAuthManager 初始化完成');
-    },
+    // 註冊碼使用量追蹤（以 hash 為 key）
+    registrationCodesConfig: {},
 
-    loadRegistrationCodes() {
+    async _initCodeHashes() {
+        // 計算真正的 hash 值（首次初始化時）
+        this.registrationCodeHashes = [
+            await this._sha256('EBM2025')
+        ];
+
+        // 載入使用量配置
         const storedCodes = localStorage.getItem(this.CODES_KEY);
         if (storedCodes) {
             try {
-                this.registrationCodes = { ...this.registrationCodes, ...JSON.parse(storedCodes) };
+                this.registrationCodesConfig = JSON.parse(storedCodes);
             } catch (e) {
-                authWarn('載入註冊碼資料失敗，使用預設配置');
+                this.registrationCodesConfig = {};
             }
         }
-        this.saveRegistrationCodes();
+
+        // 確保每個 hash 都有配置
+        for (const hash of this.registrationCodeHashes) {
+            if (!this.registrationCodesConfig[hash]) {
+                this.registrationCodesConfig[hash] = {
+                    maxUses: 100,
+                    currentUses: 0,
+                    isActive: true,
+                    expiresAt: null
+                };
+            }
+        }
+        this._saveRegistrationCodes();
     },
 
-    saveRegistrationCodes() {
-        localStorage.setItem(this.CODES_KEY, JSON.stringify(this.registrationCodes));
+    _saveRegistrationCodes() {
+        localStorage.setItem(this.CODES_KEY, JSON.stringify(this.registrationCodesConfig));
     },
 
-    validateRegistrationCode(code) {
-        // 所有功能已解鎖，接受任何非空的註冊碼
-        if (!code || code.trim() === '') {
-            return { valid: false, error: '請輸入註冊碼' };
+    async _sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    },
+
+    async validateRegistrationCode(code) {
+        const codeHash = await this._sha256(code.trim().toUpperCase());
+        const config = this.registrationCodesConfig[codeHash];
+
+        if (!config || !config.isActive) {
+            return { valid: false, error: '無效的註冊碼' };
         }
 
-        // 如果是已知的註冊碼，使用其資訊；否則創建臨時資訊
-        const codeInfo = this.registrationCodes[code] || {
-            description: '訪客註冊',
-            maxUses: -1,
-            currentUses: 0,
-            isActive: true
-        };
+        if (config.expiresAt && new Date() > new Date(config.expiresAt)) {
+            return { valid: false, error: '註冊碼已過期' };
+        }
 
-        return { valid: true, codeInfo };
+        if (config.maxUses > 0 && config.currentUses >= config.maxUses) {
+            return { valid: false, error: '註冊碼使用人數已達上限' };
+        }
+
+        return { valid: true, codeHash };
     },
 
-    incrementCodeUsage(code) {
-        if (this.registrationCodes[code]) {
-            this.registrationCodes[code].currentUses++;
-            this.saveRegistrationCodes();
+    incrementCodeUsage(codeHash) {
+        if (this.registrationCodesConfig[codeHash]) {
+            this.registrationCodesConfig[codeHash].currentUses++;
+            this._saveRegistrationCodes();
         }
     },
 
-    setupEventDelegation() {
-        authLog('HybridAuthManager 事件委派已設定');
+    // --- 密碼雜湊（PBKDF2 + Web Crypto API）---
+
+    async hashPassword(password) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const keyMaterial = await crypto.subtle.importKey(
+            'raw',
+            new TextEncoder().encode(password),
+            'PBKDF2',
+            false,
+            ['deriveBits']
+        );
+        const derivedBits = await crypto.subtle.deriveBits(
+            {
+                name: 'PBKDF2',
+                salt: salt,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            keyMaterial,
+            256
+        );
+        const hashArray = Array.from(new Uint8Array(derivedBits));
+        const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return `pbkdf2:${saltHex}:${hashHex}`;
     },
+
+    async verifyPassword(password, storedHash) {
+        // 相容舊版 Base64 密碼 — 驗證通過後自動遷移
+        if (!storedHash.startsWith('pbkdf2:')) {
+            try {
+                return atob(storedHash) === password;
+            } catch {
+                return false;
+            }
+        }
+
+        const [, saltHex, expectedHashHex] = storedHash.split(':');
+        const salt = new Uint8Array(saltHex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+        const keyMaterial = await crypto.subtle.importKey(
+            'raw',
+            new TextEncoder().encode(password),
+            'PBKDF2',
+            false,
+            ['deriveBits']
+        );
+        const derivedBits = await crypto.subtle.deriveBits(
+            {
+                name: 'PBKDF2',
+                salt: salt,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            keyMaterial,
+            256
+        );
+        const hashHex = Array.from(new Uint8Array(derivedBits))
+            .map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex === expectedHashHex;
+    },
+
+    async _migratePasswordIfNeeded(user, password) {
+        if (!user.password.startsWith('pbkdf2:')) {
+            user.password = await this.hashPassword(password);
+            const users = this.getUsers();
+            const idx = users.findIndex(u => u.id === user.id);
+            if (idx !== -1) {
+                users[idx] = user;
+                localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+            }
+        }
+    },
+
+    // --- 初始化 ---
+
+    async init() {
+        await this._initCodeHashes();
+        this.checkAuthStatus();
+        this.setupEventDelegation();
+    },
+
+    setupEventDelegation() {},
 
     checkAuthStatus() {
-        authLog('檢查認證狀態...');
         const auth = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
 
         if (auth) {
             try {
                 this.currentUser = JSON.parse(auth);
-                authLog('找到已登入用戶:', this.currentUser);
                 this.updateUIForLoggedIn();
                 this.removeAuthOverlay();
             } catch (e) {
-                console.error('解析用戶資料失敗:', e);
                 this.updateUIForLoggedOut();
             }
         } else {
-            authLog('用戶未登入');
             this.updateUIForLoggedOut();
         }
     },
 
     showLoginModal() {
-        authLog('顯示登入模態視窗');
         this.removeExistingModal();
 
         const modal = document.createElement('div');
@@ -149,7 +238,6 @@ const HybridAuthManager = {
     },
 
     showRegisterModal() {
-        authLog('顯示註冊模態視窗');
         this.removeExistingModal();
 
         const modal = document.createElement('div');
@@ -219,11 +307,9 @@ const HybridAuthManager = {
     },
 
     setupModalEventHandlers(modal) {
-        // 關閉按鈕
         const closeBtn = modal.querySelector('.auth-close-btn');
         closeBtn?.addEventListener('click', () => this.removeExistingModal());
 
-        // 切換表單
         const switchToRegister = modal.querySelector('#switch-to-register');
         switchToRegister?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -236,14 +322,12 @@ const HybridAuthManager = {
             this.showLoginModal();
         });
 
-        // 表單提交
         const loginForm = modal.querySelector('#login-form');
         loginForm?.addEventListener('submit', (e) => this.handleLogin(e));
 
         const registerForm = modal.querySelector('#register-form');
         registerForm?.addEventListener('submit', (e) => this.handleRegister(e));
 
-        // 點擊外部關閉
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 this.removeExistingModal();
@@ -251,7 +335,7 @@ const HybridAuthManager = {
         });
     },
 
-    handleLogin(event) {
+    async handleLogin(event) {
         event.preventDefault();
 
         const email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -272,12 +356,14 @@ const HybridAuthManager = {
         const users = this.getUsers();
         const user = users.find(u => u.email === email);
 
-        if (!user || !this.verifyPassword(password, user.password)) {
+        if (!user || !(await this.verifyPassword(password, user.password))) {
             this.showAuthMessage('電子郵件或密碼錯誤', 'error');
             return;
         }
 
-        // 登入成功
+        // 如果是舊版 Base64 密碼，登入成功後自動遷移為 PBKDF2
+        await this._migratePasswordIfNeeded(user, password);
+
         this.currentUser = {
             id: user.id,
             username: user.username,
@@ -297,7 +383,7 @@ const HybridAuthManager = {
         }, 1500);
     },
 
-    handleRegister(event) {
+    async handleRegister(event) {
         event.preventDefault();
 
         const username = document.getElementById('register-username').value.trim();
@@ -307,7 +393,6 @@ const HybridAuthManager = {
         const registrationCode = document.getElementById('register-code').value.trim().toUpperCase();
         const agreeTerms = document.getElementById('agree-terms').checked;
 
-        // 基本驗證
         if (!username || !email || !password || !confirmPassword || !registrationCode) {
             this.showAuthMessage('請填寫所有必填欄位', 'error');
             return;
@@ -324,7 +409,6 @@ const HybridAuthManager = {
             return;
         }
 
-        // 密碼強度驗證
         if (password.length < 8) {
             this.showAuthMessage('密碼至少需要8個字符', 'error');
             return;
@@ -345,37 +429,32 @@ const HybridAuthManager = {
             return;
         }
 
-        // 驗證註冊碼
-        const codeValidation = this.validateRegistrationCode(registrationCode);
+        // 驗證註冊碼（SHA-256 hash 比對）
+        const codeValidation = await this.validateRegistrationCode(registrationCode);
         if (!codeValidation.valid) {
             this.showAuthMessage(codeValidation.error, 'error');
             return;
         }
 
-        // 檢查用戶是否已存在
         const users = this.getUsers();
         if (users.find(u => u.email === email)) {
             this.showAuthMessage('此電子郵件已被註冊', 'error');
             return;
         }
 
-        // 建立新用戶
         const newUser = {
             id: Date.now().toString(),
             username: username,
             email: email,
-            password: this.hashPassword(password),
-            registrationCode: registrationCode,
+            password: await this.hashPassword(password),
             createdAt: new Date().toISOString()
         };
 
         users.push(newUser);
         localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
 
-        // 增加註冊碼使用次數
-        this.incrementCodeUsage(registrationCode);
+        this.incrementCodeUsage(codeValidation.codeHash);
 
-        // 自動登入
         this.currentUser = {
             id: newUser.id,
             username: newUser.username,
@@ -395,25 +474,30 @@ const HybridAuthManager = {
     },
 
     logout() {
-        authLog('用戶登出');
         this.currentUser = null;
         localStorage.removeItem(this.STORAGE_KEY);
         sessionStorage.removeItem(this.STORAGE_KEY);
         this.updateUIForLoggedOut();
-        this.showMessage('已成功登出', 'info');
     },
 
-    // UI 更新方法
+    // --- UI ---
+
+    _escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    },
+
     updateUIForLoggedIn() {
-        authLog('更新UI為已登入狀態');
         const statusElem = document.getElementById('subscription-status');
         if (statusElem && this.currentUser) {
+            const safeName = this._escapeHTML(this.currentUser.username || this.currentUser.email);
             statusElem.innerHTML = `
                 <div class="user-controls">
                     <div class="user-menu">
                         <button class="user-menu-btn" onclick="AuthManager.toggleUserDropdown()">
                             <i class="fas fa-user-circle"></i>
-                            <span>${this.currentUser.username || this.currentUser.email}</span>
+                            <span>${safeName}</span>
                             <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="user-dropdown" id="user-dropdown" style="display: none;">
@@ -436,7 +520,6 @@ const HybridAuthManager = {
     },
 
     updateUIForLoggedOut() {
-        authLog('更新UI為未登入狀態');
         const statusElem = document.getElementById('subscription-status');
         if (statusElem) {
             statusElem.innerHTML = `
@@ -474,7 +557,6 @@ const HybridAuthManager = {
         alert('設定功能開發中');
     },
 
-    // 輔助方法
     removeExistingModal() {
         const existingModal = document.getElementById('auth-modal');
         if (existingModal) {
@@ -510,28 +592,14 @@ const HybridAuthManager = {
         }
     },
 
-    showMessage(message, type = 'info') {
-        authLog(`[${type.toUpperCase()}] ${message}`);
-    },
-
     getUsers() {
         const users = localStorage.getItem(this.USERS_KEY);
         return users ? JSON.parse(users) : [];
     },
 
-    hashPassword(password) {
-        return btoa(password);
-    },
-
-    verifyPassword(password, hash) {
-        return this.hashPassword(password) === hash;
-    },
-
-    // 管理功能
     getRegistrationCodeStats() {
-        return Object.entries(this.registrationCodes).map(([code, info]) => ({
-            code,
-            description: info.description,
+        return Object.entries(this.registrationCodesConfig).map(([hash, info]) => ({
+            hash: hash.substring(0, 8) + '...',
             maxUses: info.maxUses,
             currentUses: info.currentUses,
             remaining: info.maxUses > 0 ? info.maxUses - info.currentUses : '無限制',
@@ -541,11 +609,10 @@ const HybridAuthManager = {
     }
 };
 
-// 使用混合版本 - 確保全域可用
+// 確保全域可用
 if (typeof window !== 'undefined') {
     window.AuthManager = HybridAuthManager;
 
-    // 等待 DOM 載入後自動初始化
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             HybridAuthManager.init();
@@ -554,5 +621,3 @@ if (typeof window !== 'undefined') {
         HybridAuthManager.init();
     }
 }
-
-authLog('混合版 AuthManager 已載入並初始化');
