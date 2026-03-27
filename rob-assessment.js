@@ -356,9 +356,6 @@ class RoBAssessment {
 
     // Save cleaned data back to localStorage if anything was removed
     if (this.studies.length !== originalLength) {
-      console.log(
-        `Cleaned ${originalLength - this.studies.length} demo studies`,
-      );
       this.saveStudies();
     }
   }
@@ -453,7 +450,6 @@ class RoBAssessment {
   }
 
   addNewStudy() {
-    console.log("RoBAssessment.addNewStudy() called");
     try {
       const study = {
         id: Date.now().toString(),
@@ -466,15 +462,10 @@ class RoBAssessment {
         notes: "",
       };
 
-      console.log("Creating new study:", study);
       this.studies.push(study);
-      console.log("Studies array now has", this.studies.length, "studies");
       this.saveStudies();
-      console.log("Studies saved to localStorage");
       this.renderStudiesList();
-      console.log("Studies list rendered");
       this.editStudy(this.studies.length - 1);
-      console.log("Opened edit interface for new study");
     } catch (error) {
       console.error("Error in addNewStudy():", error);
       throw error;
@@ -488,7 +479,6 @@ class RoBAssessment {
   }
 
   deleteStudy(index) {
-    console.log("deleteStudy method called with index:", index);
     if (index < 0 || index >= this.studies.length) {
       console.error("Invalid study index:", index);
       alert("無效的研究索引");
@@ -497,23 +487,16 @@ class RoBAssessment {
 
     const studyTitle = this.studies[index].title || "未命名研究";
     if (confirm(`確定要刪除研究「${studyTitle}」嗎？此操作無法復原。`)) {
-      console.log("User confirmed, deleting study:", studyTitle);
       this.studies.splice(index, 1);
       this.saveStudies();
       this.renderStudiesList();
-      console.log("Study deleted successfully");
-    } else {
-      console.log("User cancelled study deletion");
     }
   }
 
   clearAllStudies() {
-    console.log("clearAllStudies method called");
-    console.log("User confirmed, clearing all studies");
     this.studies = [];
     this.saveStudies();
     this.renderStudiesList();
-    console.log("All studies cleared successfully");
   }
 
   duplicateStudy(index) {
@@ -793,8 +776,6 @@ class RoBAssessment {
     const progressBar = document.getElementById("assessment-progress");
     if (progressBar) {
       progressBar.style.width = progress + "%";
-    } else {
-      console.warn("assessment-progress element not found");
     }
   }
 
@@ -868,10 +849,8 @@ const robSystem = new RoBAssessment();
 
 // RoB 2.0 Global Functions
 function addNewStudy() {
-  console.log("addNewStudy() called");
   try {
     robSystem.addNewStudy();
-    console.log("Successfully added new study");
   } catch (error) {
     console.error("Error adding new study:", error);
     alert("添加研究時出現錯誤: " + error.message);
@@ -879,10 +858,8 @@ function addNewStudy() {
 }
 
 function editStudy(index) {
-  console.log("editStudy() called with index:", index);
   try {
     robSystem.editStudy(index);
-    console.log("Successfully opened edit interface");
   } catch (error) {
     console.error("Error editing study:", error);
     alert("編輯研究時出現錯誤: " + error.message);
@@ -890,7 +867,6 @@ function editStudy(index) {
 }
 
 function deleteStudy(index) {
-  console.log("deleteStudy() global function called with index:", index);
   try {
     if (!robSystem) {
       console.error("robSystem is not initialized");
@@ -903,7 +879,6 @@ function deleteStudy(index) {
       return;
     }
     robSystem.deleteStudy(index);
-    console.log("Successfully deleted study");
   } catch (error) {
     console.error("Error deleting study:", error);
     alert("刪除研究時出現錯誤: " + error.message);
@@ -911,7 +886,6 @@ function deleteStudy(index) {
 }
 
 function clearAllStudies() {
-  console.log("clearAllStudies() global function called");
   try {
     if (!robSystem) {
       console.error("robSystem is not initialized");
@@ -921,11 +895,7 @@ function clearAllStudies() {
 
     // Show confirmation dialog
     if (confirm("確定要清空所有研究評估嗎？此操作無法復原。")) {
-      console.log("User confirmed, proceeding with clearAllStudies");
       robSystem.clearAllStudies();
-      console.log("Successfully cleared all studies");
-    } else {
-      console.log("User cancelled clearing all studies");
     }
   } catch (error) {
     console.error("Error clearing all studies:", error);
@@ -934,7 +904,6 @@ function clearAllStudies() {
 }
 
 function loadDemoData() {
-  console.log("loadDemoData() called");
   try {
     if (confirm("這將載入6個示範研究用於測試功能。確定要繼續嗎？")) {
       const demoStudies = createDemoData();
@@ -950,10 +919,8 @@ function loadDemoData() {
 }
 
 function duplicateStudy(index) {
-  console.log("duplicateStudy() called with index:", index);
   try {
     robSystem.duplicateStudy(index);
-    console.log("Successfully duplicated study");
   } catch (error) {
     console.error("Error duplicating study:", error);
     alert("複製研究時出現錯誤: " + error.message);

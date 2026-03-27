@@ -272,7 +272,7 @@ firebase emulators:start
 ## 👨‍⚕️ 作者
 
 **運動醫學科吳易澄醫師**
-- 🌐 個人網站：[https://wycswimming.blogspot.com/](https://wycswimming.blogspot.com/)
+- 🌐 個人網站：[https://blog.sportsmedicine.tw/](https://blog.sportsmedicine.tw/)
 - 🐙 GitHub：[@keanu77](https://github.com/keanu77)
 - 📧 專案支援：透過 GitHub Issues
 

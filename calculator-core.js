@@ -26,6 +26,18 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeFormulas();
   initializeMobileOptimization();
   initializeEventHandlers();
+
+  // Initialize RoB system
+  try {
+    if (
+      typeof robSystem !== "undefined" &&
+      document.getElementById("studies-container")
+    ) {
+      robSystem.renderStudiesList();
+    }
+  } catch (error) {
+    console.error("Error during initialization:", error);
+  }
 });
 
 // Mobile Optimization
@@ -304,7 +316,6 @@ function handleGlobalClick(event) {
         break;
 
       case "import-studies":
-        console.log("Triggering file import");
         const fileInput = document.getElementById("import-file");
         if (fileInput) fileInput.click();
         break;
@@ -343,11 +354,6 @@ function handleGlobalClick(event) {
           return;
         }
 
-        console.log(
-          `Calling robSystem action: ${action} with index:`,
-          studyIndex,
-        );
-
         switch (action) {
           case "edit":
             robSystem.editStudy(studyIndex);
@@ -367,7 +373,7 @@ function handleGlobalClick(event) {
         break;
 
       default:
-        console.warn("Unknown action:", action);
+        break;
     }
   } catch (error) {
     console.error("Error handling click action:", error);
@@ -542,23 +548,6 @@ function addToHistory(result) {
   });
 }
 
-// Export functions for potential future use
-function exportHistory() {
-  const dataStr = JSON.stringify(calculationHistory, null, 2);
-  const dataBlob = new Blob([dataStr], { type: "application/json" });
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(dataBlob);
-  link.download = "meta_analysis_calculations.json";
-  link.click();
-}
-
-// Initialize tooltips or help system if needed
-function initializeHelp() {
-  // Add event listeners for help icons, tooltips, etc.
-  // This would be expanded based on UI requirements
-}
-
 // Method accordion toggle function for statistics module
 function toggleMethod(methodId) {
   const content = document.getElementById(methodId);
@@ -636,17 +625,3 @@ function toggleHelp(helpId) {
     icon.classList.add("fa-chevron-down");
   }
 }
-
-// Initialize RoB system when page loads
-document.addEventListener("DOMContentLoaded", function () {
-  try {
-    if (
-      typeof robSystem !== "undefined" &&
-      document.getElementById("studies-container")
-    ) {
-      robSystem.renderStudiesList();
-    }
-  } catch (error) {
-    console.error("Error during initialization:", error);
-  }
-});

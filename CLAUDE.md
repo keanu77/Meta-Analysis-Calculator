@@ -15,12 +15,9 @@ npm run dev              # 啟動 http-server on port 8080 並開啟瀏覽器
 # Firebase
 npm run firebase:dev     # firebase serve（本地預覽）
 npm run firebase:deploy  # firebase deploy（正式部署）
-npm run firebase:emulators  # firebase emulators:start（含 Auth/Firestore/Hosting 模擬器）
 ```
 
 無 build step、無 lint、無測試框架。`npm run build` 只是 echo。
-
-**Port 注意**：`npm run dev`（http-server）和 Firestore emulator 都用 port 8080，不要同時啟動。Firebase emulators 的 Hosting 在 port 5000、UI 在 port 4000。
 
 ## Architecture
 
@@ -37,18 +34,11 @@ npm run firebase:emulators  # firebase emulators:start（含 Auth/Firestore/Host
 | `rob-assessment.js` | Risk of Bias 2.0 評估系統（RoBAssessment class） |
 | `chart-utils.js` | RoB 圖表生成（Traffic Light, Weighted Bar, Summary） |
 | `pdf-export.js` | PDF 匯出 |
-| `auth-hybrid.js` | 認證系統（PBKDF2 密碼雜湊、SHA-256 註冊碼驗證） |
-| `profile-modal.js` | 用戶個人資料彈窗 |
-| `subscription.js` | 訂閱方案邏輯 |
 | `style.css` | 全站樣式 |
 
-### 認證系統
+### 第三方函式庫（CDN + defer 載入）
 
-`auth-hybrid.js` 使用 localStorage 儲存用戶資料，密碼以 PBKDF2 雜湊，註冊碼以 SHA-256 hash 比對（不暴露明碼）。
-
-### 第三方函式庫（動態載入）
-
-Chart.js、jsPDF、html2canvas 不在頁面載入時下載，而是在使用者第一次需要時由 `window.loadChartJS()` / `window.loadJsPDF()` / `window.loadHtml2Canvas()` 動態載入。
+Chart.js 4.4.8、jsPDF 2.5.1、html2canvas 1.4.1，皆透過 CDN 載入並設有 SRI hash。
 
 ## Key Patterns
 

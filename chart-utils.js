@@ -12,7 +12,6 @@ let currentChart = null;
 let currentChartType = "traffic-light";
 
 function createDemoData() {
-  console.log("Creating demo data for RoB chart");
   const demoStudies = [
     {
       id: "demo-1",
@@ -99,17 +98,6 @@ function createDemoData() {
       overallRisk: "Some concerns",
     },
   ];
-
-  console.log("Demo studies created:", demoStudies);
-
-  // Debug: Check D2 data specifically
-  console.log("=== D2 (deviations) data check ===");
-  demoStudies.forEach((study, index) => {
-    const d2Value = study.assessments?.deviations?.judgment;
-    console.log(
-      `Study ${index + 1} (${study.authors} ${study.year}): D2 = ${d2Value}`,
-    );
-  });
 
   return demoStudies;
 }
@@ -445,7 +433,6 @@ function createSummaryPlot(ctx, studies) {
 }
 
 function createWeightedBarChart(ctx, studies) {
-  console.log("createWeightedBarChart called with studies:", studies);
   const domains = [
     "randomization",
     "deviations",
@@ -472,7 +459,6 @@ function createWeightedBarChart(ctx, studies) {
         domain === "overall"
           ? study.overallRisk
           : getAssessmentData(study, domain);
-      console.log(`Domain: ${domain}, Study: ${study.authors}, Risk: ${risk}`);
       if (counts[risk] !== undefined) {
         counts[risk]++;
       }
@@ -485,26 +471,7 @@ function createWeightedBarChart(ctx, studies) {
       concerns: (counts["Some concerns"] / total) * 100,
       high: (counts["High"] / total) * 100,
     };
-    console.log(`Domain ${domain} results:`, result);
     return result;
-  });
-
-  console.log("Final riskData:", riskData);
-
-  // Debug: Force show D2 data if it's zero
-  riskData.forEach((item, index) => {
-    if (item.domain === "Bias due to deviations from intended interventions") {
-      console.log("=== D2 DOMAIN FOUND ===");
-      console.log("D2 data:", item);
-      if (item.low === 0 && item.concerns === 0 && item.high === 0) {
-        console.log("WARNING: D2 has all zero values!");
-        // Force some test data to see if chart renders
-        item.low = 50;
-        item.concerns = 30;
-        item.high = 20;
-        console.log("Applied test values to D2:", item);
-      }
-    }
   });
 
   const data = {

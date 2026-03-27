@@ -30,11 +30,11 @@
     "type": "git",
     "url": "https://github.com/keanu77/Meta-Analysis-Calculator.git"
   },
-  "homepage": "https://your-project.web.app/",
+  "homepage": "https://metacalc.sportsmedicine.tw/",
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {
+  "devDependencies": {
     "http-server": "^14.1.1"
   }
 }
