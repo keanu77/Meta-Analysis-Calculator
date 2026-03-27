@@ -32,30 +32,10 @@
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">跳過導航，直接前往主要內容</a>
 
-    <!-- 未登入遮罩層 -->
-    <div id="auth-overlay" class="auth-overlay" style="display: none;">
-        <div class="auth-prompt">
-            <i class="fas fa-lock"></i>
-            <h2>請先登入以使用計算機</h2>
-            <p>登入後即可使用所有功能</p>
-            <div class="auth-prompt-buttons">
-                <button class="auth-prompt-login" onclick="AuthManager.showLoginModal()">
-                    <i class="fas fa-sign-in-alt"></i> 登入
-                </button>
-                <button class="auth-prompt-register" onclick="AuthManager.showRegisterModal()">
-                    <i class="fas fa-user-plus"></i> 註冊新帳號
-                </button>
-            </div>
-        </div>
-    </div>
-
     <header class="header">
         <div class="container">
             <h1><i class="fas fa-calculator"></i> Meta-Analysis Calculator</h1>
             <p class="subtitle">系統性文獻回顧／統合分析一站式換算工具</p>
-            <div class="auth-status" id="subscription-status">
-                <!-- 登入狀態將由 auth.js 動態更新 -->
-            </div>
         </div>
     </header>
 
@@ -3523,28 +3503,8 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- html2canvas for converting charts to images in PDF -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- 使用混合版認證系統 - 包含註冊碼管理功能 -->
-    <script type="module" defer src="auth-hybrid.js?v=2.0.2"></script>
-
     <!-- Original Scripts -->
-    <script defer src="profile-modal.js"></script>
     <script defer src="calculator.js"></script>
-
-    <!-- 初始化認證系統 -->
-    <script>
-      // 確保 DOM 載入後初始化
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          if (window.AuthManager) {
-            window.AuthManager.init();
-          }
-        });
-      } else {
-        if (window.AuthManager) {
-          window.AuthManager.init();
-        }
-      }
-    </script>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="back-to-top" aria-label="返回頂部" title="返回頂部">

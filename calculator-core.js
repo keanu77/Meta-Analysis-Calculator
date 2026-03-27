@@ -26,11 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeFormulas();
   initializeMobileOptimization();
   initializeEventHandlers();
-
-  // 等待AuthManager載入後再檢查UI狀態
-  setTimeout(() => {
-    checkAndUpdateAuthUI();
-  }, 500);
 });
 
 // Mobile Optimization
@@ -212,14 +207,6 @@ function initializeTabs() {
   tabButtons.forEach((button) => {
     button.addEventListener("click", (e) => {
       const targetTab = button.getAttribute("data-tab");
-
-      // Check if user has access to this tab
-      if (!checkTabAccess(targetTab)) {
-        e.preventDefault();
-        showAccessDeniedMessage(targetTab);
-        return;
-      }
-
       switchTab(targetTab);
     });
   });
@@ -250,9 +237,6 @@ function initializeTabs() {
       tabs[newIndex].click();
     });
   }
-
-  // Update tab visual states based on access
-  updateTabAccessStates();
 }
 
 function switchTab(tabId) {
@@ -274,129 +258,6 @@ function switchTab(tabId) {
   document.getElementById(tabId).classList.add("active");
 
   currentTab = tabId;
-}
-
-// Tab Access Control Functions
-function checkTabAccess(tabId) {
-  // Define public tabs that don't require login
-  const publicTabs = ["module-guide", "module-stats"];
-
-  // If it's a public tab, always allow access
-  if (publicTabs.includes(tabId)) {
-    return true;
-  }
-
-  // For restricted tabs, check if user is logged in
-  return isUserLoggedIn();
-}
-
-function isUserLoggedIn() {
-  // Check if AuthManager exists and user is logged in
-  if (
-    typeof window.AuthManager !== "undefined" &&
-    window.AuthManager.currentUser
-  ) {
-    return true;
-  }
-  return false;
-}
-
-function updateTabAccessStates() {
-  const tabButtons = document.querySelectorAll(".tab-btn");
-
-  tabButtons.forEach((button) => {
-    const targetTab = button.getAttribute("data-tab");
-    const hasAccess = checkTabAccess(targetTab);
-
-    if (!hasAccess) {
-      button.classList.add("restricted-tab");
-      button.setAttribute("title", "請登入以使用此功能");
-
-      // Add a lock icon
-      if (!button.querySelector(".lock-icon")) {
-        const lockIcon = document.createElement("i");
-        lockIcon.className = "fas fa-lock lock-icon";
-        lockIcon.style.marginLeft = "5px";
-        lockIcon.style.fontSize = "0.8em";
-        button.appendChild(lockIcon);
-      }
-    } else {
-      button.classList.remove("restricted-tab");
-      button.removeAttribute("title");
-
-      // Remove lock icon if it exists
-      const lockIcon = button.querySelector(".lock-icon");
-      if (lockIcon) {
-        lockIcon.remove();
-      }
-    }
-  });
-}
-
-function showAccessDeniedMessage(tabId) {
-  // Show a modal or message prompting user to log in
-  if (typeof window.AuthManager !== "undefined") {
-    // Create a temporary message modal
-    const modal = document.createElement("div");
-    modal.className = "auth-modal";
-    modal.style.display = "flex";
-
-    modal.innerHTML = `
-            <div class="auth-modal-content">
-                <div class="auth-header">
-                    <h2><i class="fas fa-lock"></i> 需要登入</h2>
-                    <p>此功能需要登入後才能使用</p>
-                </div>
-                <div class="auth-buttons">
-                    <button class="auth-btn primary" onclick="this.closest('.auth-modal').remove(); AuthManager.showLoginModal();">
-                        <i class="fas fa-sign-in-alt"></i> 登入
-                    </button>
-                    <button class="auth-btn secondary" onclick="this.closest('.auth-modal').remove(); AuthManager.showRegisterModal();">
-                        <i class="fas fa-user-plus"></i> 註冊
-                    </button>
-                    <button class="auth-btn" onclick="this.closest('.auth-modal').remove();">
-                        取消
-                    </button>
-                </div>
-            </div>
-        `;
-
-    // Add click to close
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-
-    document.body.appendChild(modal);
-
-    // Auto-remove after 10 seconds
-    setTimeout(() => {
-      if (modal.parentNode) {
-        modal.remove();
-      }
-    }, 10000);
-  }
-}
-
-// Check and update authentication UI
-function checkAndUpdateAuthUI() {
-  console.log("檢查並更新認證UI...");
-
-  if (typeof window.AuthManager !== "undefined") {
-    console.log("AuthManager 可用，當前用戶:", window.AuthManager.currentUser);
-
-    // 強制重新檢查認證狀態
-    window.AuthManager.checkAuthStatus();
-
-    // 更新頁籤存取狀態
-    updateTabAccessStates();
-
-    console.log("認證UI更新完成");
-  } else {
-    console.log("AuthManager 尚未載入，稍後重試...");
-    setTimeout(checkAndUpdateAuthUI, 1000);
-  }
 }
 
 // Unified Event Handling System
@@ -502,43 +363,6 @@ function handleGlobalClick(event) {
               );
             robSystem.deleteStudy(studyIndex);
             break;
-        }
-        break;
-
-      // Auth actions
-      case "logout":
-        if (DEBUG_EVENTS) console.log("🚪 Logout action triggered");
-        if (
-          typeof window.AuthManager !== "undefined" &&
-          window.AuthManager.logout
-        ) {
-          window.AuthManager.logout();
-        } else {
-          console.error("AuthManager not available for logout");
-        }
-        break;
-
-      case "show-profile":
-        if (DEBUG_EVENTS) console.log("👤 Show profile action triggered");
-        if (
-          typeof window.AuthManager !== "undefined" &&
-          window.AuthManager.showProfile
-        ) {
-          window.AuthManager.showProfile(event);
-        } else {
-          console.error("AuthManager not available for show-profile");
-        }
-        break;
-
-      case "show-settings":
-        if (DEBUG_EVENTS) console.log("⚙️ Show settings action triggered");
-        if (
-          typeof window.AuthManager !== "undefined" &&
-          window.AuthManager.showSettings
-        ) {
-          window.AuthManager.showSettings(event);
-        } else {
-          console.error("AuthManager not available for show-settings");
         }
         break;
 
