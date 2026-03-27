@@ -701,7 +701,7 @@ class RoBAssessment {
                 <div class="domain-rationale">
                     <label>判斷理由和評論 (Comments):</label>
                     <textarea placeholder="請詳細說明判斷的理由和依據..." 
-                             onchange="robSystem.updateRationale('${domainKey}', this.value)">${assessment.rationale || ""}</textarea>
+                             onchange="robSystem.updateRationale('${domainKey}', this.value)">${escapeHTML(assessment.rationale || "")}</textarea>
                 </div>
             </div>
         `;
@@ -938,12 +938,63 @@ function importStudies() {
       reader.onload = function (e) {
         try {
           const data = JSON.parse(e.target.result);
-          if (Array.isArray(data)) {
-            robSystem.studies = data;
-            robSystem.saveStudies();
-            robSystem.renderStudiesList();
-            alert("成功匯入研究清單！");
+          if (!Array.isArray(data)) {
+            alert("檔案格式錯誤，匯入資料必須是陣列");
+            return;
           }
+          if (data.length > 200) {
+            alert("匯入研究數量超過上限（最多 200 筆）");
+            return;
+          }
+          const allowedFields = [
+            "id",
+            "title",
+            "authors",
+            "year",
+            "outcome",
+            "assessments",
+            "overallRisk",
+            "notes",
+          ];
+          const validated = [];
+          for (const study of data) {
+            if (typeof study !== "object" || study === null) {
+              alert("匯入資料格式錯誤：每筆研究必須是物件");
+              return;
+            }
+            if (
+              typeof study.title !== "undefined" &&
+              (typeof study.title !== "string" || study.title.length > 500)
+            ) {
+              alert("匯入資料驗證失敗：title 必須是字串且長度不超過 500");
+              return;
+            }
+            if (
+              typeof study.authors !== "undefined" &&
+              (typeof study.authors !== "string" || study.authors.length > 500)
+            ) {
+              alert("匯入資料驗證失敗：authors 必須是字串且長度不超過 500");
+              return;
+            }
+            if (
+              typeof study.year !== "undefined" &&
+              (typeof study.year !== "string" || study.year.length > 500)
+            ) {
+              alert("匯入資料驗證失敗：year 必須是字串且長度不超過 500");
+              return;
+            }
+            const sanitized = {};
+            for (const key of allowedFields) {
+              if (key in study) {
+                sanitized[key] = study[key];
+              }
+            }
+            validated.push(sanitized);
+          }
+          robSystem.studies = validated;
+          robSystem.saveStudies();
+          robSystem.renderStudiesList();
+          alert("成功匯入研究清單！");
         } catch (error) {
           alert("檔案格式錯誤，請確認為有效的 JSON 格式");
         }

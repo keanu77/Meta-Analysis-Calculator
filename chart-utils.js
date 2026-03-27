@@ -256,7 +256,7 @@ function createTrafficLightPlot(container, studies) {
                     ${studies
                       .map((study, index) => {
                         const studyName = study.authors
-                          ? `${study.authors} ${study.year}`
+                          ? `${escapeHTML(study.authors)} ${escapeHTML(study.year)}`
                           : `Study ${index + 1}`;
                         return `
                             <tr>
@@ -661,8 +661,8 @@ function generateSVGFromChart() {
     const y = 100 + studyIndex * 40;
 
     // Study name
-    const studyName = `${study.authors || study.author || "Unknown"} ${study.year || ""}`;
-    svg += `<text x="50" y="${y}" font-size="12" fill="#333">${studyName.substring(0, 25)}${studyName.length > 25 ? "..." : ""}</text>`;
+    const studyName = `${escapeHTML(study.authors || study.author || "Unknown")} ${escapeHTML(study.year || "")}`;
+    svg += `<text x="50" y="${y}" font-size="12" fill="#333">${escapeHTML(studyName.substring(0, 25))}${studyName.length > 25 ? "..." : ""}</text>`;
 
     // Domain assessments
     const domainKeys = [
