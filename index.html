@@ -3503,8 +3503,15 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- html2canvas for converting charts to images in PDF -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Original Scripts -->
-    <script defer src="calculator.js"></script>
+    <!-- Core + Modules（載入順序重要） -->
+    <script defer src="calculator-core.js"></script>
+    <script defer src="modules/module-a.js"></script>
+    <script defer src="modules/module-b.js"></script>
+    <script defer src="modules/module-c.js"></script>
+    <script defer src="formula-display.js"></script>
+    <script defer src="rob-assessment.js"></script>
+    <script defer src="chart-utils.js"></script>
+    <script defer src="pdf-export.js"></script>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="back-to-top" aria-label="返回頂部" title="返回頂部">
