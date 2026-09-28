@@ -1,15 +1,15 @@
 {
   "name": "meta-analysis-calculator",
-  "version": "0.2.0-firebase",
-  "description": "Meta-Analysis Calculator - 系統性文獻回顧／統合分析一站式換算工具（Firebase版）",
+  "version": "0.3.0",
+  "description": "本機運算的統合分析統計換算工具與 RoB/GRADE 教學材料",
   "main": "index.html",
   "scripts": {
-    "dev": "npx http-server -p 8080 -o",
-    "build": "echo 'No build step needed for static site'",
-    "start": "npx http-server -p 8080",
-    "firebase:dev": "firebase serve",
-    "firebase:deploy": "firebase deploy",
-    "firebase:emulators": "firebase emulators:start"
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "firebase:dev": "npm run build && firebase serve",
+    "firebase:deploy": "npm run build && firebase deploy --only hosting"
   },
   "keywords": [
     "meta-analysis",
@@ -20,9 +20,7 @@
     "effect-size",
     "confidence-interval",
     "education",
-    "sports-medicine",
-    "firebase",
-    "firestore"
+    "sports-medicine"
   ],
   "author": "運動醫學科吳易澄醫師",
   "license": "MIT",
@@ -32,9 +30,6 @@
   },
   "homepage": "https://metacalc.sportsmedicine.tw/",
   "engines": {
-    "node": ">=18.0.0"
-  },
-  "devDependencies": {
-    "http-server": "^14.1.1"
+    "node": ">=22"
   }
 }

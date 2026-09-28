@@ -1,20 +1,8 @@
 {
   "hosting": {
-    "public": ".",
+    "public": "dist",
     "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/api/**",
-      "database-schema.sql",
-      "zeabur.json",
-      "*.md"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      "**/.*"
     ],
     "headers": [
       {
@@ -39,6 +27,10 @@
           {
             "key": "Strict-Transport-Security",
             "value": "max-age=31536000; includeSubDomains"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, must-revalidate"
           }
         ]
       },
@@ -47,7 +39,7 @@
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "max-age=31536000"
+            "value": "no-cache, must-revalidate"
           }
         ]
       }

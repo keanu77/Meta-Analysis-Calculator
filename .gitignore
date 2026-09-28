@@ -12,10 +12,8 @@ firebase-debug.*.log*
 
 # Environment files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
 # Runtime data
 pids
@@ -61,3 +59,6 @@ api/
 auth-cloud.js
 database-schema.sql
 DEPLOYMENT.md
+
+# Local audit evidence is kept outside published source changes.
+.claude/audit/

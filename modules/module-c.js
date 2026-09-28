@@ -1,10 +1,10 @@
 // Module C: CI/SE Conversion
 function calculateESConversion() {
   const esType = document.getElementById("es-type").value;
-  const esValue = parseFloat(document.getElementById("es-value").value);
-  const ciLower = parseFloat(document.getElementById("es-ci-lower").value);
-  const ciUpper = parseFloat(document.getElementById("es-ci-upper").value);
-  const se = parseFloat(document.getElementById("es-se").value);
+  const esValue = readNumber("es-value");
+  const ciLower = readNumber("es-ci-lower");
+  const ciUpper = readNumber("es-ci-upper");
+  const se = readNumber("es-se");
   const ciLevel = parseInt(document.getElementById("es-ci-level").value);
   const resultDiv = document.getElementById("es-conversion-result");
 
@@ -12,16 +12,44 @@ function calculateESConversion() {
   let calculatedES, calculatedSE, calculatedCILower, calculatedCIUpper;
   let calculations = "";
 
-  // Determine what we can calculate based on available inputs
-  if (!isNaN(ciLower) && !isNaN(ciUpper)) {
-    // Calculate ES and SE from CI
-    calculatedES = (ciLower + ciUpper) / 2;
+  const supplied = (id) => document.getElementById(id).value.trim() !== "";
+  const hasES = supplied("es-value");
+  const hasLower = supplied("es-ci-lower");
+  const hasUpper = supplied("es-ci-upper");
+  const hasSE = supplied("es-se");
+  if ((hasES && !Number.isFinite(esValue)) ||
+      (hasSE && (!Number.isFinite(se) || se <= 0)) ||
+      (hasLower && !Number.isFinite(ciLower)) ||
+      (hasUpper && !Number.isFinite(ciUpper))) {
+    showError(resultDiv, "請輸入有限數值，標準誤必須大於 0");
+    return;
+  }
+  if (hasLower !== hasUpper || (hasLower && ciLower >= ciUpper)) {
+    showError(resultDiv, "請提供完整信賴區間，且下界必須小於上界");
+    return;
+  }
+
+  if (hasLower && hasUpper) {
+    const midpoint = (ciLower + ciUpper) / 2;
     calculatedSE = (ciUpper - ciLower) / (2 * criticalValue);
+    // Preserve the intended consistency check before the CI-only path.
+    if (hasES && Math.abs(esValue - midpoint) > 0.001) {
+      showError(resultDiv, "效果量與信賴區間中點不一致；請確認尺度與輸入資料");
+      return;
+    }
+    if (hasSE && Math.abs(se - calculatedSE) > 0.001) {
+      showError(resultDiv, "標準誤與信賴區間不一致；請確認輸入資料");
+      return;
+    }
+    calculatedES = hasES ? esValue : midpoint;
+    calculatedCILower = ciLower;
+    calculatedCIUpper = ciUpper;
     calculations += `從信賴區間計算：\n`;
-    calculations += `Effect Size = (${ciUpper} + ${ciLower}) / 2 = ${calculatedES.toFixed(4)}\n`;
+    calculations += hasES
+      ? `使用輸入效果量 = ${calculatedES.toFixed(4)}（已核對 CI 中點）\n`
+      : `Effect Size = (${ciUpper} + ${ciLower}) / 2 = ${calculatedES.toFixed(4)}\n`;
     calculations += `SE = (${ciUpper} - ${ciLower}) / (2 × ${criticalValue.toFixed(4)}) = ${calculatedSE.toFixed(4)}\n\n`;
-  } else if (!isNaN(esValue) && !isNaN(se)) {
-    // Calculate CI from ES and SE
+  } else if (hasES && hasSE) {
     calculatedES = esValue;
     calculatedSE = se;
     calculatedCILower = esValue - criticalValue * se;
@@ -29,21 +57,12 @@ function calculateESConversion() {
     calculations += `從效果量和標準誤計算：\n`;
     calculations += `${ciLevel}% CI = ${esValue.toFixed(4)} ± ${criticalValue.toFixed(4)} × ${se.toFixed(4)}\n`;
     calculations += `CI = [${calculatedCILower.toFixed(4)}, ${calculatedCIUpper.toFixed(4)}]\n\n`;
-  } else if (!isNaN(esValue) && !isNaN(ciLower) && !isNaN(ciUpper)) {
-    // Validate consistency and calculate SE
-    const midpoint = (ciLower + ciUpper) / 2;
-    if (Math.abs(esValue - midpoint) > 0.001) {
-      showError(resultDiv, "效果量與信賴區間中點不一致");
-      return;
-    }
-    calculatedES = esValue;
-    calculatedSE = (ciUpper - ciLower) / (2 * criticalValue);
-    calculatedCILower = ciLower;
-    calculatedCIUpper = ciUpper;
-    calculations += `驗證一致性並計算標準誤：\n`;
-    calculations += `SE = (${ciUpper} - ${ciLower}) / (2 × ${criticalValue.toFixed(4)}) = ${calculatedSE.toFixed(4)}\n\n`;
   } else {
-    showError(resultDiv, "請提供足夠的輸入數據進行轉換");
+    showError(resultDiv, "請提供效果量與標準誤，或完整的信賴區間");
+    return;
+  }
+  if (!allFinite(calculatedES, calculatedSE, calculatedCILower, calculatedCIUpper) || calculatedSE <= 0) {
+    showError(resultDiv, "數值超出可計算範圍，請檢查輸入資料");
     return;
   }
 

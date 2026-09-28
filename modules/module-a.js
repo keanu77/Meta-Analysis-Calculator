@@ -1,11 +1,11 @@
 // Module A: Within-group & Descriptive Statistics Conversion
 function calculateSEtoSD() {
-  const se = parseFloat(document.getElementById("se-input").value);
-  const n = parseInt(document.getElementById("se-n-input").value);
+  const se = readNumber("se-input");
+  const n = readNumber("se-n-input");
   const resultDiv = document.getElementById("se-sd-result");
 
-  if (isNaN(se) || isNaN(n) || n <= 0) {
-    showError(resultDiv, "請輸入有效的 SE 值和樣本數 (n > 0)");
+  if (!Number.isFinite(se) || se < 0 || !isSampleSize(n)) {
+    showError(resultDiv, "SE 必須為非負有限數值，樣本數必須為正整數");
     return;
   }
 
@@ -28,18 +28,16 @@ function calculateSEtoSD() {
 
 // CI to Mean & SD conversion
 function calculateCItoMeanSD() {
-  const lowerCI = parseFloat(document.getElementById("ci-lower").value);
-  const upperCI = parseFloat(document.getElementById("ci-upper").value);
+  const lowerCI = readNumber("ci-lower");
+  const upperCI = readNumber("ci-upper");
   const ciLevel = parseInt(document.getElementById("ci-level").value);
-  const n = parseInt(document.getElementById("ci-n").value);
+  const n = readNumber("ci-n");
   const distribution = document.getElementById("ci-distribution").value;
   const resultDiv = document.getElementById("ci-mean-sd-result");
 
   if (
-    isNaN(lowerCI) ||
-    isNaN(upperCI) ||
-    isNaN(n) ||
-    n <= 0 ||
+    !allFinite(lowerCI, upperCI) ||
+    !isSampleSize(n, distribution === "normal" ? 1 : 2) ||
     lowerCI >= upperCI
   ) {
     showError(resultDiv, "請輸入有效的信賴區間界限和樣本數");
@@ -111,16 +109,22 @@ function calculateCItoMeanSD() {
 // Quantiles to Mean & SD conversion
 function calculateQuantilesToMeanSD() {
   const method = document.getElementById("quantile-method").value;
-  const min = parseFloat(document.getElementById("q-min").value);
-  const q1 = parseFloat(document.getElementById("q-q1").value);
-  const median = parseFloat(document.getElementById("q-median").value);
-  const q3 = parseFloat(document.getElementById("q-q3").value);
-  const max = parseFloat(document.getElementById("q-max").value);
-  const n = parseInt(document.getElementById("q-n").value);
+  const min = readNumber("q-min");
+  const q1 = readNumber("q-q1");
+  const median = readNumber("q-median");
+  const q3 = readNumber("q-q3");
+  const max = readNumber("q-max");
+  const n = readNumber("q-n");
   const resultDiv = document.getElementById("quantiles-result");
 
-  if (isNaN(median) || isNaN(n) || n <= 0) {
-    showError(resultDiv, "請至少輸入中位數和樣本數");
+  if (!Number.isFinite(median) || !isSampleSize(n)) {
+    showError(resultDiv, "請輸入有限的中位數與正整數樣本數");
+    return;
+  }
+  const quantileInputs = ["q-min", "q-q1", "q-median", "q-q3", "q-max"];
+  const provided = quantileInputs.filter((id) => document.getElementById(id).value.trim() !== "").map(readNumber);
+  if (!allFinite(...provided) || provided.some((value, index) => index > 0 && value < provided[index - 1])) {
+    showError(resultDiv, "分位數必須為有限數值，且依最小值、Q1、中位數、Q3、最大值排序");
     return;
   }
 
@@ -172,7 +176,7 @@ function calculateQuantilesToMeanSD() {
       return;
   }
 
-  if (isNaN(mean) || isNaN(sd)) {
+  if (!allFinite(mean, sd) || sd < 0) {
     showError(resultDiv, "計算失敗，請檢查輸入數據");
     return;
   }
@@ -194,13 +198,13 @@ function calculateQuantilesToMeanSD() {
 
 // Dedicated Hozo method calculator function
 function calculateHozoOnly() {
-  const min = parseFloat(document.getElementById("hozo-min").value);
-  const median = parseFloat(document.getElementById("hozo-median").value);
-  const max = parseFloat(document.getElementById("hozo-max").value);
-  const n = parseInt(document.getElementById("hozo-n").value);
+  const min = readNumber("hozo-min");
+  const median = readNumber("hozo-median");
+  const max = readNumber("hozo-max");
+  const n = readNumber("hozo-n");
   const resultDiv = document.getElementById("hozo-only-result");
 
-  if (isNaN(min) || isNaN(median) || isNaN(max) || isNaN(n) || n <= 0) {
+  if (!allFinite(min, median, max) || !isSampleSize(n)) {
     showError(resultDiv, "請輸入所有必要參數：最小值、中位數、最大值和樣本數");
     return;
   }
@@ -430,19 +434,15 @@ function calculateShiMethod(min, q1, median, q3, max, n) {
 
 // Pooled SD calculation
 function calculatePooledSD() {
-  const sd1 = parseFloat(document.getElementById("pooled-sd1").value);
-  const n1 = parseInt(document.getElementById("pooled-n1").value);
-  const sd2 = parseFloat(document.getElementById("pooled-sd2").value);
-  const n2 = parseInt(document.getElementById("pooled-n2").value);
+  const sd1 = readNumber("pooled-sd1");
+  const n1 = readNumber("pooled-n1");
+  const sd2 = readNumber("pooled-sd2");
+  const n2 = readNumber("pooled-n2");
   const resultDiv = document.getElementById("pooled-sd-result");
 
   if (
-    isNaN(sd1) ||
-    isNaN(n1) ||
-    isNaN(sd2) ||
-    isNaN(n2) ||
-    n1 <= 0 ||
-    n2 <= 0
+    !allFinite(sd1, sd2) || sd1 < 0 || sd2 < 0 ||
+    !isSampleSize(n1) || !isSampleSize(n2) || n1 + n2 <= 2
   ) {
     showError(resultDiv, "請輸入有效的標準差和樣本數");
     return;
@@ -473,12 +473,12 @@ function calculatePooledSD() {
 
 // Change Score SD calculation
 function calculateChangeSD() {
-  const sdPre = parseFloat(document.getElementById("change-sd-pre").value);
-  const sdPost = parseFloat(document.getElementById("change-sd-post").value);
-  const r = parseFloat(document.getElementById("change-r").value);
+  const sdPre = readNumber("change-sd-pre");
+  const sdPost = readNumber("change-sd-post");
+  const r = readNumber("change-r");
   const resultDiv = document.getElementById("change-sd-result");
 
-  if (isNaN(sdPre) || isNaN(sdPost) || isNaN(r) || r < -1 || r > 1) {
+  if (!allFinite(sdPre, sdPost, r) || sdPre < 0 || sdPost < 0 || r < -1 || r > 1) {
     showError(resultDiv, "請輸入有效的標準差和相關係數 (-1 ≤ r ≤ 1)");
     return;
   }

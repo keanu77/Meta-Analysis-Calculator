@@ -6,7 +6,7 @@
     <title>Meta-Analysis Calculator | 統合分析計算機</title>
 
     <!-- SEO Meta Tags -->
-    <meta name="description" content="免費的統合分析計算工具，支援效果量轉換（Cohen's d、Odds Ratio、Risk Ratio）、信賴區間計算、樣本數規劃等功能。適用於醫學、教育、運動科學研究。">
+    <meta name="description" content="免費的統合分析計算工具，支援效果量轉換（Cohen's d、Odds Ratio、Risk Ratio）、信賴區間計算等功能。適用於醫學、教育、運動科學研究。">
     <meta name="keywords" content="meta-analysis, 統合分析, effect size, Cohen's d, Odds Ratio, 信賴區間, 系統性回顧, systematic review">
     <meta name="author" content="Dr. Wu Yi-Cheng">
     <meta name="theme-color" content="#4f46e5">
@@ -14,7 +14,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Meta-Analysis Calculator | 統合分析計算機">
-    <meta property="og:description" content="免費的統合分析計算工具，支援效果量轉換、信賴區間計算、樣本數規劃等功能。">
+    <meta property="og:description" content="免費的統合分析計算工具，支援效果量轉換、信賴區間計算等功能。">
     <meta property="og:locale" content="zh_TW">
     <meta property="og:url" content="https://metacalc.sportsmedicine.tw/">
     <link rel="canonical" href="https://metacalc.sportsmedicine.tw/">
@@ -409,7 +409,7 @@
             <div id="module-b" class="tab-content">
                 <div class="module-header">
                     <h2>兩組比較與效果量</h2>
-                    <p>計算 MD、SMD、OR、RR、HR 等效果量及信賴區間</p>
+                    <p>計算 MD、SMD、OR、RR、RD 等效果量及信賴區間</p>
                 </div>
 
                 <!-- 使用時機說明 -->
@@ -624,7 +624,8 @@
                             <ul>
                                 <li>至少填寫 <strong>2 個已知項目</strong>，系統會自動計算其他數值</li>
                                 <li>可填組合：ES + CI、ES + SE、CI 上下界等</li>
-                                <li>留空不知道的欄位即可</li>
+                                <li>留空不知道的欄位即可；SE 必須大於 0，CI 下界須小於上界。</li>
+                                <li>選擇 log(OR)、log(RR) 或 log(HR) 時，效果量與 CI 均須先取自然對數；本工具不會自動轉換比值。</li>
                             </ul>
                         </div>
                         <div class="input-group">
@@ -3499,21 +3500,12 @@
         </div>
     </footer>
 
-    <!-- Chart.js for visualization -->
-    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" integrity="sha384-cvpUzShzSF6CINbXzlMHCErb6Z5GYOoOge6aft3VwFqoyuPRRoMTgN0DIYe+Wkrm" crossorigin="anonymous"></script>
-    <!-- jsPDF for PDF generation -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmIzVYo+cHLqwvQIsNv1T2ymlCmHKge5cXfeA0sNME0OIXN8bw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- html2canvas for converting charts to images in PDF -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKnEiIzpI8EaNk3CJwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- Core + Modules（載入順序重要） -->
     <script defer src="calculator-core.js"></script>
     <script defer src="modules/module-a.js"></script>
     <script defer src="modules/module-b.js"></script>
     <script defer src="modules/module-c.js"></script>
     <script defer src="formula-display.js"></script>
-    <script defer src="rob-assessment.js"></script>
-    <script defer src="chart-utils.js"></script>
-    <script defer src="pdf-export.js"></script>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="back-to-top" aria-label="返回頂部" title="返回頂部">
@@ -3537,32 +3529,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Copy result functionality
-        document.querySelectorAll('.result-box').forEach(box => {
-            box.style.position = 'relative';
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-            copyBtn.title = '複製結果';
-            copyBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const text = box.textContent.replace('複製結果', '').trim();
-                if (text && text !== '計算中...') {
-                    try {
-                        await navigator.clipboard.writeText(text);
-                        copyBtn.classList.add('copied');
-                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-                        setTimeout(() => {
-                            copyBtn.classList.remove('copied');
-                            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-                        }, 2000);
-                    } catch (err) {
-                        console.error('複製失敗:', err);
-                    }
-                }
-            });
-            box.appendChild(copyBtn);
-        });
     })();
     </script>
 </body>

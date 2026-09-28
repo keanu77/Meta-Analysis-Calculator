@@ -1,0 +1,4 @@
+{
+  "build_command": "npm test && npm run build",
+  "output_dir": "dist"
+}

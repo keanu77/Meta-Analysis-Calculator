@@ -1,9 +1,0 @@
-{
-  "name": "meta-analysis-calculator",
-  "type": "static",
-  "buildCommand": "echo 'Building static site...'",
-  "outputDirectory": ".",
-  "environment": {
-    "NODE_VERSION": "18"
-  }
-}

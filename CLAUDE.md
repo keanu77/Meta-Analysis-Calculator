@@ -1,57 +1,29 @@
-# CLAUDE.md
+# Project guidance
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
-
-Meta Analysis Calculator — 醫學研究用的線上統合分析計算工具。支援效果值轉換（Cohen's d、Pearson r、Odds Ratio）、信賴區間計算、Risk of Bias 2.0 評估。
+Meta-Analysis Calculator is a static browser calculator with Traditional Chinese teaching material. Read README.md for the actual feature and privacy scope.
 
 ## Commands
 
-```bash
-# 本地開發（靜態站點，http-server）
-npm run dev              # 啟動 http-server on port 8080 並開啟瀏覽器
+- Node.js 22 or newer; no runtime package dependencies.
+- `npm run dev`: build the reviewed runtime allowlist and preview on 127.0.0.1:8080.
+- `npm test`: numerical examples, invalid-input regressions and build output boundary checks.
+- `npm run build`: copy only reviewed app and hosting entries in `scripts/runtime-files.mjs` to `dist/`.
+- `npm start -- --port=4431`: serve the existing `dist/` on loopback.
+- `npm run firebase:deploy`: separate authorized deployment, requires user's Firebase CLI/project configuration.
 
-# Firebase
-npm run firebase:dev     # firebase serve（本地預覽）
-npm run firebase:deploy  # firebase deploy（正式部署）
-```
+## Runtime
 
-無 build step、無 lint、無測試框架。`npm run build` 只是 echo。
+`index.html`, `style.css`, `calculator-core.js`, `modules/module-{a,b,c}.js`, `formula-display.js`. JavaScript is ordered classic scripts, not ES modules. Google Fonts and Font Awesome CSS are external resources; no external JavaScript, backend, login, AI providers or API keys are required.
 
-## Architecture
+RoB/GRADE tabs contain static learning material. `rob-assessment.js`, `chart-utils.js` and `pdf-export.js` are legacy source with no active UI; do not publish or load them without a fresh review. The shipped app must not access or mutate old `rob-studies` browser data.
 
-### 前端（純靜態，無框架，模組化拆分）
+## Constraints
 
-| 檔案 | 內容 |
-|------|------|
-| `index.html` | 整個 UI，所有模組的 tab |
-| `calculator-core.js` | 初始化、tab 管理、事件處理、統計工具函式 |
-| `modules/module-a.js` | 單組內統計轉換（SE↔SD, CI→Mean/SD, 分位數法） |
-| `modules/module-b.js` | 兩組比較效果量（MD, SMD, OR, RR, RD） |
-| `modules/module-c.js` | CI/SE 互轉 |
-| `formula-display.js` | 公式顯示 modal |
-| `rob-assessment.js` | Risk of Bias 2.0 評估系統（RoBAssessment class） |
-| `chart-utils.js` | RoB 圖表生成（Traffic Light, Weighted Bar, Summary） |
-| `pdf-export.js` | PDF 匯出 |
-| `style.css` | 全站樣式 |
-
-### 第三方函式庫（CDN + defer 載入）
-
-Chart.js 4.4.8、jsPDF 2.5.1、html2canvas 1.4.1，皆透過 CDN 載入並設有 SRI hash。
-
-## Key Patterns
-
-- 所有 JS 檔案使用 `<script defer>` 載入，共享全域 scope（非 ES6 modules）
-- 載入順序重要：calculator-core.js → modules → formula → rob → chart → pdf
-- `calculator-core.js` 定義共用工具函式（escapeHTML, displayResult, showError, getCriticalValueZ 等）
-- 所有 UI 狀態管理在前端 DOM 操作
-- Tab 系統使用 ARIA 屬性 + 鍵盤導航（左右方向鍵）
-- 使用者輸入經 `escapeHTML()` 消毒後才插入 innerHTML
-
-## Deployment
-
-- **Firebase Hosting**：主要部署方式，`firebase deploy`
-- **Zeabur**：靜態部署備選，設定在 `zeabur.json`（type: static）
-- Firebase `public` 設為 `"."`（專案根目錄），firebase.json 的 ignore 列表控制排除項目
-- JS/CSS 檔案有 1 年 Cache-Control header，改版後注意快取失效問題
+- Preserve clinician-owned statistical methods and assessment decisions. Separate mathematical input/overflow guards from methodological changes.
+- Numeric inputs must be finite; sample/event counts must be safe integers. Never silently truncate them.
+- Calculation output must use textContent, not untrusted HTML.
+- Do not add credentials or cloud storage to the frontend. Preserve the keyless design.
+- Firebase/Zeabur must publish only `dist/`. Never point a static hosting service at repository root.
+- Zeabur reads `zbpack.json` (`build_command`, `output_dir`), not the legacy `zeabur.json` fields. Run the configured `npm test && npm run build` release gate. `_headers` controls response headers; `404.html` enables missing-page responses. Verify actual production status codes after release.
+- Fixed asset names require cache revalidation; check actual response headers after any authorized deployment.
+- Keep local tests, historical audits and production verification distinct. Passing regression tests does not certify all medical/statistical methodology.

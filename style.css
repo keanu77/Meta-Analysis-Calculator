@@ -6254,7 +6254,7 @@ html {
         scrollbar-width: thin;
         padding: 0.5rem 0;
         gap: 0.5rem;
-        margin: 0 -10px;
+        margin: 0;
         padding-left: 10px;
         padding-right: 10px;
     }
@@ -7724,4 +7724,25 @@ html {
     .resource-links {
         flex-direction: column;
     }
+}
+
+/* Keep the copy control outside replaceable result text. */
+.result-box { padding-right: 72px; }
+.copy-btn { width: auto; min-width: 48px; opacity: 1; }
+.copy-status { display: block; margin-top: 0.5rem; white-space: normal; }
+
+/* Stack teaching diagrams within narrow screens; wide tables keep local scrolling. */
+@media (max-width: 480px) {
+    .tab-content { overflow-wrap: anywhere; }
+    .decision-branches-enhanced, .outcome-grid, .principles-grid,
+    .effect-comparison, .binary-measures-grid, .survival-details,
+    .conversion-scenarios, .tau-grid, .factors-grid, .intro-highlights,
+    .effect-type-options, .domains-overview, .help-tips-grid, .reference-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .reference-card, .domain-content, .factor-group, .highlight-item > div { min-width: 0; }
+    .intro-card { padding: 1rem; }
+    .scale-item { flex-wrap: wrap; gap: 0.5rem; }
+    .scale-label { margin: 0; min-width: 0; }
+    .scale-range, .tree-box { min-width: 0; }
 }

@@ -3,20 +3,20 @@ function calculateMD() {
   const resultDiv = document.getElementById("md-result");
 
   try {
-    const mean1 = parseFloat(document.getElementById("md-mean1").value);
-    const sd1 = parseFloat(document.getElementById("md-sd1").value);
-    const n1 = parseInt(document.getElementById("md-n1").value);
-    const mean2 = parseFloat(document.getElementById("md-mean2").value);
-    const sd2 = parseFloat(document.getElementById("md-sd2").value);
-    const n2 = parseInt(document.getElementById("md-n2").value);
+    const mean1 = readNumber("md-mean1");
+    const sd1 = readNumber("md-sd1");
+    const n1 = readNumber("md-n1");
+    const mean2 = readNumber("md-mean2");
+    const sd2 = readNumber("md-sd2");
+    const n2 = readNumber("md-n2");
 
     // Enhanced input validation
-    if ([mean1, sd1, mean2, sd2].some(isNaN)) {
+    if (!allFinite(mean1, sd1, mean2, sd2)) {
       showError(resultDiv, "請輸入所有必要的數值（均值和標準差）");
       return;
     }
 
-    if ([n1, n2].some((x) => isNaN(x) || x <= 0)) {
+    if (![n1, n2].every((x) => isSampleSize(x))) {
       showError(resultDiv, "樣本大小必須為正整數");
       return;
     }
@@ -92,18 +92,18 @@ function calculateMD() {
 
 // Standardized Mean Difference calculation
 function calculateSMD() {
-  const mean1 = parseFloat(document.getElementById("smd-mean1").value);
-  const sd1 = parseFloat(document.getElementById("smd-sd1").value);
-  const n1 = parseInt(document.getElementById("smd-n1").value);
-  const mean2 = parseFloat(document.getElementById("smd-mean2").value);
-  const sd2 = parseFloat(document.getElementById("smd-sd2").value);
-  const n2 = parseInt(document.getElementById("smd-n2").value);
+  const mean1 = readNumber("smd-mean1");
+  const sd1 = readNumber("smd-sd1");
+  const n1 = readNumber("smd-n1");
+  const mean2 = readNumber("smd-mean2");
+  const sd2 = readNumber("smd-sd2");
+  const n2 = readNumber("smd-n2");
   const useCorrection = document.getElementById("smd-correction").checked;
   const resultDiv = document.getElementById("smd-result");
 
   if (
-    [mean1, sd1, mean2, sd2].some(isNaN) ||
-    [n1, n2].some((x) => isNaN(x) || x <= 0)
+    !allFinite(mean1, sd1, mean2, sd2) || sd1 < 0 || sd2 < 0 ||
+    ![n1, n2].every((x) => isSampleSize(x)) || n1 + n2 <= 2
   ) {
     showError(resultDiv, "請輸入所有必要的數值");
     return;
@@ -113,6 +113,10 @@ function calculateSMD() {
   const pooledSD = Math.sqrt(
     ((n1 - 1) * sd1 ** 2 + (n2 - 1) * sd2 ** 2) / (n1 + n2 - 2),
   );
+  if (!Number.isFinite(pooledSD) || pooledSD <= 0) {
+    showError(resultDiv, "合併標準差必須大於 0 且為有限數值，才能計算 SMD");
+    return;
+  }
 
   // Calculate Cohen's d
   const cohensD = (mean1 - mean2) / pooledSD;
@@ -172,19 +176,16 @@ function calculateSMD() {
 
 // Binary outcomes calculation (OR, RR, RD)
 function calculateBinaryOutcomes() {
-  const events1 = parseInt(document.getElementById("bin-events1").value);
-  const total1 = parseInt(document.getElementById("bin-total1").value);
-  const events2 = parseInt(document.getElementById("bin-events2").value);
-  const total2 = parseInt(document.getElementById("bin-total2").value);
+  const events1 = readNumber("bin-events1");
+  const total1 = readNumber("bin-total1");
+  const events2 = readNumber("bin-events2");
+  const total2 = readNumber("bin-total2");
   const correction = document.getElementById("bin-correction").value;
   const resultDiv = document.getElementById("binary-result");
 
   if (
-    [events1, total1, events2, total2].some(isNaN) ||
-    events1 < 0 ||
-    events2 < 0 ||
-    total1 <= 0 ||
-    total2 <= 0 ||
+    !isSampleSize(events1, 0) || !isSampleSize(events2, 0) ||
+    !isSampleSize(total1) || !isSampleSize(total2) ||
     events1 > total1 ||
     events2 > total2
   ) {
@@ -198,6 +199,11 @@ function calculateBinaryOutcomes() {
     c = events2,
     d = total2 - events2;
   let correctionApplied = false;
+
+  if ([a, b, c, d].some((cell) => cell === 0) && correction === "none") {
+    showError(resultDiv, "2×2 表含零格且未使用修正，現有 OR/RR 對數公式無法產生完整有限結果；請確認分析方法。");
+    return;
+  }
 
   if ((a === 0 || b === 0 || c === 0 || d === 0) && correction !== "none") {
     correctionApplied = true;

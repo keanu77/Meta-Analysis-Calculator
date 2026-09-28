@@ -27,17 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeMobileOptimization();
   initializeEventHandlers();
 
-  // Initialize RoB system
-  try {
-    if (
-      typeof robSystem !== "undefined" &&
-      document.getElementById("studies-container")
-    ) {
-      robSystem.renderStudiesList();
-    }
-  } catch (error) {
-    console.error("Error during initialization:", error);
-  }
+  initializeResultControls();
 });
 
 // Mobile Optimization
@@ -528,24 +518,75 @@ function normalCDF(x) {
   return 0.5 * (1.0 + sign * y);
 }
 
-// Display and utility functions
+// Read the complete numeric value: do not truncate fractional sample sizes.
+function readNumber(id) {
+  const raw = document.getElementById(id).value.trim();
+  return raw === "" ? NaN : Number(raw);
+}
+
+function isSampleSize(value, minimum = 1) {
+  return Number.isSafeInteger(value) && value >= minimum;
+}
+
+function allFinite(...values) {
+  return values.every(Number.isFinite);
+}
+
+function initializeResultControls() {
+  document.querySelectorAll(".result-box").forEach((box) => {
+    const output = document.createElement("span");
+    output.className = "result-text";
+    const copy = document.createElement("button");
+    copy.type = "button";
+    copy.className = "copy-btn";
+    copy.textContent = "複製";
+    copy.setAttribute("aria-label", "複製計算結果");
+    const status = document.createElement("span");
+    status.className = "copy-status";
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(output.textContent);
+        status.textContent = "已複製";
+      } catch {
+        status.textContent = "無法自動複製，請選取結果文字後複製。";
+      }
+    });
+    box.append(output, copy, status);
+  });
+}
+
+function setResultText(resultDiv, text) {
+  const output = resultDiv.querySelector(".result-text");
+  if (output) output.textContent = text;
+  else resultDiv.textContent = text;
+  const status = resultDiv.querySelector(".copy-status");
+  if (status) status.textContent = "";
+}
+
+// Display text only, with a final guard for numerical overflow.
 function displayResult(resultDiv, text) {
-  resultDiv.textContent = text;
+  if (/\b(?:NaN|Infinity)\b/.test(text)) {
+    showError(resultDiv, "數值超出可計算範圍，請檢查輸入資料。");
+    return;
+  }
+  setResultText(resultDiv, text);
   resultDiv.classList.add("has-result");
   resultDiv.classList.remove("has-error");
 }
 
 function showError(resultDiv, message) {
-  resultDiv.textContent = message;
+  setResultText(resultDiv, message);
   resultDiv.classList.add("has-error");
   resultDiv.classList.remove("has-result");
 }
 
 function addToHistory(result) {
-  calculationHistory.push({
-    timestamp: new Date(),
-    ...result,
-  });
+  const valid = (value) => typeof value === "number"
+    ? Number.isFinite(value)
+    : Array.isArray(value) ? value.every(valid)
+    : value && typeof value === "object" ? Object.values(value).every(valid) : true;
+  if (!valid(result.outputs)) return;
+  calculationHistory.push({ timestamp: new Date(), ...result });
 }
 
 // Method accordion toggle function for statistics module
