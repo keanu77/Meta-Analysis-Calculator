@@ -21,5 +21,10 @@ test('build only publishes reviewed runtime assets',()=>{
  const headers=readFileSync(new URL('dist/_headers',root),'utf8');
  assert.match(headers,/Cache-Control: no-cache, must-revalidate/);
  assert.match(headers,/X-Content-Type-Options: nosniff/);
+ // Zeabur's header extension matches exact paths, not Netlify-style globs.
+ assert.doesNotMatch(headers,/^\/\*/m);
+ for (const path of ['/', ...runtimeFiles.map(file=>`/${file}`), '/404.html', '/_headers']) {
+  assert.ok(headers.split('\n').includes(path), `${path} must receive security and cache headers`);
+ }
  assert.ok(readFileSync(new URL('dist/404.html',root),'utf8').includes('找不到頁面'));
 });
