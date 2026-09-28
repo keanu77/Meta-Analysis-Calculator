@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { relative, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +15,8 @@ test('build only publishes reviewed runtime assets',()=>{
  assert.doesNotMatch(html,/<script[^>]+src="https?:/);
  assert.doesNotMatch(html,/<script[^>]+src="(?:rob-assessment|chart-utils|pdf-export)/);
  for (const file of runtimeFiles.filter(file=>/\.(js|css)$/.test(file))) {
-  assert.ok(html.includes(`"${file}?v=`), `${file} must invalidate legacy browser caches`);
+  const digest=createHash('sha256').update(readFileSync(new URL(`dist/${file}`,root))).update(readFileSync(new URL('dist/_headers',root))).digest('hex').slice(0,16);
+  assert.ok(html.includes(`"${file}?v=${digest}"`), `${file} must invalidate caches when content or header policy changes`);
  }
  assert.doesNotMatch(readFileSync(new URL('dist/calculator-core.js',root),'utf8'),/localStorage|sessionStorage/);
  for(const file of ['firebase.json','zbpack.json']) {const config=JSON.parse(readFileSync(new URL(file,root)));assert.equal(config.hosting?.public??config.output_dir,'dist');}

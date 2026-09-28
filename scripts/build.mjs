@@ -13,8 +13,10 @@ for (const file of [...runtimeFiles, ...hostingFiles]) {
 }
 // Bypass browser caches left by the former one-year cache policy on first release.
 let html = await readFile(new URL('index.html', output), 'utf8');
+const headerPolicy = await readFile(new URL('_headers', output));
 for (const file of runtimeFiles.filter((file) => /\.(js|css)$/.test(file))) {
-  const digest = createHash('sha256').update(await readFile(new URL(file, output))).digest('hex').slice(0, 16);
+  // Changed response headers also need fresh cache keys on existing CDN entries.
+  const digest = createHash('sha256').update(await readFile(new URL(file, output))).update(headerPolicy).digest('hex').slice(0, 16);
   html = html.replaceAll(`"${file}"`, `"${file}?v=${digest}"`);
 }
 await writeFile(new URL('index.html', output), html);
