@@ -16,145 +16,19 @@ function escapeHTML(str) {
 let currentTab = "module-guide"; // Start with guide tab
 let calculationHistory = [];
 
+// Pages with at least this many section headings get an in-page table of contents.
+const TOC_MIN_SECTIONS = 3;
+
 // Initialize the application
 document.addEventListener("DOMContentLoaded", function () {
   initializeTabs();
   initializeFormulas();
-  initializeMobileOptimization();
-
-  initializeResultControls();
-});
-
-// Mobile Optimization
-function initializeMobileOptimization() {
-  // Detect mobile device
-  const isMobile =
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent,
-    );
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-
-  if (isMobile || isTouch) {
-    document.body.classList.add("mobile-device");
-    setupMobileFeatures();
-  }
-
-  // Handle viewport changes
-  handleViewportChanges();
-
-  // Setup responsive tables
   setupResponsiveTables();
-}
-
-function setupMobileFeatures() {
-  // Add swipe gestures for tabs
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  const tabContainer = document.querySelector(".nav-tabs");
-  if (tabContainer) {
-    tabContainer.addEventListener(
-      "touchstart",
-      function (e) {
-        touchStartX = e.changedTouches[0].screenX;
-      },
-      { passive: true },
-    );
-
-    tabContainer.addEventListener(
-      "touchend",
-      function (e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      },
-      { passive: true },
-    );
-  }
-
-  function handleSwipe() {
-    const swipeThreshold = 50;
-    const diff = touchStartX - touchEndX;
-
-    if (Math.abs(diff) > swipeThreshold) {
-      const tabs = document.querySelectorAll(".nav-tab");
-      const currentIndex = Array.from(tabs).findIndex((tab) =>
-        tab.classList.contains("active"),
-      );
-
-      if (diff > 0 && currentIndex < tabs.length - 1) {
-        // Swipe left - next tab
-        tabs[currentIndex + 1].click();
-      } else if (diff < 0 && currentIndex > 0) {
-        // Swipe right - previous tab
-        tabs[currentIndex - 1].click();
-      }
-    }
-  }
-
-  // Improve form input focus behavior
-  const inputs = document.querySelectorAll("input, textarea, select");
-  inputs.forEach((input) => {
-    input.addEventListener("focus", function () {
-      // Scroll input into view with some padding
-      setTimeout(() => {
-        this.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }, 300);
-    });
-  });
-
-  // Add touch feedback to buttons
-  const buttons = document.querySelectorAll("button, .btn, .rob-btn");
-  buttons.forEach((button) => {
-    button.addEventListener(
-      "touchstart",
-      function () {
-        this.classList.add("touch-active");
-      },
-      { passive: true },
-    );
-
-    button.addEventListener(
-      "touchend",
-      function () {
-        setTimeout(() => {
-          this.classList.remove("touch-active");
-        }, 100);
-      },
-      { passive: true },
-    );
-  });
-}
-
-function handleViewportChanges() {
-  // Adjust for viewport changes (keyboard, orientation)
-  let viewportHeight = window.innerHeight;
-
-  window.addEventListener("resize", function () {
-    const newHeight = window.innerHeight;
-
-    // Detect if keyboard is shown (viewport shrinks significantly)
-    if (newHeight < viewportHeight * 0.75) {
-      document.body.classList.add("keyboard-visible");
-    } else {
-      document.body.classList.remove("keyboard-visible");
-    }
-
-    viewportHeight = newHeight;
-  });
-
-  // Handle orientation changes
-  window.addEventListener("orientationchange", function () {
-    setTimeout(() => {
-      // Recalculate layouts after orientation change
-      if (window.currentChart) {
-        window.currentChart.resize();
-      }
-    }, 300);
-  });
-}
+  buildPageTocs();
+  initializeResultControls();
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
+});
 
 function setupResponsiveTables() {
   // Wrap all tables in responsive containers
@@ -198,14 +72,23 @@ function setupResponsiveTables() {
 
 // Tab Management
 function initializeTabs() {
-  const tabButtons = document.querySelectorAll(".tab-btn");
-  const tabContents = document.querySelectorAll(".tab-content");
+  document.querySelectorAll(".tab-content").forEach((panel) => {
+    panel.setAttribute("role", "tabpanel");
+  });
 
-  tabButtons.forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const targetTab = button.getAttribute("data-tab");
-      switchTab(targetTab);
+  document.querySelectorAll(".tab-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      switchTab(button.getAttribute("data-tab"), { updateUrl: true });
     });
+  });
+
+  // Links and buttons elsewhere on the page that open a tab (home entry cards, brand).
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-goto]");
+    if (!trigger) return;
+    event.preventDefault();
+    switchTab(trigger.getAttribute("data-goto"), { updateUrl: true });
+    document.querySelector(`.tab-btn[data-tab="${trigger.getAttribute("data-goto")}"]`)?.focus({ preventScroll: true });
   });
 
   // 鍵盤導航：左右方向鍵切換 tab
@@ -236,25 +119,75 @@ function initializeTabs() {
   }
 }
 
-function switchTab(tabId) {
+function switchTab(tabId, { updateUrl = false, keepScroll = false } = {}) {
+  const panel = document.getElementById(tabId);
+  const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if (!panel || !activeBtn) return;
+
   // Update tab buttons + ARIA
   document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.remove("active");
     btn.setAttribute("aria-selected", "false");
     btn.setAttribute("tabindex", "-1");
   });
-  const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
   activeBtn.classList.add("active");
   activeBtn.setAttribute("aria-selected", "true");
   activeBtn.setAttribute("tabindex", "0");
+  activeBtn.scrollIntoView({ block: "nearest", inline: "nearest" });
 
   // Update tab contents
   document.querySelectorAll(".tab-content").forEach((content) => {
     content.classList.remove("active");
   });
-  document.getElementById(tabId).classList.add("active");
-
+  panel.classList.add("active");
   currentTab = tabId;
+
+  if (updateUrl) history.replaceState(null, "", `#${tabId}`);
+  // A new page starts at its top instead of the previous page's scroll position.
+  const main = document.getElementById("main-content");
+  if (!keepScroll && main && window.scrollY > main.offsetTop) {
+    window.scrollTo({ top: main.offsetTop, behavior: "auto" });
+  }
+}
+
+// Open the tab (or the section inside a tab) named by the URL hash.
+function openFromHash() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = id && document.getElementById(id);
+  if (!target) return;
+  const panel = target.classList.contains("tab-content") ? target : target.closest(".tab-content");
+  if (!panel) return;
+  switchTab(panel.id, { keepScroll: target !== panel });
+  if (target !== panel) target.scrollIntoView();
+}
+
+// In-page table of contents built from each page's section headings.
+function buildPageTocs() {
+  document.querySelectorAll(".tab-content").forEach((panel) => {
+    if (panel.id === "module-guide") return;
+    const headings = Array.from(panel.querySelectorAll("h3")).filter(
+      (heading) => !heading.closest(".usage-guide"),
+    );
+    if (headings.length < TOC_MIN_SECTIONS) return;
+
+    const toc = document.createElement("nav");
+    toc.className = "page-toc";
+    toc.setAttribute("aria-label", "本頁內容");
+    const label = document.createElement("span");
+    label.className = "page-toc-label";
+    label.textContent = "本頁內容";
+    toc.append(label);
+    headings.forEach((heading, index) => {
+      if (!heading.id) heading.id = `${panel.id}-section-${index + 1}`;
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.textContent = heading.textContent.trim();
+      toc.append(link);
+    });
+    const header = panel.querySelector(".module-header");
+    if (header) header.after(toc);
+    else panel.prepend(toc);
+  });
 }
 
 // Utility Functions

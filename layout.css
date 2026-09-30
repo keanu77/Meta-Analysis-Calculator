@@ -1,0 +1,1359 @@
+/* Layout and design system: app shell, home page, calculators.
+   style.css keeps the teaching-content components. Light theme only. */
+
+:root {
+    color-scheme: light;
+    --teal-50: #f0fdfa;
+    --teal-100: #ccfbf1;
+    --teal-200: #99f6e4;
+    --teal-600: #0d9488;
+    --teal-700: #0f766e;
+    --teal-800: #115e59;
+    --sky-50: #f0f9ff;
+    --sky-100: #e0f2fe;
+    --sky-200: #bae6fd;
+    --orange-50: #fff7ed;
+    --orange-100: #ffedd5;
+    --orange-500: #f97316;
+    --orange-700: #c2410c;
+    --orange-800: #9a3412;
+    --ink-900: #0f172a;
+    --ink-700: #334155;
+    --ink-600: #475569;
+    --ink-500: #64748b;
+    --ink-300: #cbd5e1;
+    --ink-200: #e2e8f0;
+    --ink-100: #f1f5f9;
+    --ink-50: #f8fafc;
+    --danger-50: #fef2f2;
+    --danger-600: #dc2626;
+    --danger-700: #b91c1c;
+
+    --font-ui: "Inter", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --font-code: "JetBrains Mono", "SFMono-Regular", Consolas, "PingFang TC", monospace;
+    --radius-card: 16px;
+    --radius-control: 10px;
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
+    --shadow-raised: 0 12px 32px -12px rgba(15, 118, 110, 0.28);
+    --nav-height: 56px;
+}
+
+/* ---------- Base ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-height) + 16px);
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink-700);
+    background: var(--ink-50);
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+:focus-visible {
+    outline: 3px solid var(--orange-500);
+    outline-offset: 2px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 1000;
+    padding: 10px 16px;
+    border-radius: var(--radius-control);
+    background: var(--ink-900);
+    color: #fff;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 12px;
+}
+
+/* ---------- App header ---------- */
+.app-header {
+    background: #fff;
+    border-bottom: 1px solid var(--ink-200);
+}
+
+.app-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 72px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--teal-600), var(--teal-800));
+    color: #fff;
+    font-size: 1.15rem;
+    box-shadow: var(--shadow-raised);
+}
+
+.brand-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--ink-900);
+    line-height: 1.2;
+}
+
+.brand-subtitle {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--ink-500);
+}
+
+.brand-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--teal-50);
+    color: var(--teal-800);
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+/* ---------- Tab navigation ---------- */
+.nav-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: saturate(160%) blur(10px);
+    border-bottom: 1px solid var(--ink-200);
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: var(--nav-height);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.nav-inner::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-group-label {
+    flex: none;
+    margin: 0 4px 0 16px;
+    padding-left: 16px;
+    border-left: 1px solid var(--ink-200);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--ink-500);
+    white-space: nowrap;
+}
+
+.tab-btn {
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--ink-600);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.tab-btn i {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.tab-btn:hover {
+    background: var(--ink-100);
+    color: var(--ink-900);
+}
+
+.tab-btn.active {
+    background: var(--teal-50);
+    color: var(--teal-800);
+}
+
+.tab-btn.active::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: -8px;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--orange-500);
+}
+
+/* ---------- Page shell ---------- */
+.main-content {
+    padding: 32px 0 72px;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: tab-in 0.25s ease-out;
+}
+
+@keyframes tab-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+.module-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 28px 32px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: linear-gradient(120deg, #fff 45%, var(--sky-50) 75%, var(--teal-50));
+    box-shadow: var(--shadow-card);
+}
+
+.module-header h2 {
+    margin: 0 0 6px;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--ink-900);
+    line-height: 1.25;
+}
+
+.module-header p {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--ink-600);
+}
+
+.module-header-art {
+    display: block;
+    width: 200px;
+    height: auto;
+}
+
+.module-header.is-banner .module-header-art {
+    width: auto;
+    max-width: 360px;
+    max-height: 150px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-accent {
+    background: var(--orange-700);
+    color: #fff;
+}
+
+.btn-accent:hover {
+    background: var(--orange-800);
+}
+
+.btn-primary {
+    background: var(--teal-700);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--teal-800);
+}
+
+.btn-ghost {
+    background: #fff;
+    border-color: var(--ink-300);
+    color: var(--ink-700);
+}
+
+.btn-ghost:hover {
+    border-color: var(--teal-600);
+    color: var(--teal-800);
+}
+
+/* ---------- Home ---------- */
+.home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 40px;
+    padding: 40px;
+    border: 1px solid var(--ink-200);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 85% 20%, var(--sky-100), transparent 55%),
+        radial-gradient(circle at 70% 90%, var(--teal-50), transparent 50%),
+        #fff;
+    box-shadow: var(--shadow-card);
+}
+
+.eyebrow {
+    margin: 0 0 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--orange-700);
+}
+
+.home-hero h2 {
+    margin: 0 0 16px;
+    font-size: clamp(1.75rem, 3.4vw, 2.6rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--ink-900);
+}
+
+.home-hero .lead {
+    margin: 0 0 24px;
+    font-size: 1.05rem;
+    color: var(--ink-600);
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.hero-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.88rem;
+    color: var(--ink-600);
+}
+
+.hero-points i {
+    margin-right: 6px;
+    color: var(--teal-600);
+}
+
+.home-hero-art img {
+    display: block;
+    width: 100%;
+}
+
+.guide-section {
+    margin-bottom: 40px;
+}
+
+.guide-section > h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--ink-900);
+}
+
+.guide-section > h3 i {
+    color: var(--teal-600);
+}
+
+.entry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.entry-card {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.entry-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--teal-200);
+    box-shadow: var(--shadow-raised);
+}
+
+.entry-card img {
+    align-self: center;
+    width: 180px;
+    height: 140px;
+    object-fit: contain;
+    margin-bottom: 12px;
+}
+
+.entry-card h4 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    color: var(--ink-900);
+}
+
+.entry-card > p {
+    margin: 0 0 12px;
+    color: var(--ink-600);
+    font-size: 0.95rem;
+}
+
+.entry-tasks {
+    flex: 1;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.entry-tasks li {
+    position: relative;
+    padding: 4px 0 4px 20px;
+    font-size: 0.92rem;
+    color: var(--ink-700);
+}
+
+.entry-tasks li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0.85em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--orange-500);
+}
+
+.entry-card .btn {
+    align-self: flex-start;
+}
+
+.guide-card {
+    padding: 24px 28px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+    box-shadow: var(--shadow-card);
+}
+
+.guide-card h4 {
+    margin: 0 0 12px;
+    color: var(--teal-800);
+}
+
+.guide-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+}
+
+.guide-steps li {
+    position: relative;
+    padding: 44px 0 0;
+    font-size: 0.93rem;
+    color: var(--ink-600);
+    counter-increment: step;
+}
+
+.guide-steps li::before {
+    content: counter(step);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--teal-700);
+    color: #fff;
+    font-weight: 700;
+}
+
+.guide-steps strong {
+    display: block;
+    color: var(--ink-900);
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.tip-card {
+    padding: 22px 24px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+}
+
+.tip-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: var(--teal-50);
+    color: var(--teal-700);
+    font-size: 1.1rem;
+}
+
+.tip-icon .fa-exclamation-triangle {
+    color: var(--orange-700);
+}
+
+.tip-card:nth-child(2) .tip-icon {
+    background: var(--orange-50);
+}
+
+.tip-card h4 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    color: var(--ink-900);
+}
+
+.tip-card ul {
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.92rem;
+    color: var(--ink-600);
+}
+
+.tip-card li {
+    margin-bottom: 4px;
+}
+
+/* Illustrations are drawn on white; multiply lets them sit on tinted panels. */
+.home-hero-art img,
+.module-header-art,
+.entry-card img {
+    mix-blend-mode: multiply;
+}
+
+/* ---------- Page table of contents ---------- */
+.page-toc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 24px;
+    padding: 14px 16px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+}
+
+.page-toc-label {
+    margin-right: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-500);
+}
+
+.page-toc a {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--ink-100);
+    color: var(--ink-700);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.page-toc a:hover {
+    background: var(--teal-50);
+    color: var(--teal-800);
+}
+
+/* ---------- "When to use" panels ---------- */
+.usage-guide {
+    margin-bottom: 24px;
+    padding: 24px 28px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+}
+
+.usage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.usage-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--ink-900);
+}
+
+.usage-header i {
+    color: var(--teal-600);
+}
+
+.usage-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.usage-content h4 {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    color: var(--ink-500);
+}
+
+.usage-content ul {
+    margin: 0;
+    padding-left: 1.2em;
+}
+
+.usage-content li {
+    margin-bottom: 6px;
+    font-size: 0.93rem;
+}
+
+.example-case {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius-control);
+    background: var(--ink-50);
+    font-size: 0.9rem;
+}
+
+.example-tag {
+    flex: none;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--teal-700);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* ---------- Calculators ---------- */
+.calculator-grid {
+    display: grid;
+    gap: 24px;
+}
+
+.calculator-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 28px;
+    border: 1px solid var(--ink-200);
+    border-radius: var(--radius-card);
+    background: #fff;
+    box-shadow: var(--shadow-card);
+    scroll-margin-top: calc(var(--nav-height) + 16px);
+}
+
+.calculator-card > h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--ink-100);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--ink-900);
+}
+
+.calculator-card > h3 i {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--teal-50);
+    color: var(--teal-700);
+    font-size: 0.85rem;
+}
+
+.input-group {
+    margin-bottom: 14px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--ink-700);
+}
+
+.input-group input[type="number"],
+.input-group input[type="text"],
+.input-group select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--ink-300);
+    border-radius: var(--radius-control);
+    background: #fff;
+    color: var(--ink-900);
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-group input::placeholder {
+    color: var(--ink-500);
+    opacity: 0.8;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--teal-600);
+    box-shadow: 0 0 0 3px var(--teal-100);
+}
+
+.input-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: -3px;
+    accent-color: var(--teal-700);
+}
+
+.input-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: var(--ink-500);
+}
+
+/* Paired inputs (e.g. experimental vs control group) */
+.field-row {
+    margin: 0 0 6px;
+    padding: 0;
+    border: 0;
+}
+
+.field-row-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--teal-800);
+}
+
+.field-row-title::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--teal-600);
+}
+
+.field-row.is-control .field-row-title {
+    color: var(--ink-600);
+}
+
+.field-row.is-control .field-row-title::before {
+    background: var(--ink-500);
+}
+
+.field-row-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+    gap: 0 12px;
+}
+
+.calc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 6px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: var(--teal-700);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.15s;
+}
+
+.calc-btn:hover {
+    background: var(--teal-800);
+}
+
+.calc-btn:active {
+    transform: translateY(1px);
+}
+
+.formula-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    margin-top: 12px;
+    padding: 8px 14px;
+    border: 1px dashed var(--ink-300);
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--ink-600);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    justify-self: start;
+}
+
+.formula-btn:hover {
+    border-color: var(--teal-600);
+    border-style: solid;
+    color: var(--teal-800);
+    background: var(--teal-50);
+}
+
+/* Result panel */
+.result-box {
+    position: relative;
+    display: none;
+    margin-top: 16px;
+    padding: 18px 20px;
+    border: 1px solid var(--teal-200);
+    border-radius: 12px;
+    background: var(--teal-50);
+}
+
+.result-box.has-result,
+.result-box.has-error {
+    display: block;
+    animation: tab-in 0.2s ease-out;
+}
+
+.result-box.has-error {
+    border-color: #fecaca;
+    background: var(--danger-50);
+}
+
+.result-text {
+    display: block;
+    padding-right: 64px;
+    font-family: var(--font-code);
+    font-size: 0.86rem;
+    line-height: 1.7;
+    color: var(--ink-900);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.result-box.has-error .result-text {
+    padding-right: 0;
+    font-family: var(--font-ui);
+    color: var(--danger-700);
+}
+
+.result-box.has-error .copy-btn {
+    display: none;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    min-height: 32px;
+    padding: 4px 12px;
+    border: 1px solid var(--teal-200);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--teal-800);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    background: var(--teal-100);
+}
+
+.copy-status {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--teal-800);
+}
+
+.copy-status:empty {
+    display: none;
+}
+
+/* Wide cards: inputs on the left, result panel on the right. */
+@media (min-width: 900px) {
+    .calculator-card {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+        /* The result panel spans every input row; its extra height goes to the final fr row. */
+        grid-template-rows: auto repeat(18, auto) 1fr;
+        column-gap: 32px;
+    }
+
+    .calculator-card > * {
+        grid-column: 1;
+    }
+
+    .calculator-card > h3 {
+        grid-column: 1 / -1;
+    }
+
+    .calculator-card > .result-box {
+        grid-column: 2;
+        grid-row: 2 / -1;
+        align-self: start;
+        display: block;
+        position: sticky;
+        top: calc(var(--nav-height) + 16px);
+        margin-top: 0;
+        min-height: 160px;
+    }
+
+    .calculator-card > .result-box:not(.has-result):not(.has-error) {
+        border-style: dashed;
+        border-color: var(--ink-300);
+        background: var(--ink-50);
+    }
+
+    .calculator-card > .result-box:not(.has-result):not(.has-error)::before {
+        content: "填入數值後按「計算」，結果與計算步驟會顯示在這裡。";
+        display: block;
+        color: var(--ink-500);
+        font-size: 0.9rem;
+    }
+
+    .calculator-card > .result-box:not(.has-result):not(.has-error) .copy-btn {
+        display: none;
+    }
+}
+
+/* Inline notes inside calculators */
+.note-box,
+.es-usage-hint {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-left: 3px solid var(--orange-500);
+    border-radius: 0 var(--radius-control) var(--radius-control) 0;
+    background: var(--orange-50);
+    font-size: 0.88rem;
+    color: var(--ink-700);
+}
+
+.note-box i,
+.es-usage-hint i {
+    color: var(--orange-700);
+}
+
+.es-usage-hint ul {
+    margin: 6px 0 0;
+    padding-left: 1.2em;
+}
+
+.es-usage-hint li {
+    margin-bottom: 4px;
+}
+
+/* ---------- Formula modal ---------- */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    padding: 24px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.modal-content {
+    max-width: 720px;
+    margin: 6vh auto;
+    border-radius: var(--radius-card);
+    background: #fff;
+    box-shadow: 0 24px 64px -16px rgba(15, 23, 42, 0.45);
+    animation: tab-in 0.2s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--ink-200);
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: var(--ink-900);
+}
+
+.modal-close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--ink-100);
+    color: var(--ink-700);
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: var(--ink-200);
+}
+
+.modal-body {
+    padding: 20px 24px 28px;
+    font-size: 0.95rem;
+}
+
+.modal-body h4 {
+    margin: 20px 0 8px;
+    color: var(--teal-800);
+}
+
+.modal-body h4:first-child {
+    margin-top: 0;
+}
+
+.modal-body p {
+    margin: 0 0 8px;
+}
+
+.modal-body table td {
+    padding: 6px 12px;
+    border: 1px solid var(--ink-200);
+}
+
+/* ---------- Footer & back to top ---------- */
+.footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--ink-200);
+    background: #fff;
+    color: var(--ink-500);
+    font-size: 0.88rem;
+    text-align: center;
+}
+
+.footer p {
+    margin: 0 0 4px;
+}
+
+.footer a {
+    color: var(--teal-700);
+}
+
+.back-to-top {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--teal-700);
+    color: #fff;
+    box-shadow: var(--shadow-raised);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+    .brand-note {
+        display: none;
+    }
+
+    .home-hero {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 32px;
+    }
+
+    .home-hero-art {
+        order: -1;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .entry-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tips-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .entry-card {
+        display: grid;
+        grid-template-columns: 140px minmax(0, 1fr);
+        column-gap: 20px;
+    }
+
+    .entry-card img {
+        grid-row: 1 / span 4;
+        width: 140px;
+        height: 120px;
+    }
+
+    .module-header.is-banner .module-header-art {
+        max-width: 260px;
+    }
+}
+
+@media (max-width: 720px) {
+    .container {
+        padding: 0 16px;
+    }
+
+    .app-header-inner {
+        min-height: 60px;
+    }
+
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+    }
+
+    .brand-title {
+        font-size: 1.05rem;
+    }
+
+    .brand-subtitle {
+        font-size: 0.75rem;
+    }
+
+    .nav-tabs {
+        /* Hint that the tab row scrolls horizontally. */
+        -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
+        mask-image: linear-gradient(90deg, #000 88%, transparent);
+    }
+
+    .tab-group-label {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.88rem;
+    }
+
+    .main-content {
+        padding-top: 20px;
+    }
+
+    .home-hero {
+        padding: 24px 20px;
+        border-radius: 18px;
+    }
+
+    .hero-actions .btn {
+        flex: 1 1 100%;
+    }
+
+    .entry-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .entry-card img {
+        grid-row: auto;
+        width: 150px;
+        height: 110px;
+    }
+
+    .module-header {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 22px 20px;
+    }
+
+    .module-header-art,
+    .module-header.is-banner .module-header-art {
+        display: none;
+    }
+
+    .page-toc {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+        mask-image: linear-gradient(90deg, #000 85%, transparent);
+    }
+
+    .page-toc::-webkit-scrollbar {
+        display: none;
+    }
+
+    .page-toc a,
+    .page-toc-label {
+        flex: none;
+        white-space: nowrap;
+    }
+
+    .usage-guide {
+        padding: 20px;
+    }
+
+    .usage-content {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .calculator-card {
+        padding: 20px;
+    }
+
+    .guide-card {
+        padding: 20px;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-content {
+        margin: 2vh auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media print {
+    .app-header,
+    .nav-tabs,
+    .page-toc,
+    .back-to-top,
+    .calc-btn,
+    .formula-btn,
+    .copy-btn {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .calculator-card,
+    .module-header {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+}

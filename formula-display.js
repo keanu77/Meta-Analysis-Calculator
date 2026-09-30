@@ -23,6 +23,9 @@ function toggleFormulaMethod(methodId) {
   }
 }
 
+// Element focused before the formula dialog opened, restored on close.
+let formulaReturnFocus = null;
+
 function showFormula(calculationType) {
   const modal = document.getElementById("formula-modal");
   const modalTitle = document.getElementById("modal-title");
@@ -342,12 +345,24 @@ function showFormula(calculationType) {
 
   modalTitle.textContent = title;
   modalBody.innerHTML = content;
+  formulaReturnFocus = document.activeElement;
   modal.style.display = "block";
+  document.body.style.overflow = "hidden";
+  modal.querySelector(".modal-close")?.focus();
 }
 
 function closeModal() {
-  document.getElementById("formula-modal").style.display = "none";
+  const modal = document.getElementById("formula-modal");
+  if (modal.style.display !== "block") return;
+  modal.style.display = "none";
+  document.body.style.overflow = "";
+  formulaReturnFocus?.focus?.();
+  formulaReturnFocus = null;
 }
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeModal();
+});
 
 // Close modal when clicking outside
 window.addEventListener("click", (event) => {

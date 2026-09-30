@@ -5,7 +5,7 @@ import { runtimeFiles } from './runtime-files.mjs';
 const portArgument = process.argv.find((value) => value.startsWith('--port='));
 const port = Number(portArgument?.split('=')[1] ?? process.env.PORT ?? 8080);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port');
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
+const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.webp': 'image/webp' };
 const allowed = new Set(runtimeFiles);
 http.createServer(async (request, response) => {
   response.setHeader('X-Content-Type-Options', 'nosniff');

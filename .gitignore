@@ -62,3 +62,4 @@ DEPLOYMENT.md
 
 # Local audit evidence is kept outside published source changes.
 .claude/audit/
+.claude/HANDOFF.md

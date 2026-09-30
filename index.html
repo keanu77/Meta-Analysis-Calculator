@@ -9,7 +9,8 @@
     <meta name="description" content="免費的統合分析計算工具，支援效果量轉換（Cohen's d、Odds Ratio、Risk Ratio）、信賴區間計算等功能。適用於醫學、教育、運動科學研究。">
     <meta name="keywords" content="meta-analysis, 統合分析, effect size, Cohen's d, Odds Ratio, 信賴區間, 系統性回顧, systematic review">
     <meta name="author" content="Dr. Wu Yi-Cheng">
-    <meta name="theme-color" content="#4f46e5">
+    <meta name="theme-color" content="#0f766e">
+    <meta name="color-scheme" content="light">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -17,10 +18,11 @@
     <meta property="og:description" content="免費的統合分析計算工具，支援效果量轉換、信賴區間計算等功能。">
     <meta property="og:locale" content="zh_TW">
     <meta property="og:url" content="https://metacalc.sportsmedicine.tw/">
+    <meta property="og:image" content="https://metacalc.sportsmedicine.tw/images/hero.webp">
     <link rel="canonical" href="https://metacalc.sportsmedicine.tw/">
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Meta-Analysis Calculator">
     <meta name="twitter:description" content="免費的統合分析計算工具，支援效果量轉換、信賴區間計算等功能。">
 
@@ -28,53 +30,38 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="layout.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 <body>
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">跳過導航，直接前往主要內容</a>
 
-    <header class="header">
-        <div class="container">
-            <h1><i class="fas fa-calculator"></i> Meta-Analysis Calculator</h1>
-            <p class="subtitle">系統性文獻回顧／統合分析一站式換算工具</p>
+    <header class="app-header">
+        <div class="container app-header-inner">
+            <a class="brand" href="#module-guide" data-goto="module-guide">
+                <span class="brand-mark" aria-hidden="true"><i class="fas fa-calculator"></i></span>
+                <span>
+                    <h1 class="brand-title">Meta-Analysis Calculator</h1>
+                    <span class="brand-subtitle">統合分析換算工具與教學資源</span>
+                </span>
+            </a>
+            <span class="brand-note"><i class="fas fa-lock" aria-hidden="true"></i> 在瀏覽器內計算，不上傳資料</span>
         </div>
     </header>
 
-    <nav class="nav-tabs" role="tablist" aria-label="功能模組導航">
-        <div class="container">
-            <button class="tab-btn active" data-tab="module-guide" role="tab" aria-selected="true" aria-controls="module-guide" title="了解如何使用此計算工具">
-                <i class="fas fa-book-open" aria-hidden="true"></i>
-                使用指南
-            </button>
-            <button class="tab-btn" data-tab="module-stats" role="tab" aria-selected="false" aria-controls="module-stats" title="Meta分析的基本統計概念介紹">
-                <i class="fas fa-chart-pie" aria-hidden="true"></i>
-                MA基本概念
-            </button>
-            <button class="tab-btn" data-tab="module-a" role="tab" aria-selected="false" aria-controls="module-a" title="SE轉SD、CI轉Mean&SD、分位數轉換">
-                <i class="fas fa-chart-bar" aria-hidden="true"></i>
-                單組內統計轉換
-            </button>
-            <button class="tab-btn" data-tab="module-b" role="tab" aria-selected="false" aria-controls="module-b" title="計算MD、SMD、OR、RR等效果量">
-                <i class="fas fa-balance-scale" aria-hidden="true"></i>
-                兩組比較效果量
-            </button>
-            <button class="tab-btn" data-tab="module-c" role="tab" aria-selected="false" aria-controls="module-c" title="信賴區間與標準誤的相互轉換">
-                <i class="fas fa-exchange-alt" aria-hidden="true"></i>
-                CI/SE互轉
-            </button>
-            <button class="tab-btn" data-tab="module-rob" role="tab" aria-selected="false" aria-controls="module-rob" title="Cochrane RoB 2.0 風險偏差評估工具">
-                <i class="fas fa-shield-alt" aria-hidden="true"></i>
-                風險偏差評估 (RoB 2.0)
-            </button>
-            <button class="tab-btn" data-tab="module-grade" role="tab" aria-selected="false" aria-controls="module-grade" title="GRADE 證據品質評估系統">
-                <i class="fas fa-star-half-alt" aria-hidden="true"></i>
-                GRADE 證據品質
-            </button>
-            <button class="tab-btn" data-tab="module-e" role="tab" aria-selected="false" aria-controls="module-e" title="相關文獻與參考資料">
-                <i class="fas fa-info-circle" aria-hidden="true"></i>
-                參考資料
-            </button>
+    <nav class="nav-tabs" aria-label="功能模組導航">
+        <div class="container nav-inner" role="tablist">
+            <button class="tab-btn active" data-tab="module-guide" role="tab" aria-selected="true" aria-controls="module-guide" tabindex="0" title="了解如何使用此計算工具"><i class="fas fa-house" aria-hidden="true"></i>首頁</button>
+            <span class="tab-group-label" aria-hidden="true">計算工具</span>
+            <button class="tab-btn" data-tab="module-a" role="tab" aria-selected="false" aria-controls="module-a" tabindex="-1" title="SE轉SD、CI轉Mean&SD、分位數轉換"><i class="fas fa-chart-bar" aria-hidden="true"></i>單組換算</button>
+            <button class="tab-btn" data-tab="module-b" role="tab" aria-selected="false" aria-controls="module-b" tabindex="-1" title="計算MD、SMD、OR、RR等效果量"><i class="fas fa-balance-scale" aria-hidden="true"></i>兩組效果量</button>
+            <button class="tab-btn" data-tab="module-c" role="tab" aria-selected="false" aria-controls="module-c" tabindex="-1" title="信賴區間與標準誤的相互轉換"><i class="fas fa-exchange-alt" aria-hidden="true"></i>CI↔SE 換算</button>
+            <span class="tab-group-label" aria-hidden="true">學習資源</span>
+            <button class="tab-btn" data-tab="module-stats" role="tab" aria-selected="false" aria-controls="module-stats" tabindex="-1" title="Meta分析的基本統計概念介紹"><i class="fas fa-chart-pie" aria-hidden="true"></i>MA 基本概念</button>
+            <button class="tab-btn" data-tab="module-rob" role="tab" aria-selected="false" aria-controls="module-rob" tabindex="-1" title="Cochrane RoB 2.0 風險偏差評估工具"><i class="fas fa-shield-alt" aria-hidden="true"></i>RoB 2</button>
+            <button class="tab-btn" data-tab="module-grade" role="tab" aria-selected="false" aria-controls="module-grade" tabindex="-1" title="GRADE 證據品質評估系統"><i class="fas fa-star-half-alt" aria-hidden="true"></i>GRADE</button>
+            <button class="tab-btn" data-tab="module-e" role="tab" aria-selected="false" aria-controls="module-e" tabindex="-1" title="相關文獻與參考資料"><i class="fas fa-book" aria-hidden="true"></i>參考資料</button>
         </div>
     </nav>
 
@@ -82,58 +69,78 @@
         <div class="container">
             <!-- Module Guide: 使用指南 -->
             <div id="module-guide" class="tab-content active">
-                <div class="module-header">
-                    <h2>歡迎使用 Meta-Analysis Calculator</h2>
-                    <p>本指南將協助您快速掌握計算機的各項功能</p>
-                </div>
+                <section class="home-hero" aria-labelledby="home-title">
+                    <div class="home-hero-text">
+                        <p class="eyebrow">系統性文獻回顧 · 統合分析</p>
+                        <h2 id="home-title">把文獻裡的統計數字，<br>換算成統合分析需要的格式</h2>
+                        <p class="lead">原文只給 SE、信賴區間、中位數與四分位數，或 2×2 表？輸入原文報告的數值，就能得到 Mean、SD、效果量與標準誤，並附計算步驟與參考文獻。</p>
+                        <div class="hero-actions">
+                            <button type="button" class="btn btn-accent" data-goto="module-a"><i class="fas fa-calculator" aria-hidden="true"></i> 開始換算</button>
+                            <button type="button" class="btn btn-ghost" data-goto="module-stats"><i class="fas fa-book-open" aria-hidden="true"></i> 學習 MA 基本概念</button>
+                        </div>
+                        <ul class="hero-points">
+                            <li><i class="fas fa-lock" aria-hidden="true"></i>在瀏覽器內計算，不上傳資料</li>
+                            <li><i class="fas fa-list-ol" aria-hidden="true"></i>每個結果附計算步驟</li>
+                            <li><i class="fas fa-check-double" aria-hidden="true"></i>中位數換算已與 R 套件 meta 核對</li>
+                        </ul>
+                    </div>
+                    <div class="home-hero-art">
+                        <img src="images/hero.webp" width="1200" height="675" alt="" fetchpriority="high">
+                    </div>
+                </section>
 
                 <div class="guide-content">
-                    <div class="guide-section">
-                        <h3><i class="fas fa-rocket"></i> 快速開始</h3>
+                    <section class="guide-section" aria-labelledby="entry-title">
+                        <h3 id="entry-title"><i class="fas fa-compass" aria-hidden="true"></i> 你手上的資料是……</h3>
+                        <div class="entry-grid">
+                            <article class="entry-card">
+                                <img src="images/single.webp" width="360" height="257" alt="" loading="lazy">
+                                <h4>單一組別的統計量</h4>
+                                <p>原文只給 SE、CI、中位數／IQR／範圍，需要 Mean 與 SD。</p>
+                                <ul class="entry-tasks">
+                                    <li>SE → SD、CI → Mean 與 SD</li>
+                                    <li>中位數、IQR、範圍 → Mean 與 SD</li>
+                                    <li>Pooled SD、變化量 SD</li>
+                                </ul>
+                                <button type="button" class="btn btn-primary" data-goto="module-a">單組換算 <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                            </article>
+                            <article class="entry-card">
+                                <img src="images/twogroup.webp" width="360" height="252" alt="" loading="lazy">
+                                <h4>兩組的比較資料</h4>
+                                <p>兩組的平均與 SD，或事件數與總人數。</p>
+                                <ul class="entry-tasks">
+                                    <li>平均差 MD、標準化平均差 SMD（Hedges' g）</li>
+                                    <li>勝算比 OR、風險比 RR、風險差 RD</li>
+                                    <li>零事件的處理與提示</li>
+                                </ul>
+                                <button type="button" class="btn btn-primary" data-goto="module-b">兩組效果量 <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                            </article>
+                            <article class="entry-card">
+                                <img src="images/ciset.webp" width="360" height="348" alt="" loading="lazy">
+                                <h4>已有效果量與信賴區間</h4>
+                                <p>原文報告 MD、SMD、OR、RR 或 HR 與 CI，需要 SE 放進統合分析軟體。</p>
+                                <ul class="entry-tasks">
+                                    <li>CI → SE（比值自動取對數）</li>
+                                    <li>效果量 + SE → CI</li>
+                                    <li>Z 值與 p 值</li>
+                                </ul>
+                                <button type="button" class="btn btn-primary" data-goto="module-c">CI↔SE 換算 <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="guide-section" aria-labelledby="steps-title">
+                        <h3 id="steps-title"><i class="fas fa-route" aria-hidden="true"></i> 使用步驟</h3>
                         <div class="guide-card">
-                            <h4>基本操作流程</h4>
                             <ol class="guide-steps">
-                                <li><strong>選擇功能模組</strong>：點擊上方導航標籤選擇所需的計算功能</li>
-                                <li><strong>輸入數據</strong>：在對應欄位填入您的研究數據</li>
-                                <li><strong>執行計算</strong>：點擊「計算」按鈕獲得結果</li>
-                                <li><strong>查看結果</strong>：結果會顯示在綠色背景的結果框中</li>
-                                <li><strong>查看公式</strong>：點擊「查看公式」了解計算原理</li>
+                                <li><strong>選擇工具</strong>依手上的資料，從上方「計算工具」選擇頁面</li>
+                                <li><strong>填入原文數值</strong>欄位保持原文的單位與小數位數</li>
+                                <li><strong>按「計算」</strong>結果顯示在輸入欄旁（手機在下方）</li>
+                                <li><strong>核對步驟</strong>檢查計算步驟與提示，再複製結果</li>
+                                <li><strong>查看公式</strong>了解公式、假設與參考文獻</li>
                             </ol>
                         </div>
-                    </div>
-
-
-                    <div class="guide-section">
-                        <h3><i class="fas fa-th-large"></i> 功能模組概覽</h3>
-                        <div class="module-overview">
-                            <div class="overview-card">
-                                <div class="overview-icon"><i class="fas fa-chart-bar"></i></div>
-                                <h4>單組內統計轉換</h4>
-                                <p>處理單一組別的統計數據轉換，如 SE↔SD、CI→Mean/SD、次序統計轉換等</p>
-                                <div class="when-to-use">
-                                    <strong>使用時機：</strong>文獻只報告部分統計值，需要轉換為標準格式進行meta-analysis
-                                </div>
-                            </div>
-
-                            <div class="overview-card">
-                                <div class="overview-icon"><i class="fas fa-balance-scale"></i></div>
-                                <h4>兩組比較效果量</h4>
-                                <p>計算實驗組與對照組的比較指標，包括 MD、SMD、OR、RR、RD 等</p>
-                                <div class="when-to-use">
-                                    <strong>使用時機：</strong>進行兩組比較的效果量計算，為森林圖準備數據
-                                </div>
-                            </div>
-
-                            <div class="overview-card">
-                                <div class="overview-icon"><i class="fas fa-exchange-alt"></i></div>
-                                <h4>CI/SE 互轉</h4>
-                                <p>各種效果量的信賴區間、標準誤、Z/t值相互轉換</p>
-                                <div class="when-to-use">
-                                    <strong>使用時機：</strong>文獻報告格式不一致，需要統一為CI或SE格式
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
 
                     <div class="guide-section">
                         <h3><i class="fas fa-lightbulb"></i> 使用建議</h3>
@@ -154,7 +161,7 @@
                                 <ul>
                                     <li>混淆 SD 和 SE</li>
                                     <li>錯誤的信賴區間水準</li>
-                                    <li>零事件未進行修正</li>
+                                    <li>零事件研究直接計算 OR/RR</li>
                                 </ul>
                             </div>
 
@@ -176,8 +183,11 @@
             <!-- Module A: 單組內與描述統計轉換 -->
             <div id="module-a" class="tab-content">
                 <div class="module-header">
-                    <h2>單組內與描述統計轉換</h2>
-                    <p>提供 SE、CI、次序統計等與 Mean、SD 間的轉換</p>
+                    <div class="module-header-text">
+                        <h2>單組內與描述統計轉換</h2>
+                        <p>SE、信賴區間、中位數／四分位數／範圍，換算成 Mean 與 SD。</p>
+                    </div>
+                    <img class="module-header-art" src="images/single.webp" alt="" loading="lazy">
                 </div>
 
                 <!-- 使用時機說明 -->
@@ -215,18 +225,18 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> SE → SD</h3>
                         <div class="input-group">
-                            <label for="se-input">Standard Error (SE):</label>
+                            <label for="se-input">標準誤 SE</label>
                             <input type="number" id="se-input" step="any" placeholder="輸入 SE 值">
                         </div>
                         <div class="input-group">
-                            <label for="se-n-input">Sample Size (n):</label>
+                            <label for="se-n-input">樣本數 n</label>
                             <input type="number" id="se-n-input" step="1" min="1" placeholder="輸入樣本數">
                         </div>
-                        <button class="calc-btn" onclick="calculateSEtoSD()">
+                        <button type="button" class="calc-btn" onclick="calculateSEtoSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="se-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('se-sd')">
+                        <button type="button" class="formula-btn" onclick="showFormula('se-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -234,16 +244,21 @@
                     <!-- CI to Mean & SD -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> CI → Mean & SD</h3>
+                        <div class="field-row" role="group" aria-label="信賴區間">
+                            <p class="field-row-title" aria-hidden="true">信賴區間</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="ci-lower">Lower CI:</label>
+                            <label for="ci-lower">下界</label>
                             <input type="number" id="ci-lower" step="any" placeholder="下界">
                         </div>
                         <div class="input-group">
-                            <label for="ci-upper">Upper CI:</label>
+                            <label for="ci-upper">上界</label>
                             <input type="number" id="ci-upper" step="any" placeholder="上界">
                         </div>
+                            </div>
+                        </div>
                         <div class="input-group">
-                            <label for="ci-level">Confidence Level (%):</label>
+                            <label for="ci-level">信賴水準</label>
                             <select id="ci-level">
                                 <option value="95">95%</option>
                                 <option value="90">90%</option>
@@ -251,25 +266,23 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label for="ci-n">Sample Size (n):</label>
+                            <label for="ci-n">樣本數 n</label>
                             <input type="number" id="ci-n" step="1" min="1" placeholder="樣本數">
                         </div>
                         <div class="input-group">
-                            <label for="ci-distribution">Distribution:</label>
+                            <label for="ci-distribution">臨界值分布</label>
                             <select id="ci-distribution">
                                 <option value="auto" selected>自動選擇 (建議)</option>
                                 <option value="t">t-distribution</option>
                                 <option value="normal">Normal (Z)</option>
                             </select>
-                            <small style="color: #666; display: block; margin-top: 5px;">
-                                自動: n&lt;120 使用 t 分布, n≥120 使用 Z 分布
-                            </small>
+                            <small class="input-hint">自動：n &lt; 120 用 t 分布，n ≥ 120 用常態分布</small>
                         </div>
-                        <button class="calc-btn" onclick="calculateCItoMeanSD()">
+                        <button type="button" class="calc-btn" onclick="calculateCItoMeanSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="ci-mean-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('ci-mean-sd')">
+                        <button type="button" class="formula-btn" onclick="showFormula('ci-mean-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -278,42 +291,47 @@
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> 次序統計 → Mean & SD</h3>
                         <div class="input-group">
-                            <label for="quantile-method">Method:</label>
+                            <label for="quantile-method">估計方法</label>
                             <select id="quantile-method">
                                 <option value="luo">Luo 2018 (Mean) + Wan 2014 / Shi 2020 (SD)（建議）</option>
                                 <option value="wan">Wan 2014 (Mean &amp; SD)</option>
                                 <option value="hozo">Hozo 2005（僅 min/median/max，教學對照）</option>
                             </select>
                         </div>
+                        <div class="field-row" role="group" aria-label="原文報告的分位數（min/max、Q1/Q3 需成對）">
+                            <p class="field-row-title" aria-hidden="true">原文報告的分位數（min/max、Q1/Q3 需成對）</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="q-min">Min:</label>
-                            <input type="number" id="q-min" step="any" placeholder="最小值（與最大值成對）">
+                            <label for="q-min">最小值</label>
+                            <input type="number" id="q-min" step="any" placeholder="min">
                         </div>
                         <div class="input-group">
-                            <label for="q-q1">Q1:</label>
-                            <input type="number" id="q-q1" step="any" placeholder="第一四分位數（與 Q3 成對）">
+                            <label for="q-q1">Q1</label>
+                            <input type="number" id="q-q1" step="any" placeholder="Q1">
                         </div>
                         <div class="input-group">
-                            <label for="q-median">Median:</label>
-                            <input type="number" id="q-median" step="any" placeholder="中位數">
+                            <label for="q-median">中位數</label>
+                            <input type="number" id="q-median" step="any" placeholder="median">
                         </div>
                         <div class="input-group">
-                            <label for="q-q3">Q3:</label>
-                            <input type="number" id="q-q3" step="any" placeholder="第三四分位數（與 Q1 成對）">
+                            <label for="q-q3">Q3</label>
+                            <input type="number" id="q-q3" step="any" placeholder="Q3">
                         </div>
                         <div class="input-group">
-                            <label for="q-max">Max:</label>
-                            <input type="number" id="q-max" step="any" placeholder="最大值（與最小值成對）">
+                            <label for="q-max">最大值</label>
+                            <input type="number" id="q-max" step="any" placeholder="max">
+                        </div>
+                            </div>
                         </div>
                         <div class="input-group">
-                            <label for="q-n">Sample Size (n):</label>
+                            <label for="q-n">樣本數 n</label>
                             <input type="number" id="q-n" step="1" min="2" placeholder="樣本數">
                         </div>
-                        <button class="calc-btn" onclick="calculateQuantilesToMeanSD()">
+                        <button type="button" class="calc-btn" onclick="calculateQuantilesToMeanSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="quantiles-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('quantiles')">
+                        <button type="button" class="formula-btn" onclick="showFormula('quantiles')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -325,27 +343,32 @@
                             <i class="fas fa-info-circle"></i>
                             <strong>Hozo (2005) 方法（教學對照）：</strong>只有中位數、最小值、最大值時可用；Wan 2014 的模擬顯示其 SD 偏差較大，實際分析建議改用上方的 Luo + Wan 方法
                         </div>
+                        <div class="field-row" role="group" aria-label="範圍與中位數">
+                            <p class="field-row-title" aria-hidden="true">範圍與中位數</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="hozo-min">Minimum (a):</label>
+                            <label for="hozo-min">最小值 a</label>
                             <input type="number" id="hozo-min" step="any" placeholder="最小值">
                         </div>
                         <div class="input-group">
-                            <label for="hozo-median">Median (m):</label>
+                            <label for="hozo-median">中位數 m</label>
                             <input type="number" id="hozo-median" step="any" placeholder="中位數">
                         </div>
                         <div class="input-group">
-                            <label for="hozo-max">Maximum (b):</label>
+                            <label for="hozo-max">最大值 b</label>
                             <input type="number" id="hozo-max" step="any" placeholder="最大值">
                         </div>
+                            </div>
+                        </div>
                         <div class="input-group">
-                            <label for="hozo-n">Sample Size (n):</label>
+                            <label for="hozo-n">樣本數 n</label>
                             <input type="number" id="hozo-n" step="1" min="1" placeholder="樣本數">
                         </div>
-                        <button class="calc-btn" onclick="calculateHozoOnly()">
+                        <button type="button" class="calc-btn" onclick="calculateHozoOnly()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="hozo-only-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('hozo-method')">
+                        <button type="button" class="formula-btn" onclick="showFormula('hozo-method')">
                             <i class="fas fa-eye"></i> 查看 Hozo 公式
                         </button>
                     </div>
@@ -353,27 +376,37 @@
                     <!-- Pooled SD -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Pooled SD</h3>
+                        <div class="field-row" role="group" aria-label="第 1 組">
+                            <p class="field-row-title" aria-hidden="true">第 1 組</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="pooled-sd1">SD1:</label>
+                            <label for="pooled-sd1">SD</label>
                             <input type="number" id="pooled-sd1" step="any" placeholder="第一組標準差">
                         </div>
                         <div class="input-group">
-                            <label for="pooled-n1">n1:</label>
+                            <label for="pooled-n1">n</label>
                             <input type="number" id="pooled-n1" step="1" min="1" placeholder="第一組樣本數">
                         </div>
+                            </div>
+                        </div>
+                        <div class="field-row is-control" role="group" aria-label="第 2 組">
+                            <p class="field-row-title" aria-hidden="true">第 2 組</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="pooled-sd2">SD2:</label>
+                            <label for="pooled-sd2">SD</label>
                             <input type="number" id="pooled-sd2" step="any" placeholder="第二組標準差">
                         </div>
                         <div class="input-group">
-                            <label for="pooled-n2">n2:</label>
+                            <label for="pooled-n2">n</label>
                             <input type="number" id="pooled-n2" step="1" min="1" placeholder="第二組樣本數">
                         </div>
-                        <button class="calc-btn" onclick="calculatePooledSD()">
+                            </div>
+                        </div>
+                        <button type="button" class="calc-btn" onclick="calculatePooledSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="pooled-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('pooled-sd')">
+                        <button type="button" class="formula-btn" onclick="showFormula('pooled-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -381,23 +414,28 @@
                     <!-- Change Score SD -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Change Score SD</h3>
+                        <div class="field-row" role="group" aria-label="前後測標準差">
+                            <p class="field-row-title" aria-hidden="true">前後測標準差</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="change-sd-pre">SD Pre:</label>
+                            <label for="change-sd-pre">前測 SD</label>
                             <input type="number" id="change-sd-pre" step="any" placeholder="前測標準差">
                         </div>
                         <div class="input-group">
-                            <label for="change-sd-post">SD Post:</label>
+                            <label for="change-sd-post">後測 SD</label>
                             <input type="number" id="change-sd-post" step="any" placeholder="後測標準差">
                         </div>
+                            </div>
+                        </div>
                         <div class="input-group">
-                            <label for="change-r">Correlation (r):</label>
+                            <label for="change-r">前後測相關係數 r</label>
                             <input type="number" id="change-r" step="any" min="-1" max="1" placeholder="相關係數 (-1 to 1)">
                         </div>
-                        <button class="calc-btn" onclick="calculateChangeSD()">
+                        <button type="button" class="calc-btn" onclick="calculateChangeSD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="change-sd-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('change-sd')">
+                        <button type="button" class="formula-btn" onclick="showFormula('change-sd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -407,8 +445,11 @@
             <!-- Module B: 兩組比較與效果量 -->
             <div id="module-b" class="tab-content">
                 <div class="module-header">
-                    <h2>兩組比較與效果量</h2>
-                    <p>計算 MD、SMD、OR、RR、RD 等效果量及信賴區間</p>
+                    <div class="module-header-text">
+                        <h2>兩組比較與效果量</h2>
+                        <p>由兩組的平均與 SD 或 2×2 表，計算 MD、SMD、OR、RR、RD 與 95% CI。</p>
+                    </div>
+                    <img class="module-header-art" src="images/twogroup.webp" alt="" loading="lazy">
                 </div>
 
                 <!-- 使用時機說明 -->
@@ -449,39 +490,39 @@
                     <!-- Mean Difference -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Mean Difference (MD)</h3>
-                        <div class="input-row">
+                        <div class="field-row" role="group" aria-label="實驗組"><p class="field-row-title" aria-hidden="true">實驗組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="md-mean1">Group 1 Mean:</label>
+                                <label for="md-mean1">平均 Mean</label>
                                 <input type="number" id="md-mean1" step="any" placeholder="實驗組平均">
                             </div>
                             <div class="input-group">
-                                <label for="md-sd1">Group 1 SD:</label>
+                                <label for="md-sd1">標準差 SD</label>
                                 <input type="number" id="md-sd1" step="any" placeholder="實驗組標準差">
                             </div>
                             <div class="input-group">
-                                <label for="md-n1">Group 1 n:</label>
+                                <label for="md-n1">樣本數 n</label>
                                 <input type="number" id="md-n1" step="1" min="1" placeholder="實驗組樣本數">
                             </div>
-                        </div>
-                        <div class="input-row">
+                        </div></div>
+                        <div class="field-row is-control" role="group" aria-label="對照組"><p class="field-row-title" aria-hidden="true">對照組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="md-mean2">Group 2 Mean:</label>
+                                <label for="md-mean2">平均 Mean</label>
                                 <input type="number" id="md-mean2" step="any" placeholder="對照組平均">
                             </div>
                             <div class="input-group">
-                                <label for="md-sd2">Group 2 SD:</label>
+                                <label for="md-sd2">標準差 SD</label>
                                 <input type="number" id="md-sd2" step="any" placeholder="對照組標準差">
                             </div>
                             <div class="input-group">
-                                <label for="md-n2">Group 2 n:</label>
+                                <label for="md-n2">樣本數 n</label>
                                 <input type="number" id="md-n2" step="1" min="1" placeholder="對照組樣本數">
                             </div>
-                        </div>
-                        <button class="calc-btn" onclick="calculateMD()">
+                        </div></div>
+                        <button type="button" class="calc-btn" onclick="calculateMD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="md-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('md')">
+                        <button type="button" class="formula-btn" onclick="showFormula('md')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -489,45 +530,45 @@
                     <!-- Standardized Mean Difference -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Standardized Mean Difference (SMD)</h3>
-                        <div class="input-row">
+                        <div class="field-row" role="group" aria-label="實驗組"><p class="field-row-title" aria-hidden="true">實驗組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="smd-mean1">Group 1 Mean:</label>
+                                <label for="smd-mean1">平均 Mean</label>
                                 <input type="number" id="smd-mean1" step="any" placeholder="實驗組平均">
                             </div>
                             <div class="input-group">
-                                <label for="smd-sd1">Group 1 SD:</label>
+                                <label for="smd-sd1">標準差 SD</label>
                                 <input type="number" id="smd-sd1" step="any" placeholder="實驗組標準差">
                             </div>
                             <div class="input-group">
-                                <label for="smd-n1">Group 1 n:</label>
+                                <label for="smd-n1">樣本數 n</label>
                                 <input type="number" id="smd-n1" step="1" min="1" placeholder="實驗組樣本數">
                             </div>
-                        </div>
-                        <div class="input-row">
+                        </div></div>
+                        <div class="field-row is-control" role="group" aria-label="對照組"><p class="field-row-title" aria-hidden="true">對照組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="smd-mean2">Group 2 Mean:</label>
+                                <label for="smd-mean2">平均 Mean</label>
                                 <input type="number" id="smd-mean2" step="any" placeholder="對照組平均">
                             </div>
                             <div class="input-group">
-                                <label for="smd-sd2">Group 2 SD:</label>
+                                <label for="smd-sd2">標準差 SD</label>
                                 <input type="number" id="smd-sd2" step="any" placeholder="對照組標準差">
                             </div>
                             <div class="input-group">
-                                <label for="smd-n2">Group 2 n:</label>
+                                <label for="smd-n2">樣本數 n</label>
                                 <input type="number" id="smd-n2" step="1" min="1" placeholder="對照組樣本數">
                             </div>
-                        </div>
+                        </div></div>
                         <div class="input-group">
                             <label>
-                                <input type="checkbox" id="smd-correction" checked> 
-                                Apply Hedges' g small-sample correction
+                                <input type="checkbox" id="smd-correction" checked>
+                                套用 Hedges' g 小樣本修正
                             </label>
                         </div>
-                        <button class="calc-btn" onclick="calculateSMD()">
+                        <button type="button" class="calc-btn" onclick="calculateSMD()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="smd-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('smd')">
+                        <button type="button" class="formula-btn" onclick="showFormula('smd')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -535,38 +576,38 @@
                     <!-- Binary Outcomes -->
                     <div class="calculator-card">
                         <h3><i class="fas fa-arrow-right"></i> Binary Outcomes (OR/RR/RD)</h3>
-                        <div class="input-row">
+                        <div class="field-row" role="group" aria-label="實驗組"><p class="field-row-title" aria-hidden="true">實驗組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="bin-events1">Group 1 Events:</label>
+                                <label for="bin-events1">事件數</label>
                                 <input type="number" id="bin-events1" step="1" min="0" placeholder="實驗組事件數">
                             </div>
                             <div class="input-group">
-                                <label for="bin-total1">Group 1 Total:</label>
+                                <label for="bin-total1">總人數</label>
                                 <input type="number" id="bin-total1" step="1" min="1" placeholder="實驗組總數">
                             </div>
-                        </div>
-                        <div class="input-row">
+                        </div></div>
+                        <div class="field-row is-control" role="group" aria-label="對照組"><p class="field-row-title" aria-hidden="true">對照組</p><div class="field-row-fields">
                             <div class="input-group">
-                                <label for="bin-events2">Group 2 Events:</label>
+                                <label for="bin-events2">事件數</label>
                                 <input type="number" id="bin-events2" step="1" min="0" placeholder="對照組事件數">
                             </div>
                             <div class="input-group">
-                                <label for="bin-total2">Group 2 Total:</label>
+                                <label for="bin-total2">總人數</label>
                                 <input type="number" id="bin-total2" step="1" min="1" placeholder="對照組總數">
                             </div>
-                        </div>
+                        </div></div>
                         <div class="input-group">
-                            <label for="bin-correction">Zero Event Correction:</label>
+                            <label for="bin-correction">零格修正</label>
                             <select id="bin-correction">
                                 <option value="haldane">Haldane-Anscombe（有零格時各格 +0.5，僅用於 OR/RR）</option>
                                 <option value="none">不修正（零格時 OR/RR 顯示無法估計）</option>
                             </select>
                         </div>
-                        <button class="calc-btn" onclick="calculateBinaryOutcomes()">
+                        <button type="button" class="calc-btn" onclick="calculateBinaryOutcomes()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="binary-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('binary')">
+                        <button type="button" class="formula-btn" onclick="showFormula('binary')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -576,8 +617,11 @@
             <!-- Module C: CI/SE互轉 -->
             <div id="module-c" class="tab-content">
                 <div class="module-header">
-                    <h2>信賴區間與標準誤互轉</h2>
-                    <p>各種效果量的 CI、SE、Z/t 值互相換算</p>
+                    <div class="module-header-text">
+                        <h2>信賴區間與標準誤互轉</h2>
+                        <p>效果量、CI 與 SE 互相換算；OR／RR／HR 可直接輸入原始比值。</p>
+                    </div>
+                    <img class="module-header-art" src="images/ciset.webp" alt="" loading="lazy">
                 </div>
 
                 <!-- 使用時機說明 -->
@@ -629,7 +673,7 @@
                             </ul>
                         </div>
                         <div class="input-group">
-                            <label for="es-type">Effect Size Type:</label>
+                            <label for="es-type">效果量類型</label>
                             <select id="es-type">
                                 <option value="mean">Mean/MD</option>
                                 <option value="smd">SMD</option>
@@ -642,34 +686,39 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label for="es-value">Effect Size:</label>
+                            <label for="es-value">效果量</label>
                             <input type="number" id="es-value" step="any" placeholder="效果量值">
                         </div>
+                        <div class="field-row" role="group" aria-label="信賴區間">
+                            <p class="field-row-title" aria-hidden="true">信賴區間</p>
+                            <div class="field-row-fields">
                         <div class="input-group">
-                            <label for="es-ci-lower">Lower CI:</label>
+                            <label for="es-ci-lower">下界</label>
                             <input type="number" id="es-ci-lower" step="any" placeholder="下界">
                         </div>
                         <div class="input-group">
-                            <label for="es-ci-upper">Upper CI:</label>
+                            <label for="es-ci-upper">上界</label>
                             <input type="number" id="es-ci-upper" step="any" placeholder="上界">
                         </div>
+                            </div>
+                        </div>
                         <div class="input-group">
-                            <label for="es-se">Standard Error:</label>
+                            <label for="es-se">標準誤 SE</label>
                             <input type="number" id="es-se" step="any" placeholder="標準誤">
                         </div>
                         <div class="input-group">
-                            <label for="es-ci-level">Confidence Level (%):</label>
+                            <label for="es-ci-level">信賴水準</label>
                             <select id="es-ci-level">
                                 <option value="95">95%</option>
                                 <option value="90">90%</option>
                                 <option value="99">99%</option>
                             </select>
                         </div>
-                        <button class="calc-btn" onclick="calculateESConversion()">
+                        <button type="button" class="calc-btn" onclick="calculateESConversion()">
                             <i class="fas fa-calculator"></i> 計算
                         </button>
                         <div class="result-box" id="es-conversion-result" role="status" aria-live="polite" aria-atomic="true"></div>
-                        <button class="formula-btn" onclick="showFormula('es-conversion')">
+                        <button type="button" class="formula-btn" onclick="showFormula('es-conversion')">
                             <i class="fas fa-eye"></i> 查看公式
                         </button>
                     </div>
@@ -678,9 +727,12 @@
 
             <!-- Module RoB: Risk of Bias 2.0 Assessment Tool -->
             <div id="module-rob" class="tab-content">
-                <div class="module-header">
-                    <h2>風險偏差評估工具 (Risk of Bias 2.0)</h2>
-                    <p>基於 Cochrane RoB 2.0 標準的互動式偏差風險評估系統</p>
+                <div class="module-header is-banner">
+                    <div class="module-header-text">
+                        <h2>風險偏差評估 (RoB 2)</h2>
+                        <p>Cochrane RoB 2 的五個偏差領域、判斷標準與評估要訣（閱讀材料）。</p>
+                    </div>
+                    <img class="module-header-art" src="images/rob.webp" alt="" loading="lazy">
                 </div>
 
                 <div class="rob-content">
@@ -716,8 +768,8 @@
                                         <div class="highlight-item">
                                             <i class="fas fa-robot"></i>
                                             <div>
-                                                <strong>內建判斷算法</strong>
-                                                <p>工具內嵌算法根據信號問題答案提供偏差風險判斷建議</p>
+                                                <strong>判斷演算法</strong>
+                                                <p>官方 RoB 2 工具依信號問題的回答，以演算法建議各領域判斷；評讀者可依理由調整</p>
                                             </div>
                                         </div>
                                     </div>
@@ -948,9 +1000,12 @@
 
             <!-- Module GRADE: GRADE 證據品質評估 -->
             <div id="module-grade" class="tab-content">
-                <div class="module-header">
-                    <h2>GRADE 證據品質評估</h2>
-                    <p>系統性評估證據確定性的國際標準方法</p>
+                <div class="module-header is-banner">
+                    <div class="module-header-text">
+                        <h2>GRADE 證據確定性</h2>
+                        <p>評估證據確定性的國際標準：降級與升級因素、等級與流程。</p>
+                    </div>
+                    <img class="module-header-art" src="images/grade.webp" alt="" loading="lazy">
                 </div>
 
                 <div class="grade-content">
@@ -1686,9 +1741,12 @@
 
             <!-- Module Stats: Meta-Analysis 基本概念 -->
             <div id="module-stats" class="tab-content">
-                <div class="module-header">
-                    <h2>Meta-Analysis 基本概念</h2>
-                    <p>了解統合分析的核心概念與統計方法</p>
+                <div class="module-header is-banner">
+                    <div class="module-header-text">
+                        <h2>Meta-Analysis 基本概念</h2>
+                        <p>模型選擇、效果量、異質性、森林圖與報告規範的核心概念。</p>
+                    </div>
+                    <img class="module-header-art" src="images/concepts.webp" alt="" loading="lazy">
                 </div>
 
                 <div class="stats-content">
@@ -3407,8 +3465,10 @@
             <!-- Module E: 參考資料 -->
             <div id="module-e" class="tab-content">
                 <div class="module-header">
-                    <h2>參考資料與計算依據</h2>
-                    <p>本工具所使用的所有公式、參考文獻、網站資源與演算法說明</p>
+                    <div class="module-header-text">
+                        <h2>參考資料與計算依據</h2>
+                        <p>本工具使用的公式、參考文獻、網站資源與演算法說明。</p>
+                    </div>
                 </div>
 
                 <div class="formula-reference">
@@ -3486,10 +3546,10 @@
 
     <!-- Formula Modal -->
     <div id="formula-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div class="modal-header">
                 <h3 id="modal-title">計算公式</h3>
-                <span class="close" onclick="closeModal()">&times;</span>
+                <button type="button" class="modal-close" onclick="closeModal()" aria-label="關閉公式說明">&times;</button>
             </div>
             <div class="modal-body" id="modal-body">
                 <!-- Formula content will be inserted here -->
@@ -3499,7 +3559,8 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Meta-Analysis Calculator 用於教學與練習<br>製作者：<a href="https://blog.sportsmedicine.tw/" target="_blank">運動醫學科吳易澄醫師</a></p>
+            <p>Meta-Analysis Calculator · 教學與練習用途；正式研究請以原始方法文獻與統計軟體交叉核對。</p>
+            <p>製作者：<a href="https://blog.sportsmedicine.tw/" target="_blank" rel="noopener">運動醫學科吳易澄醫師</a></p>
         </div>
     </footer>
 
