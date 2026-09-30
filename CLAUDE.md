@@ -13,13 +13,14 @@ Meta-Analysis Calculator is a static browser calculator with Traditional Chinese
 
 ## Runtime
 
-`index.html`, `style.css`, `calculator-core.js`, `modules/module-{a,b,c}.js`, `formula-display.js`. JavaScript is ordered classic scripts, not ES modules. Google Fonts and Font Awesome CSS are external resources; no external JavaScript, backend, login, AI providers or API keys are required.
+`index.html`, `style.css`, `stats-math.js` (normal/t distribution functions), `calculator-core.js`, `modules/quantile-methods.js`, `modules/module-{a,b,c}.js`, `formula-display.js`. JavaScript is ordered classic scripts, not ES modules. Google Fonts and Font Awesome CSS are external resources; no external JavaScript, backend, login, AI providers or API keys are required.
 
 RoB/GRADE tabs contain static learning material. `rob-assessment.js`, `chart-utils.js` and `pdf-export.js` are legacy source with no active UI; do not publish or load them without a fresh review. The shipped app must not access or mutate old `rob-studies` browser data.
 
 ## Constraints
 
 - Preserve clinician-owned statistical methods and assessment decisions. Separate mathematical input/overflow guards from methodological changes.
+- Quantile→Mean/SD formulas mirror the R package `meta` (`mean_sd_range`, `mean_sd_iqr`, `mean_sd_iqr_range`); regenerate test references with R when changing them.
 - Numeric inputs must be finite; sample/event counts must be safe integers. Never silently truncate them.
 - Calculation output must use textContent, not untrusted HTML.
 - Do not add credentials or cloud storage to the frontend. Preserve the keyless design.

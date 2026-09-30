@@ -21,7 +21,7 @@ function calculateSEtoSD() {
 
   displayResult(
     resultDiv,
-    `SD = ${sd.toFixed(4)}\n\n計算步驟：\nSD = ${se} × √${n}\nSD = ${se} × ${Math.sqrt(n).toFixed(4)}\nSD = ${sd.toFixed(4)}`,
+    `SD = ${sd.toFixed(4)}\n\n計算步驟：\nSD = ${se} × √${n}\nSD = ${se} × ${Math.sqrt(n).toFixed(4)}\nSD = ${sd.toFixed(4)}\n\n適用：單組平均值的 SE。兩組差值 (MD) 的 SE 請改用 SD = SE / √(1/n₁ + 1/n₂)。`,
   );
   addToHistory(result);
 }
@@ -35,12 +35,12 @@ function calculateCItoMeanSD() {
   const distribution = document.getElementById("ci-distribution").value;
   const resultDiv = document.getElementById("ci-mean-sd-result");
 
-  if (
-    !allFinite(lowerCI, upperCI) ||
-    !isSampleSize(n, distribution === "normal" ? 1 : 2) ||
-    lowerCI >= upperCI
-  ) {
-    showError(resultDiv, "請輸入有效的信賴區間界限和樣本數");
+  if (!allFinite(lowerCI, upperCI) || !isSampleSize(n, 2) || lowerCI >= upperCI) {
+    showError(resultDiv, "請輸入有效的信賴區間界限（下界 < 上界）和 ≥ 2 的整數樣本數");
+    return;
+  }
+  if (!["auto", "normal", "t"].includes(distribution)) {
+    showError(resultDiv, "未知的分布選項");
     return;
   }
 
@@ -72,6 +72,10 @@ function calculateCItoMeanSD() {
   // Calculate SE and SD
   const se = (upperCI - lowerCI) / (2 * criticalValue);
   const sd = se * Math.sqrt(n);
+  if (!allFinite(criticalValue, se, sd)) {
+    showError(resultDiv, "數值超出可計算範圍，請檢查輸入資料");
+    return;
+  }
 
   const result = {
     calculation: "CI to Mean & SD",
@@ -101,99 +105,91 @@ function calculateCItoMeanSD() {
       `使用分布: ${distributionUsed}\n` +
       `Critical value (${ciLevel}%) = ${criticalValue.toFixed(4)}\n` +
       `SE = (${upperCI} - ${lowerCI})/(2 × ${criticalValue.toFixed(4)}) = ${se.toFixed(4)}\n` +
-      `SD = ${se.toFixed(4)} × √${n} = ${sd.toFixed(4)}`,
+      `SD = ${se.toFixed(4)} × √${n} = ${sd.toFixed(4)}\n\n` +
+      `適用：單組平均值、以平均值為中心的對稱 CI。若是兩組差值 (MD) 的 CI，不能直接用此換算。`,
   );
   addToHistory(result);
 }
 
 // Quantiles to Mean & SD conversion
+const QUANTILE_FIELDS = { min: "q-min", q1: "q-q1", median: "q-median", q3: "q-q3", max: "q-max" };
+const SCENARIO_LABELS = {
+  S1: "S1：min、median、max",
+  S2: "S2：Q1、median、Q3",
+  S3: "S3：min、Q1、median、Q3、max（五數摘要）",
+};
+
+function readQuantileInputs() {
+  const values = {};
+  for (const [key, id] of Object.entries(QUANTILE_FIELDS)) {
+    const supplied = document.getElementById(id).value.trim() !== "";
+    values[key] = supplied ? readNumber(id) : undefined;
+  }
+  return values;
+}
+
+// Returns an error message, or null when the supplied values are usable.
+function validateQuantileInputs(values, n) {
+  if (!isSampleSize(n, 2)) return "樣本數必須為 ≥ 2 的整數";
+  const supplied = Object.values(values).filter((value) => value !== undefined);
+  if (!allFinite(...supplied)) return "分位數必須為有限數值";
+  if (!Number.isFinite(values.median)) return "請輸入中位數";
+  if (supplied.some((value, index) => index > 0 && value < supplied[index - 1])) {
+    return "分位數必須依最小值 ≤ Q1 ≤ 中位數 ≤ Q3 ≤ 最大值排序";
+  }
+  if (!quantileScenario(values)) {
+    return "請成對提供 min 與 max、或 Q1 與 Q3（也可兩組都提供）";
+  }
+  return null;
+}
+
 function calculateQuantilesToMeanSD() {
   const method = document.getElementById("quantile-method").value;
-  const min = readNumber("q-min");
-  const q1 = readNumber("q-q1");
-  const median = readNumber("q-median");
-  const q3 = readNumber("q-q3");
-  const max = readNumber("q-max");
   const n = readNumber("q-n");
+  const values = readQuantileInputs();
   const resultDiv = document.getElementById("quantiles-result");
 
-  if (!Number.isFinite(median) || !isSampleSize(n)) {
-    showError(resultDiv, "請輸入有限的中位數與正整數樣本數");
+  if (!["luo", "wan", "hozo"].includes(method)) {
+    showError(resultDiv, "未知的計算方法");
     return;
   }
-  const quantileInputs = ["q-min", "q-q1", "q-median", "q-q3", "q-max"];
-  const provided = quantileInputs.filter((id) => document.getElementById(id).value.trim() !== "").map(readNumber);
-  if (!allFinite(...provided) || provided.some((value, index) => index > 0 && value < provided[index - 1])) {
-    showError(resultDiv, "分位數必須為有限數值，且依最小值、Q1、中位數、Q3、最大值排序");
+  const invalid = validateQuantileInputs(values, n);
+  if (invalid) {
+    showError(resultDiv, invalid);
+    return;
+  }
+  const scenario = quantileScenario(values);
+  if (method === "hozo" && scenario === "S2") {
+    showError(resultDiv, "Hozo 方法需要最小值與最大值；只有 Q1/Q3 時請改用 Luo 或 Wan");
     return;
   }
 
-  let mean, sd;
-  let calculationSteps = "";
-  let reference = "";
-
-  switch (method) {
-    case "luo":
-      ({ mean, sd, calculationSteps, reference } = calculateLuoMethod(
-        min,
-        q1,
-        median,
-        q3,
-        max,
-        n,
-      ));
-      break;
-    case "wan":
-      ({ mean, sd, calculationSteps, reference } = calculateWanMethod(
-        min,
-        q1,
-        median,
-        q3,
-        max,
-        n,
-      ));
-      break;
-    case "hozo":
-      ({ mean, sd, calculationSteps, reference } = calculateHozoMethod(
-        min,
-        median,
-        max,
-        n,
-      ));
-      break;
-    case "shi":
-      ({ mean, sd, calculationSteps, reference } = calculateShiMethod(
-        min,
-        q1,
-        median,
-        q3,
-        max,
-        n,
-      ));
-      break;
-    default:
-      showError(resultDiv, "未知的計算方法");
-      return;
-  }
-
+  const estimate = method === "hozo"
+    ? calculateHozoMethod(values.min, values.median, values.max, n)
+    : estimateFromQuantiles(method, scenario, values, n);
+  const { mean, sd, calculationSteps, reference } = estimate;
   if (!allFinite(mean, sd) || sd < 0) {
-    showError(resultDiv, "計算失敗，請檢查輸入數據");
+    showError(resultDiv, "數值超出可計算範圍，請檢查輸入資料");
     return;
   }
 
-  const result = {
-    calculation: `Quantiles to Mean & SD (${method.toUpperCase()})`,
-    inputs: { min, q1, median, q3, max, n, method },
+  const usedScenario = method === "hozo" ? "S1" : scenario;
+  const ignored = method === "hozo" && scenario === "S3" ? "\n（Hozo 只使用 min、median、max，已忽略 Q1/Q3）" : "";
+  addToHistory({
+    calculation: `Quantiles to Mean & SD (${method}, ${usedScenario})`,
+    inputs: { ...values, n, method, scenario: usedScenario },
     outputs: { mean, SD: sd },
     formula: calculationSteps,
-    reference: reference,
-  };
-
+    reference,
+  });
   displayResult(
     resultDiv,
-    `Mean = ${mean.toFixed(4)}\nSD = ${sd.toFixed(4)}\n\n計算方法：${method.toUpperCase()}\n${calculationSteps}\n\n參考文獻：${reference}`,
+    `Mean ≈ ${mean.toFixed(4)}\nSD ≈ ${sd.toFixed(4)}\n\n` +
+      `資料情境：${SCENARIO_LABELS[usedScenario]}${ignored}\n\n${calculationSteps}\n\n` +
+      `參考文獻：${reference}\n\n` +
+      `注意：以上為假設資料近似常態時的估計值，不是原始數據。` +
+      `若中位數明顯偏離範圍或四分位距的中點（偏態），請考慮其他方法或敏感度分析。`,
   );
-  addToHistory(result);
 }
 
 // Dedicated Hozo method calculator function
@@ -204,232 +200,27 @@ function calculateHozoOnly() {
   const n = readNumber("hozo-n");
   const resultDiv = document.getElementById("hozo-only-result");
 
-  if (!allFinite(min, median, max) || !isSampleSize(n)) {
-    showError(resultDiv, "請輸入所有必要參數：最小值、中位數、最大值和樣本數");
+  if (!allFinite(min, median, max) || !isSampleSize(n, 2)) {
+    showError(resultDiv, "請輸入最小值、中位數、最大值，以及 ≥ 2 的整數樣本數");
+    return;
+  }
+  if (min > median || median > max || min === max) {
+    showError(resultDiv, "請確保 最小值 ≤ 中位數 ≤ 最大值，且最小值 < 最大值");
     return;
   }
 
-  if (min >= median || median >= max) {
-    showError(resultDiv, "請確保 最小值 < 中位數 < 最大值");
-    return;
-  }
-
-  try {
-    const { mean, sd, calculationSteps, reference } = calculateHozoMethod(
-      min,
-      median,
-      max,
-      n,
-    );
-
-    const result = {
-      calculation: "Median & Range to Mean & SD (Hozo 2005)",
-      inputs: { min, median, max, n },
-      outputs: { mean, SD: sd },
-      formula: calculationSteps,
-      reference: reference,
-    };
-
-    displayResult(
-      resultDiv,
-      `平均數 (Mean) = ${mean.toFixed(4)}\n標準差 (SD) = ${sd.toFixed(4)}\n\n${calculationSteps}\n\n參考文獻：${reference}`,
-    );
-    addToHistory(result);
-  } catch (error) {
-    showError(resultDiv, error.message);
-  }
-}
-
-// Luo et al. (2018) method
-function calculateLuoMethod(min, q1, median, q3, max, n) {
-  let mean, sd;
-  let calculationSteps = "";
-  const reference = "Luo et al. (2018) Statistical Methods in Medical Research";
-
-  // Check available data and use appropriate formula
-  if (
-    !isNaN(min) &&
-    !isNaN(q1) &&
-    !isNaN(median) &&
-    !isNaN(q3) &&
-    !isNaN(max)
-  ) {
-    // Full five-number summary available
-    mean = (min + 2 * q1 + 2 * median + 2 * q3 + max) / 8;
-
-    const a = (n - 1) / (n + 1);
-    const b = (n - 1) / (n * (n + 1));
-
-    sd = Math.sqrt(
-      (a * ((max - min) ** 2 + 2 * (q3 - q1) ** 2)) / 16 +
-        (b * ((max - min) ** 2 - 2 * (q3 - q1) ** 2)) / 16,
-    );
-
-    calculationSteps =
-      `使用完整五數摘要 (min, Q1, median, Q3, max)\n` +
-      `Mean = (min + 2×Q1 + 2×median + 2×Q3 + max) / 8\n` +
-      `Mean = (${min} + 2×${q1} + 2×${median} + 2×${q3} + ${max}) / 8 = ${mean.toFixed(4)}\n\n` +
-      `SD 計算使用 Luo 優化公式，考慮樣本大小修正`;
-  } else if (!isNaN(min) && !isNaN(median) && !isNaN(max)) {
-    // Only min, median, max available
-    mean = (min + 2 * median + max) / 4;
-
-    const c = (n - 1) / (n + 1);
-    sd = (Math.sqrt(c) * (max - min)) / 4;
-
-    calculationSteps =
-      `使用三點估計 (min, median, max)\n` +
-      `Mean = (min + 2×median + max) / 4\n` +
-      `Mean = (${min} + 2×${median} + ${max}) / 4 = ${mean.toFixed(4)}\n\n` +
-      `SD = √((n-1)/(n+1)) × (max - min) / 4\n` +
-      `SD = √(${n - 1}/${n + 1}) × (${max} - ${min}) / 4 = ${sd.toFixed(4)}`;
-  } else {
-    throw new Error("Insufficient data for Luo method");
-  }
-
-  return { mean, sd, calculationSteps, reference };
-}
-
-// Wan et al. (2014) method
-function calculateWanMethod(min, q1, median, q3, max, n) {
-  let mean, sd;
-  let calculationSteps = "";
-  const reference = "Wan et al. (2014) BMC Medical Research Methodology";
-
-  if (
-    !isNaN(min) &&
-    !isNaN(q1) &&
-    !isNaN(median) &&
-    !isNaN(q3) &&
-    !isNaN(max)
-  ) {
-    // Full five-number summary
-    mean = (q1 + median + q3) / 3;
-
-    sd =
-      (max - min) / (2 * getQuantileNormal(0.75, n)) +
-      (q3 - q1) / (2 * getQuantileNormal(0.75, n));
-
-    calculationSteps =
-      `使用五數摘要的 Wan 方法\n` +
-      `Mean = (Q1 + median + Q3) / 3\n` +
-      `Mean = (${q1} + ${median} + ${q3}) / 3 = ${mean.toFixed(4)}\n\n` +
-      `SD 計算結合範圍和四分位距信息`;
-  } else if (!isNaN(min) && !isNaN(median) && !isNaN(max)) {
-    // Only three points
-    mean = (min + median + max) / 3;
-    sd = (max - min) / (2 * getQuantileNormal(0.75, n));
-
-    calculationSteps =
-      `使用三點的 Wan 方法\n` +
-      `Mean = (min + median + max) / 3\n` +
-      `Mean = (${min} + ${median} + ${max}) / 3 = ${mean.toFixed(4)}\n\n` +
-      `SD = (max - min) / (2 × Φ⁻¹(0.75)) ≈ (max - min) / 2.67`;
-  } else {
-    throw new Error("Insufficient data for Wan method");
-  }
-
-  return { mean, sd, calculationSteps, reference };
-}
-
-// Hozo et al. (2005) method - Enhanced with accurate formulas from the paper
-function calculateHozoMethod(min, median, max, n) {
-  if (isNaN(min) || isNaN(median) || isNaN(max)) {
-    throw new Error("Hozo method requires min, median, and max");
-  }
-
-  // Mean estimation using Hozo formula (5)
-  let mean;
-  if (n > 25) {
-    // For large samples, median approximates mean well
-    mean = median;
-  } else {
-    // For small samples, use the corrected formula
-    mean = (min + 2 * median + max) / 4;
-  }
-
-  // SD estimation using Hozo formulas based on sample size
-  let sd;
-  let sdFormula;
-
-  if (n <= 15) {
-    // Formula (16) for very small samples
-    sd = Math.sqrt(
-      (1 / 12) *
-        (Math.pow(min - 2 * median + max, 2) / 4 + Math.pow(max - min, 2)),
-    );
-    sdFormula = "Formula (16): √[(a-2m+b)²/48 + (b-a)²/12]";
-  } else if (n <= 70) {
-    // Range/4 for moderate samples
-    sd = (max - min) / 4;
-    sdFormula = "Range/4 formula";
-  } else {
-    // Range/6 for large samples
-    sd = (max - min) / 6;
-    sdFormula = "Range/6 formula";
-  }
-
-  const calculationSteps =
-    `Hozo et al. (2005) 方法 (n=${n})\n\n` +
-    `平均數估計：\n` +
-    (n > 25
-      ? `n > 25，使用中位數作為平均數估計\nMean ≈ median = ${median}`
-      : `n ≤ 25，使用修正公式\nMean = (a + 2m + b) / 4\nMean = (${min} + 2×${median} + ${max}) / 4 = ${mean.toFixed(4)}`) +
-    `\n\n` +
-    `標準差估計：\n` +
-    `使用 ${sdFormula}\n` +
-    (n <= 15
-      ? `SD = √[(${min}-2×${median}+${max})²/48 + (${max}-${min})²/12]\n` +
-        `SD = √[${Math.pow(min - 2 * median + max, 2).toFixed(2)}/48 + ${Math.pow(max - min, 2).toFixed(2)}/12] = ${sd.toFixed(4)}`
-      : `SD = (${max} - ${min}) / ${n <= 70 ? "4" : "6"} = ${sd.toFixed(4)}`);
-
-  const reference =
-    "Hozo et al. (2005) Estimating the mean and variance from the median, range, and the size of a sample. BMC Medical Research Methodology, 5:13";
-
-  return { mean, sd, calculationSteps, reference };
-}
-
-// Shi et al. (2020) method
-function calculateShiMethod(min, q1, median, q3, max, n) {
-  if (isNaN(min) || isNaN(median) || isNaN(max)) {
-    throw new Error("Shi method requires at least min, median, and max");
-  }
-
-  let mean, sd;
-  let calculationSteps = "";
-  const reference = "Shi et al. (2020) Research Synthesis Methods";
-
-  if (!isNaN(q1) && !isNaN(q3)) {
-    // Use optimized five-number summary method
-    mean = (min + q1 + median + q3 + max) / 5;
-
-    // Shi's optimized SD estimation
-    const alpha = (n + 1) / (n - 1);
-    const beta = n / (n - 1);
-
-    sd = Math.sqrt(
-      (alpha * ((max - min) ** 2 + (q3 - q1) ** 2)) / 16 +
-        beta * (median - (min + max) / 2) ** 2,
-    );
-
-    calculationSteps =
-      `Shi 優化方法使用五數摘要\n` +
-      `Mean = (min + Q1 + median + Q3 + max) / 5\n` +
-      `Mean = (${min} + ${q1} + ${median} + ${q3} + ${max}) / 5 = ${mean.toFixed(4)}\n\n` +
-      `SD 使用 Shi 優化公式，考慮所有分位數信息`;
-  } else {
-    // Fall back to three-point method
-    mean = (min + median + max) / 3;
-    sd = (max - min) / (2 * Math.sqrt(3));
-
-    calculationSteps =
-      `Shi 三點方法\n` +
-      `Mean = (min + median + max) / 3\n` +
-      `Mean = (${min} + ${median} + ${max}) / 3 = ${mean.toFixed(4)}\n\n` +
-      `SD = (max - min) / (2√3) = ${sd.toFixed(4)}`;
-  }
-
-  return { mean, sd, calculationSteps, reference };
+  const { mean, sd, calculationSteps, reference } = calculateHozoMethod(min, median, max, n);
+  addToHistory({
+    calculation: "Median & Range to Mean & SD (Hozo 2005)",
+    inputs: { min, median, max, n },
+    outputs: { mean, SD: sd },
+    formula: calculationSteps,
+    reference,
+  });
+  displayResult(
+    resultDiv,
+    `平均數 (Mean) ≈ ${mean.toFixed(4)}\n標準差 (SD) ≈ ${sd.toFixed(4)}\n\n${calculationSteps}\n\n參考文獻：${reference}`,
+  );
 }
 
 // Pooled SD calculation
@@ -464,7 +255,7 @@ function calculatePooledSD() {
     resultDiv,
     `Pooled SD = ${pooledSD.toFixed(4)}\n\n計算步驟：\n` +
       `Pooled SD = √[((${n1}-1)×${sd1}² + (${n2}-1)×${sd2}²) / (${n1}+${n2}-2)]\n` +
-      `Pooled SD = √[(${n1 - 1}×${sd1 ** 2} + ${n2 - 1}×${sd2 ** 2}) / ${n1 + n2 - 2}]\n` +
+      `Pooled SD = √[(${n1 - 1}×${fmt(sd1 ** 2)} + ${n2 - 1}×${fmt(sd2 ** 2)}) / ${n1 + n2 - 2}]\n` +
       `Pooled SD = √[${((n1 - 1) * sd1 ** 2 + (n2 - 1) * sd2 ** 2).toFixed(4)} / ${n1 + n2 - 2}]\n` +
       `Pooled SD = ${pooledSD.toFixed(4)}`,
   );
@@ -483,7 +274,9 @@ function calculateChangeSD() {
     return;
   }
 
-  const changeSD = Math.sqrt(sdPre ** 2 + sdPost ** 2 - 2 * r * sdPre * sdPost);
+  // Algebraically non-negative; clamp float round-off (e.g. r = 1, equal SDs).
+  const changeVariance = Math.max(0, sdPre ** 2 + sdPost ** 2 - 2 * r * sdPre * sdPost);
+  const changeSD = Math.sqrt(changeVariance);
 
   const result = {
     calculation: "Change Score SD",
@@ -496,9 +289,9 @@ function calculateChangeSD() {
   displayResult(
     resultDiv,
     `Change SD = ${changeSD.toFixed(4)}\n\n計算步驟：\n` +
-      `SD_change = √(${sdPre}² + ${sdPost}² - 2×${r}×${sdPre}×${sdPost})\n` +
-      `SD_change = √(${sdPre ** 2} + ${sdPost ** 2} - ${2 * r * sdPre * sdPost})\n` +
-      `SD_change = √${(sdPre ** 2 + sdPost ** 2 - 2 * r * sdPre * sdPost).toFixed(4)}\n` +
+      `SD_change = √(${fmt(sdPre)}² + ${fmt(sdPost)}² - 2×${fmt(r)}×${fmt(sdPre)}×${fmt(sdPost)})\n` +
+      `SD_change = √(${fmt(sdPre ** 2)} + ${fmt(sdPost ** 2)} - ${fmt(2 * r * sdPre * sdPost)})\n` +
+      `SD_change = √${changeVariance.toFixed(4)}\n` +
       `SD_change = ${changeSD.toFixed(4)}`,
   );
   addToHistory(result);

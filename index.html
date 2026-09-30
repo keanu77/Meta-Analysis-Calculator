@@ -280,19 +280,18 @@
                         <div class="input-group">
                             <label for="quantile-method">Method:</label>
                             <select id="quantile-method">
-                                <option value="luo">Luo et al. (2018)</option>
-                                <option value="wan">Wan et al. (2014)</option>
-                                <option value="hozo">Hozo et al. (2005)</option>
-                                <option value="shi">Shi et al. (2020)</option>
+                                <option value="luo">Luo 2018 (Mean) + Wan 2014 / Shi 2020 (SD)（建議）</option>
+                                <option value="wan">Wan 2014 (Mean &amp; SD)</option>
+                                <option value="hozo">Hozo 2005（僅 min/median/max，教學對照）</option>
                             </select>
                         </div>
                         <div class="input-group">
                             <label for="q-min">Min:</label>
-                            <input type="number" id="q-min" step="any" placeholder="最小值">
+                            <input type="number" id="q-min" step="any" placeholder="最小值（與最大值成對）">
                         </div>
                         <div class="input-group">
                             <label for="q-q1">Q1:</label>
-                            <input type="number" id="q-q1" step="any" placeholder="第一四分位數 (可選)">
+                            <input type="number" id="q-q1" step="any" placeholder="第一四分位數（與 Q3 成對）">
                         </div>
                         <div class="input-group">
                             <label for="q-median">Median:</label>
@@ -300,15 +299,15 @@
                         </div>
                         <div class="input-group">
                             <label for="q-q3">Q3:</label>
-                            <input type="number" id="q-q3" step="any" placeholder="第三四分位數 (可選)">
+                            <input type="number" id="q-q3" step="any" placeholder="第三四分位數（與 Q1 成對）">
                         </div>
                         <div class="input-group">
                             <label for="q-max">Max:</label>
-                            <input type="number" id="q-max" step="any" placeholder="最大值">
+                            <input type="number" id="q-max" step="any" placeholder="最大值（與最小值成對）">
                         </div>
                         <div class="input-group">
                             <label for="q-n">Sample Size (n):</label>
-                            <input type="number" id="q-n" step="1" min="1" placeholder="樣本數">
+                            <input type="number" id="q-n" step="1" min="2" placeholder="樣本數">
                         </div>
                         <button class="calc-btn" onclick="calculateQuantilesToMeanSD()">
                             <i class="fas fa-calculator"></i> 計算
@@ -324,7 +323,7 @@
                         <h3><i class="fas fa-arrow-right"></i> Median & Range → Mean & SD</h3>
                         <div class="note-box">
                             <i class="fas fa-info-circle"></i>
-                            <strong>專用於 Hozo (2005) 方法：</strong>當文獻只報告中位數、最小值、最大值時使用
+                            <strong>Hozo (2005) 方法（教學對照）：</strong>只有中位數、最小值、最大值時可用；Wan 2014 的模擬顯示其 SD 偏差較大，實際分析建議改用上方的 Luo + Wan 方法
                         </div>
                         <div class="input-group">
                             <label for="hozo-min">Minimum (a):</label>
@@ -559,9 +558,8 @@
                         <div class="input-group">
                             <label for="bin-correction">Zero Event Correction:</label>
                             <select id="bin-correction">
-                                <option value="haldane">Haldane-Anscombe (0.5)</option>
-                                <option value="continuity">Continuity Correction</option>
-                                <option value="none">None</option>
+                                <option value="haldane">Haldane-Anscombe（有零格時各格 +0.5，僅用於 OR/RR）</option>
+                                <option value="none">不修正（零格時 OR/RR 顯示無法估計）</option>
                             </select>
                         </div>
                         <button class="calc-btn" onclick="calculateBinaryOutcomes()">
@@ -610,7 +608,7 @@
                             </div>
                             <div class="example-case">
                                 <span class="example-tag">情境3</span>
-                                想知道研究的統計檢定力 → 需要 Z 值和 p 值
+                                只有效果量與 CI → 需要 Z 值和 p 值（p 值不是統計檢定力）
                             </div>
                         </div>
                     </div>
@@ -625,7 +623,9 @@
                                 <li>至少填寫 <strong>2 個已知項目</strong>，系統會自動計算其他數值</li>
                                 <li>可填組合：ES + CI、ES + SE、CI 上下界等</li>
                                 <li>留空不知道的欄位即可；SE 必須大於 0，CI 下界須小於上界。</li>
-                                <li>選擇 log(OR)、log(RR) 或 log(HR) 時，效果量與 CI 均須先取自然對數；本工具不會自動轉換比值。</li>
+                                <li>OR／RR／HR：直接輸入原始比值（例如 1.5 [1.1, 2.0]），工具自動取自然對數；SE 欄位須填 ln 尺度的 SE。</li>
+                                <li>若數值已是對數尺度，改選 ln(OR)／ln(RR)／ln(HR)。</li>
+                                <li>效果量與 CI 中點因四捨五入略有差異時會照常計算，差距過大才提示。</li>
                             </ul>
                         </div>
                         <div class="input-group">
@@ -633,9 +633,12 @@
                             <select id="es-type">
                                 <option value="mean">Mean/MD</option>
                                 <option value="smd">SMD</option>
-                                <option value="log-or">log(OR)</option>
-                                <option value="log-rr">log(RR)</option>
-                                <option value="log-hr">log(HR)</option>
+                                <option value="or">OR（原始比值）</option>
+                                <option value="rr">RR（原始比值）</option>
+                                <option value="hr">HR（原始比值）</option>
+                                <option value="log-or">ln(OR)（已取對數）</option>
+                                <option value="log-rr">ln(RR)（已取對數）</option>
+                                <option value="log-hr">ln(HR)（已取對數）</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -3501,7 +3504,9 @@
     </footer>
 
     <!-- Core + Modules（載入順序重要） -->
+    <script defer src="stats-math.js"></script>
     <script defer src="calculator-core.js"></script>
+    <script defer src="modules/quantile-methods.js"></script>
     <script defer src="modules/module-a.js"></script>
     <script defer src="modules/module-b.js"></script>
     <script defer src="modules/module-c.js"></script>

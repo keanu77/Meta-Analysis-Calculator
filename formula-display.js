@@ -63,47 +63,55 @@ function showFormula(calculationType) {
                 
                 <h4>Critical Values</h4>
                 <ul>
-                    <li>95% CI (Normal): 1.96</li>
-                    <li>90% CI (Normal): 1.645</li>
-                    <li>99% CI (Normal): 2.576</li>
-                    <li>t-distribution: 使用自由度 df = n-1</li>
+                    <li>95% CI (Normal): 1.959964</li>
+                    <li>90% CI (Normal): 1.644854</li>
+                    <li>99% CI (Normal): 2.575829</li>
+                    <li>t-distribution: 自由度 df = n-1，以精確的 t 分位數計算</li>
+                    <li>自動：n &lt; 120 用 t，n ≥ 120 用常態</li>
                 </ul>
                 
                 <h4>適用條件</h4>
-                <p>假設數據來自常態分布或 t 分布（小樣本）。</p>
+                <p>僅適用於單組平均值、以平均值為中心的對稱 CI。兩組差值 (MD) 的 CI 需另行換算（Cochrane Handbook §6.5.2.3）。</p>
             `;
       break;
 
     case "quantiles":
       title = "次序統計 → Mean & SD 估計";
       content = `
-                <h4>Luo et al. (2018) 方法</h4>
-                <p><strong>完整五數摘要：</strong></p>
-                <p>Mean = (min + 2×Q1 + 2×median + 2×Q3 + max) / 8</p>
-                
-                <h4>Wan et al. (2014) 方法</h4>
-                <p><strong>三點估計：</strong></p>
-                <p>Mean = (Q1 + median + Q3) / 3</p>
-                
-                <h4>Hozo et al. (2005) 方法 (已增強)</h4>
-                <p><strong>平均數：</strong></p>
-                <p>n ≤ 25: Mean = (min + 2×median + max) / 4</p>
-                <p>n > 25: Mean ≈ median</p>
-                <p><strong>標準差：</strong></p>
-                <p>n ≤ 15: SD = √[(a-2m+b)²/48 + (b-a)²/12]</p>
-                <p>15 < n ≤ 70: SD = (max - min) / 4</p>
-                <p>n > 70: SD = (max - min) / 6</p>
-                
-                <h4>Shi et al. (2020) 方法</h4>
-                <p>使用優化的加權方式，特別適合小樣本。</p>
-                
+                <h4>資料情境（Wan 2014）</h4>
+                <ul>
+                    <li><strong>S1：</strong>min、median、max</li>
+                    <li><strong>S2：</strong>Q1、median、Q3</li>
+                    <li><strong>S3：</strong>min、Q1、median、Q3、max（五數摘要）</li>
+                </ul>
+                <p>工具依填入的欄位自動判斷情境（min/max、Q1/Q3 需成對）。</p>
+
+                <h4>平均數：Luo et al. (2018)（建議）</h4>
+                <p>S1：Mean = w×(min+max)/2 + (1−w)×median，w = 4/(4+n<sup>0.75</sup>)</p>
+                <p>S2：Mean = w×(Q1+Q3)/2 + (1−w)×median，w = 0.7 + 0.39/n</p>
+                <p>S3：Mean = w₁×(min+max)/2 + w₂×(Q1+Q3)/2 + (1−w₁−w₂)×median，w₁ = 2.2/(2.2+n<sup>0.75</sup>)，w₂ = 0.7 − 0.72/n<sup>0.55</sup></p>
+
+                <h4>平均數：Wan et al. (2014)</h4>
+                <p>S1：Mean = (min + 2×median + max)/4 + (min − 2×median + max)/(4n)</p>
+                <p>S2：Mean = (Q1 + median + Q3)/3</p>
+                <p>S3：Mean = (min + 2×Q1 + 2×median + 2×Q3 + max)/8</p>
+
+                <h4>標準差</h4>
+                <p>ξ(n) = 2Φ⁻¹((n−0.375)/(n+0.25))，η(n) = 2Φ⁻¹((0.75n−0.125)/(n+0.25))；小樣本（range n ≤ 50、IQR n ≤ 201）使用 Wan 論文附表的精確值。</p>
+                <p>S1（Wan）：SD = (max − min)/ξ(n)</p>
+                <p>S2（Wan）：SD = (Q3 − Q1)/η(n)</p>
+                <p>S3（Wan）：SD = ½ × [(max − min)/ξ(n) + (Q3 − Q1)/η(n)]</p>
+                <p>S3（Shi 2020，搭配 Luo 使用）：SD = (max − min)/θ₁(n) + (Q3 − Q1)/θ₂(n)，θ₁ = (2 + 0.14n<sup>0.6</sup>)×Φ⁻¹((n−0.375)/(n+0.25))，θ₂ = (2 + 2/(0.07n<sup>0.6</sup>))×Φ⁻¹((0.75n−0.125)/(n+0.25))</p>
+
                 <h4>方法選擇建議</h4>
                 <ul>
-                    <li><strong>Luo 2018:</strong> 數據完整時的首選</li>
-                    <li><strong>Wan 2014:</strong> 中等樣本大小，有四分位數</li>
-                    <li><strong>Hozo 2005:</strong> 只有三點數據的快速估計</li>
-                    <li><strong>Shi 2020:</strong> 小樣本或偏態分布</li>
+                    <li><strong>Luo + Wan/Shi（建議）：</strong>平均數用 Luo 2018，SD 在 S1/S2 用 Wan 2014、S3 用 Shi 2020；與 R 套件 meta 的預設一致。</li>
+                    <li><strong>Wan 2014：</strong>平均數與 SD 都用 Wan 公式，可作敏感度分析。</li>
+                    <li><strong>Hozo 2005：</strong>僅 S1，已被上述方法取代，保留作教學對照。</li>
                 </ul>
+
+                <h4>限制</h4>
+                <p>以上方法都假設資料近似常態。若中位數明顯偏離範圍或四分位距的中點（偏態），估計會有偏差，可考慮 McGrath et al. (2020) 的 QE/BC 方法或敏感度分析。</p>
             `;
       break;
 
@@ -131,12 +139,11 @@ function showFormula(calculationType) {
                 <p><strong>大樣本 (n > 70):</strong></p>
                 <p>SD ≈ (b-a)/6</p>
                 
-                <h4>理論背景</h4>
+                <h4>理論背景與限制</h4>
                 <ul>
-                    <li>基於分布自由的不等式推導</li>
-                    <li>不假設數據的特定分布</li>
-                    <li>適用於各種偏態分布</li>
-                    <li>在模擬研究中表現優秀</li>
+                    <li>以不等式推導上下界，再依樣本數分段取經驗規則</li>
+                    <li>n = 25/26 與 n = 70/71 兩處切換會讓估計值跳動</li>
+                    <li>Wan et al. (2014) 的模擬顯示其 SD 估計偏差較大，現行建議改用 Luo/Wan 方法</li>
                 </ul>
                 
                 <h4>適用條件</h4>
@@ -156,7 +163,7 @@ function showFormula(calculationType) {
                 <h4>公式</h4>
                 <p><strong>MD = Mean₁ - Mean₂</strong></p>
                 <p><strong>SE(MD) = √(SD₁²/n₁ + SD₂²/n₂)</strong></p>
-                <p><strong>95% CI = MD ± 1.96 × SE(MD)</strong></p>
+                <p><strong>95% CI = MD ± 1.959964 × SE(MD)</strong></p>
                 
                 <h4>統計檢驗</h4>
                 <p><strong>Z = MD / SE(MD)</strong></p>
@@ -186,7 +193,9 @@ function showFormula(calculationType) {
                 <p><strong>Hedges' g = Cohen's d × J</strong></p>
                 
                 <h4>標準誤計算</h4>
-                <p><strong>SE(g) = √[(n₁+n₂)/(n₁×n₂) + g²/(2×(n₁+n₂))]</strong></p>
+                <p><strong>SE(d) = √[(n₁+n₂)/(n₁×n₂) + d²/(2×(n₁+n₂))]</strong></p>
+                <p><strong>SE(g) = J × SE(d)</strong>（Borenstein et al. 2009）</p>
+                <p>各組樣本數需 ≥ 2。RevMan 使用略有不同的近似 SE(g) = √[N/(n₁n₂) + g²/(2(N−3.94))]。</p>
                 
                 <h4>效果量解釋 (Cohen 1988)</h4>
                 <ul>
@@ -222,11 +231,14 @@ function showFormula(calculationType) {
                 <h4>Risk Difference (RD)</h4>
                 <p><strong>RD = a/(a+b) - c/(c+d)</strong></p>
                 <p><strong>SE(RD) = √[p₁(1-p₁)/(a+b) + p₂(1-p₂)/(c+d)]</strong></p>
+                <p>CI 以 Wald 近似計算，事件極少或極多時可能超出 [−1, 1]。</p>
                 
-                <h4>零事件修正</h4>
+                <h4>零事件處理</h4>
                 <ul>
-                    <li><strong>Haldane-Anscombe:</strong> 各格加 0.5</li>
-                    <li><strong>Continuity Correction:</strong> 連續性修正</li>
+                    <li><strong>Haldane-Anscombe：</strong>任一格為 0 時四格各加 0.5，只用於 OR/RR</li>
+                    <li><strong>RD：</strong>一律用原始計數，不需修正</li>
+                    <li><strong>兩組皆無事件（或皆全部發生）：</strong>OR/RR 無法估計，此研究對相對效果不提供資訊</li>
+                    <li>稀有事件的統合分析可考慮 Peto 或 Mantel-Haenszel 方法（Cochrane Handbook §10.4.4）</li>
                 </ul>
             `;
       break;
@@ -295,6 +307,31 @@ function showFormula(calculationType) {
                     <li><strong>r = 1:</strong> SDchange = |SDpost - SDpre|（完全相關）</li>
                     <li><strong>SDpre = SDpost:</strong> SDchange = SD × √(2(1-r))</li>
                 </ul>
+            `;
+      break;
+
+    case "es-conversion":
+      title = "效果量 CI ↔ SE 轉換";
+      content = `
+                <h4>公式</h4>
+                <p><strong>SE = (上界 − 下界) / (2 × z)</strong></p>
+                <p><strong>CI = 效果量 ± z × SE</strong></p>
+                <p>z：90% = 1.644854，95% = 1.959964，99% = 2.575829</p>
+
+                <h4>比值型效果量（OR、RR、HR）</h4>
+                <p>比值的 CI 在原始尺度不對稱，需先取自然對數：</p>
+                <p><strong>SE[ln(OR)] = (ln(上界) − ln(下界)) / (2 × z)</strong></p>
+                <p>選「OR／RR／HR」時直接輸入原始比值（例如 1.5 [1.1, 2.0]），工具會自動取對數；選「ln(OR)」等選項時，輸入值須已是對數尺度。</p>
+
+                <h4>一致性檢查</h4>
+                <ul>
+                    <li>效果量落在 CI 外：視為輸入錯誤</li>
+                    <li>效果量偏離 CI 中點超過半寬的 10%：提示 CI 可能不對稱</li>
+                    <li>輸入的 SE 與 CI 推得的 SE 相差超過 10%：提示並改用 CI 推得的 SE</li>
+                </ul>
+
+                <h4>限制</h4>
+                <p>假設 CI 為對稱的常態（Wald）區間。小樣本連續資料的 CI 若以 t 分布建構，由 CI 推得的 SE 會略為高估（Cochrane Handbook §6.5.2.3）。</p>
             `;
       break;
 

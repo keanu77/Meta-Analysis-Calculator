@@ -1,93 +1,61 @@
 // Module B: Two-group Comparisons & Effect Sizes
+// Two-group results report 95% Wald intervals with the exact normal quantile.
+const Z_95 = getCriticalValueZ(95);
+
 function calculateMD() {
+  const mean1 = readNumber("md-mean1");
+  const sd1 = readNumber("md-sd1");
+  const n1 = readNumber("md-n1");
+  const mean2 = readNumber("md-mean2");
+  const sd2 = readNumber("md-sd2");
+  const n2 = readNumber("md-n2");
   const resultDiv = document.getElementById("md-result");
 
-  try {
-    const mean1 = readNumber("md-mean1");
-    const sd1 = readNumber("md-sd1");
-    const n1 = readNumber("md-n1");
-    const mean2 = readNumber("md-mean2");
-    const sd2 = readNumber("md-sd2");
-    const n2 = readNumber("md-n2");
-
-    // Enhanced input validation
-    if (!allFinite(mean1, sd1, mean2, sd2)) {
-      showError(resultDiv, "請輸入所有必要的數值（均值和標準差）");
-      return;
-    }
-
-    if (![n1, n2].every((x) => isSampleSize(x))) {
-      showError(resultDiv, "樣本大小必須為正整數");
-      return;
-    }
-
-    if ([sd1, sd2].some((x) => x < 0)) {
-      showError(resultDiv, "標準差不能為負數");
-      return;
-    }
-
-    if ([sd1, sd2].some((x) => x === 0)) {
-      showError(resultDiv, "警告：標準差為0可能導致計算問題");
-    }
-
-    const md = mean1 - mean2;
-    const seMD = Math.sqrt(sd1 ** 2 / n1 + sd2 ** 2 / n2);
-
-    // Check for division by zero or invalid SE
-    if (seMD === 0 || !isFinite(seMD)) {
-      showError(resultDiv, "無法計算標準誤：檢查輸入數據");
-      return;
-    }
-
-    const ci95Lower = md - 1.96 * seMD;
-    const ci95Upper = md + 1.96 * seMD;
-    const zValue = md / seMD;
-    const pValue = 2 * (1 - normalCDF(Math.abs(zValue)));
-
-    // Validate results
-    if (
-      !isFinite(md) ||
-      !isFinite(ci95Lower) ||
-      !isFinite(ci95Upper) ||
-      !isFinite(zValue) ||
-      !isFinite(pValue)
-    ) {
-      showError(resultDiv, "計算結果無效，請檢查輸入數據");
-      return;
-    }
-
-    const result = {
-      calculation: "Mean Difference (MD)",
-      inputs: { mean1, sd1, n1, mean2, sd2, n2 },
-      outputs: {
-        MD: md,
-        SE: seMD,
-        CI95_lower: ci95Lower,
-        CI95_upper: ci95Upper,
-        Z: zValue,
-        p: pValue,
-      },
-      formula: "MD = Mean₁ - Mean₂; SE(MD) = √(SD₁²/n₁ + SD₂²/n₂)",
-      reference: "Standard mean difference calculation",
-    };
-
-    displayResult(
-      resultDiv,
-      `Mean Difference = ${md.toFixed(4)}\n` +
-        `SE(MD) = ${seMD.toFixed(4)}\n` +
-        `95% CI = [${ci95Lower.toFixed(4)}, ${ci95Upper.toFixed(4)}]\n` +
-        `Z = ${zValue.toFixed(4)}\n` +
-        `p-value = ${pValue.toFixed(6)}\n\n` +
-        `計算步驟：\n` +
-        `MD = ${mean1} - ${mean2} = ${md.toFixed(4)}\n` +
-        `SE(MD) = √(${sd1}²/${n1} + ${sd2}²/${n2}) = ${seMD.toFixed(4)}\n` +
-        `95% CI = ${md.toFixed(4)} ± 1.96 × ${seMD.toFixed(4)}`,
-    );
-    addToHistory(result);
-  } catch (error) {
-    console.error("Error in calculateMD:", error);
-    showError(resultDiv, "計算過程中發生錯誤，請檢查輸入數據格式");
+  if (!allFinite(mean1, sd1, mean2, sd2)) {
+    showError(resultDiv, "請輸入所有必要的數值（均值和標準差）");
+    return;
   }
+  if (![n1, n2].every((x) => isSampleSize(x))) {
+    showError(resultDiv, "樣本大小必須為正整數");
+    return;
+  }
+  if (sd1 < 0 || sd2 < 0) {
+    showError(resultDiv, "標準差不能為負數");
+    return;
+  }
+
+  const md = mean1 - mean2;
+  const seMD = Math.sqrt(sd1 ** 2 / n1 + sd2 ** 2 / n2);
+  if (!(seMD > 0) || !Number.isFinite(seMD)) {
+    showError(resultDiv, "無法計算標準誤：兩組標準差不可同時為 0");
+    return;
+  }
+
+  const ci95Lower = md - Z_95 * seMD;
+  const ci95Upper = md + Z_95 * seMD;
+  const zValue = md / seMD;
+  const pValue = twoSidedPFromZ(zValue);
+
+  addToHistory({
+    calculation: "Mean Difference (MD)",
+    inputs: { mean1, sd1, n1, mean2, sd2, n2 },
+    outputs: { MD: md, SE: seMD, CI95_lower: ci95Lower, CI95_upper: ci95Upper, Z: zValue, p: pValue },
+    formula: "MD = Mean₁ - Mean₂; SE(MD) = √(SD₁²/n₁ + SD₂²/n₂)",
+    reference: "Cochrane Handbook §6.5.1.1",
+  });
+  displayResult(
+    resultDiv,
+    `Mean Difference = ${md.toFixed(4)}\n` +
+      `SE(MD) = ${seMD.toFixed(4)}\n` +
+      `95% CI = [${ci95Lower.toFixed(4)}, ${ci95Upper.toFixed(4)}]\n` +
+      `Z = ${zValue.toFixed(4)}\n` +
+      `p-value = ${formatP(pValue)}\n\n` +
+      `計算步驟：\n` +
+      `MD = ${fmt(mean1)} - ${fmt(mean2)} = ${md.toFixed(4)}\n` +
+      `SE(MD) = √(${fmt(sd1)}²/${n1} + ${fmt(sd2)}²/${n2}) = ${seMD.toFixed(4)}\n` +
+      `95% CI = ${md.toFixed(4)} ± ${Z_95.toFixed(4)} × ${seMD.toFixed(4)}\n\n` +
+      `CI 與 p 值為常態（Wald）近似；小樣本時原文若用 t 檢定，數值會略有差異。`,
+  );
 }
 
 // Standardized Mean Difference calculation
@@ -101,77 +69,96 @@ function calculateSMD() {
   const useCorrection = document.getElementById("smd-correction").checked;
   const resultDiv = document.getElementById("smd-result");
 
-  if (
-    !allFinite(mean1, sd1, mean2, sd2) || sd1 < 0 || sd2 < 0 ||
-    ![n1, n2].every((x) => isSampleSize(x)) || n1 + n2 <= 2
-  ) {
-    showError(resultDiv, "請輸入所有必要的數值");
+  if (!allFinite(mean1, sd1, mean2, sd2) || sd1 < 0 || sd2 < 0) {
+    showError(resultDiv, "請輸入所有必要的數值，標準差不能為負數");
+    return;
+  }
+  if (![n1, n2].every((x) => isSampleSize(x, 2))) {
+    showError(resultDiv, "每組樣本數必須為 ≥ 2 的整數");
     return;
   }
 
-  // Calculate pooled standard deviation
-  const pooledSD = Math.sqrt(
-    ((n1 - 1) * sd1 ** 2 + (n2 - 1) * sd2 ** 2) / (n1 + n2 - 2),
-  );
+  const pooledSD = Math.sqrt(((n1 - 1) * sd1 ** 2 + (n2 - 1) * sd2 ** 2) / (n1 + n2 - 2));
   if (!Number.isFinite(pooledSD) || pooledSD <= 0) {
     showError(resultDiv, "合併標準差必須大於 0 且為有限數值，才能計算 SMD");
     return;
   }
 
-  // Calculate Cohen's d
+  const total = n1 + n2;
+  const df = total - 2;
   const cohensD = (mean1 - mean2) / pooledSD;
-
-  // Calculate Hedges' g (small sample correction)
-  const df = n1 + n2 - 2;
+  const seD = Math.sqrt(total / (n1 * n2) + cohensD ** 2 / (2 * total));
+  // Hedges' small-sample factor; Var(g) = J² × Var(d) (Borenstein 2009, eq. 4.24).
   const j = 1 - 3 / (4 * df - 1);
-  const hedgesG = useCorrection ? cohensD * j : cohensD;
+  const estimate = useCorrection ? cohensD * j : cohensD;
+  const se = useCorrection ? j * seD : seD;
+  const ci95Lower = estimate - Z_95 * se;
+  const ci95Upper = estimate + Z_95 * se;
+  const zValue = estimate / se;
+  const pValue = twoSidedPFromZ(zValue);
+  const label = useCorrection ? "g" : "d";
 
-  // Calculate SE(g)
-  const seG = Math.sqrt((n1 + n2) / (n1 * n2) + hedgesG ** 2 / (2 * (n1 + n2)));
-
-  // Calculate 95% CI
-  const ci95Lower = hedgesG - 1.96 * seG;
-  const ci95Upper = hedgesG + 1.96 * seG;
-
-  // Calculate Z and p-value
-  const zValue = hedgesG / seG;
-  const pValue = 2 * (1 - normalCDF(Math.abs(zValue)));
-
-  const result = {
+  addToHistory({
     calculation: "Standardized Mean Difference (SMD)",
     inputs: { mean1, sd1, n1, mean2, sd2, n2, useCorrection },
     outputs: {
-      cohensD: cohensD,
-      hedgesG: hedgesG,
-      pooledSD: pooledSD,
-      SE: seG,
+      cohensD,
+      hedgesG: useCorrection ? estimate : null,
+      pooledSD,
+      SE: se,
       CI95_lower: ci95Lower,
       CI95_upper: ci95Upper,
       Z: zValue,
       p: pValue,
-      J: j,
+      J: useCorrection ? j : null,
     },
     formula: useCorrection
-      ? "Hedges g = Cohen's d × J, where J = 1 - 3/(4df-1)"
-      : "Cohen's d = (Mean₁ - Mean₂) / Pooled SD",
-    reference: "Hedges & Olkin (1985) statistical methods",
-  };
-
+      ? "g = J × d, J = 1 − 3/(4df − 1); SE(g) = J × √[(n₁+n₂)/(n₁n₂) + d²/(2(n₁+n₂))]"
+      : "d = (Mean₁ − Mean₂)/Pooled SD; SE(d) = √[(n₁+n₂)/(n₁n₂) + d²/(2(n₁+n₂))]",
+    reference: "Borenstein et al. (2009) Introduction to Meta-Analysis, ch. 4",
+  });
   displayResult(
     resultDiv,
     `Cohen's d = ${cohensD.toFixed(4)}\n` +
-      `${useCorrection ? `Hedges' g = ${hedgesG.toFixed(4)}\n` : ""}` +
+      `${useCorrection ? `Hedges' g = ${estimate.toFixed(4)}\n` : ""}` +
       `Pooled SD = ${pooledSD.toFixed(4)}\n` +
-      `SE(${useCorrection ? "g" : "d"}) = ${seG.toFixed(4)}\n` +
+      `SE(${label}) = ${se.toFixed(4)}\n` +
       `95% CI = [${ci95Lower.toFixed(4)}, ${ci95Upper.toFixed(4)}]\n` +
       `Z = ${zValue.toFixed(4)}\n` +
-      `p-value = ${pValue.toFixed(6)}\n\n` +
+      `p-value = ${formatP(pValue)}\n\n` +
       `計算步驟：\n` +
-      `Pooled SD = √[((${n1}-1)×${sd1}² + (${n2}-1)×${sd2}²) / (${n1}+${n2}-2)] = ${pooledSD.toFixed(4)}\n` +
-      `Cohen's d = (${mean1} - ${mean2}) / ${pooledSD.toFixed(4)} = ${cohensD.toFixed(4)}\n` +
-      `${useCorrection ? `J = 1 - 3/(4×${df}-1) = ${j.toFixed(4)}\nHedges' g = ${cohensD.toFixed(4)} × ${j.toFixed(4)} = ${hedgesG.toFixed(4)}\n` : ""}`,
+      `Pooled SD = √[((${n1}-1)×${fmt(sd1)}² + (${n2}-1)×${fmt(sd2)}²) / (${n1}+${n2}-2)] = ${pooledSD.toFixed(4)}\n` +
+      `Cohen's d = (${fmt(mean1)} - ${fmt(mean2)}) / ${pooledSD.toFixed(4)} = ${cohensD.toFixed(4)}\n` +
+      `SE(d) = √[${total}/(${n1}×${n2}) + d²/(2×${total})] = ${seD.toFixed(4)}\n` +
+      (useCorrection
+        ? `J = 1 - 3/(4×${df}-1) = ${j.toFixed(4)}\n` +
+          `Hedges' g = ${cohensD.toFixed(4)} × ${j.toFixed(4)} = ${estimate.toFixed(4)}\n` +
+          `SE(g) = J × SE(d) = ${se.toFixed(4)}\n`
+        : "") +
+      `\n不同軟體的 SE(g) 近似式略有差異（例如 RevMan 用 g²/(2(N−3.94))），小樣本時差距約數個百分點。`,
   );
-  addToHistory(result);
+}
+
+// Relative effects (OR, RR) on the log scale from a 2×2 table.
+function relativeEffects(a, b, c, d) {
+  const or = (a * d) / (b * c);
+  const seLogOR = Math.sqrt(1 / a + 1 / b + 1 / c + 1 / d);
+  const rr = a / (a + b) / (c / (c + d));
+  const seLogRR = Math.sqrt(1 / a - 1 / (a + b) + 1 / c - 1 / (c + d));
+  const interval = (ratio, se) => [Math.exp(Math.log(ratio) - Z_95 * se), Math.exp(Math.log(ratio) + Z_95 * se)];
+  return {
+    OR: or, logOR: Math.log(or), SE_logOR: seLogOR, OR_CI95: interval(or, seLogOR),
+    RR: rr, logRR: Math.log(rr), SE_logRR: seLogRR, RR_CI95: interval(rr, seLogRR),
+  };
+}
+
+const NOT_ESTIMABLE = {
+  OR: null, logOR: null, SE_logOR: null, OR_CI95: null,
+  RR: null, logRR: null, SE_logRR: null, RR_CI95: null,
+};
+
+function formatCount(value) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
 // Binary outcomes calculation (OR, RR, RD)
@@ -186,110 +173,72 @@ function calculateBinaryOutcomes() {
   if (
     !isSampleSize(events1, 0) || !isSampleSize(events2, 0) ||
     !isSampleSize(total1) || !isSampleSize(total2) ||
-    events1 > total1 ||
-    events2 > total2
+    events1 > total1 || events2 > total2
   ) {
     showError(resultDiv, "請輸入有效的事件數和總數");
     return;
   }
-
-  // Apply zero event correction if needed
-  let a = events1,
-    b = total1 - events1,
-    c = events2,
-    d = total2 - events2;
-  let correctionApplied = false;
-
-  if ([a, b, c, d].some((cell) => cell === 0) && correction === "none") {
-    showError(resultDiv, "2×2 表含零格且未使用修正，現有 OR/RR 對數公式無法產生完整有限結果；請確認分析方法。");
+  if (!["haldane", "none"].includes(correction)) {
+    showError(resultDiv, "未知的零格修正方法");
     return;
   }
 
-  if ((a === 0 || b === 0 || c === 0 || d === 0) && correction !== "none") {
-    correctionApplied = true;
-    if (correction === "haldane") {
-      a += 0.5;
-      b += 0.5;
-      c += 0.5;
-      d += 0.5;
-    } else if (correction === "continuity") {
-      const corrValue = 0.5;
-      a += corrValue;
-      b += corrValue;
-      c += corrValue;
-      d += corrValue;
-    }
+  const a = events1;
+  const b = total1 - events1;
+  const c = events2;
+  const d = total2 - events2;
+  const hasZeroCell = [a, b, c, d].includes(0);
+  // Both arms with no events (or all events): no information on relative effects.
+  const uninformative = (a === 0 && c === 0) || (b === 0 && d === 0);
+  const corrected = hasZeroCell && correction === "haldane" && !uninformative;
+  const k = corrected ? 0.5 : 0;
+
+  let relative = NOT_ESTIMABLE;
+  let relativeNote = "";
+  if (uninformative) {
+    relativeNote = a === 0
+      ? "兩組皆無事件：OR/RR 無法估計（此研究對相對效果不提供資訊，Cochrane 建議 OR/RR 統合分析時排除）。"
+      : "兩組皆全部發生事件：OR/RR 無法估計（此研究對相對效果不提供資訊）。";
+  } else if (hasZeroCell && !corrected) {
+    relativeNote = "2×2 表含零格且未修正：OR/RR 無法估計。可改選 Haldane-Anscombe 修正，或在統合分析時改用 Peto／Mantel-Haenszel 等方法。";
+  } else {
+    relative = relativeEffects(a + k, b + k, c + k, d + k);
   }
 
-  // Calculate proportions
-  const p1 = a / (a + b);
-  const p2 = c / (c + d);
-
-  // Calculate Odds Ratio
-  const or = (a * d) / (b * c);
-  const logOR = Math.log(or);
-  const seLogOR = Math.sqrt(1 / a + 1 / b + 1 / c + 1 / d);
-  const orCI95Lower = Math.exp(logOR - 1.96 * seLogOR);
-  const orCI95Upper = Math.exp(logOR + 1.96 * seLogOR);
-
-  // Calculate Risk Ratio
-  const rr = p1 / p2;
-  const logRR = Math.log(rr);
-  const seLogRR = Math.sqrt(1 / a - 1 / (a + b) + 1 / c - 1 / (c + d));
-  const rrCI95Lower = Math.exp(logRR - 1.96 * seLogRR);
-  const rrCI95Upper = Math.exp(logRR + 1.96 * seLogRR);
-
-  // Calculate Risk Difference
+  // Risk difference from the observed counts; no zero-cell correction needed.
+  const p1 = a / total1;
+  const p2 = c / total2;
   const rd = p1 - p2;
-  const seRD = Math.sqrt((p1 * (1 - p1)) / (a + b) + (p2 * (1 - p2)) / (c + d));
-  const rdCI95Lower = rd - 1.96 * seRD;
-  const rdCI95Upper = rd + 1.96 * seRD;
+  const seRD = Math.sqrt((p1 * (1 - p1)) / total1 + (p2 * (1 - p2)) / total2);
+  const rdCI = [rd - Z_95 * seRD, rd + Z_95 * seRD];
 
-  const result = {
+  addToHistory({
     calculation: "Binary Outcomes (OR/RR/RD)",
-    inputs: {
-      events1: events1,
-      total1: total1,
-      events2: events2,
-      total2: total2,
-      correction: correction,
-      correctionApplied: correctionApplied,
-    },
-    outputs: {
-      OR: or,
-      logOR: logOR,
-      SE_logOR: seLogOR,
-      OR_CI95: [orCI95Lower, orCI95Upper],
-      RR: rr,
-      logRR: logRR,
-      SE_logRR: seLogRR,
-      RR_CI95: [rrCI95Lower, rrCI95Upper],
-      RD: rd,
-      SE_RD: seRD,
-      RD_CI95: [rdCI95Lower, rdCI95Upper],
-      p1: p1,
-      p2: p2,
-    },
+    inputs: { events1, total1, events2, total2, correction, correctionApplied: corrected },
+    outputs: { ...relative, RD: rd, SE_RD: seRD, RD_CI95: rdCI, p1, p2 },
     formula: "OR = (a×d)/(b×c); RR = (a/(a+b))/(c/(c+d)); RD = p₁ - p₂",
-    reference: "Standard 2×2 table analysis",
-  };
+    reference: "Cochrane Handbook §6.4, §10.4.4",
+  });
 
+  const cells = [a + k, b + k, c + k, d + k].map(formatCount);
+  const relativeText = relative.OR === null
+    ? `Odds Ratio：無法估計\nRisk Ratio：無法估計\n${relativeNote}\n\n`
+    : `Odds Ratio = ${relative.OR.toFixed(4)}\n` +
+      `log(OR) = ${relative.logOR.toFixed(4)}，SE = ${relative.SE_logOR.toFixed(4)}\n` +
+      `95% CI = [${relative.OR_CI95[0].toFixed(4)}, ${relative.OR_CI95[1].toFixed(4)}]\n\n` +
+      `Risk Ratio = ${relative.RR.toFixed(4)}\n` +
+      `log(RR) = ${relative.logRR.toFixed(4)}，SE = ${relative.SE_logRR.toFixed(4)}\n` +
+      `95% CI = [${relative.RR_CI95[0].toFixed(4)}, ${relative.RR_CI95[1].toFixed(4)}]\n\n`;
   displayResult(
     resultDiv,
-    `${correctionApplied ? `零事件修正已應用 (${correction})\n\n` : ""}` +
-      `2×2 表格：\n` +
-      `           事件    非事件   總計    比例\n` +
-      `實驗組      ${a.toFixed(1)}     ${b.toFixed(1)}      ${(a + b).toFixed(1)}    ${p1.toFixed(4)}\n` +
-      `對照組      ${c.toFixed(1)}     ${d.toFixed(1)}      ${(c + d).toFixed(1)}    ${p2.toFixed(4)}\n\n` +
-      `Odds Ratio = ${or.toFixed(4)}\n` +
-      `log(OR) = ${logOR.toFixed(4)} ± ${seLogOR.toFixed(4)}\n` +
-      `95% CI = [${orCI95Lower.toFixed(4)}, ${orCI95Upper.toFixed(4)}]\n\n` +
-      `Risk Ratio = ${rr.toFixed(4)}\n` +
-      `log(RR) = ${logRR.toFixed(4)} ± ${seLogRR.toFixed(4)}\n` +
-      `95% CI = [${rrCI95Lower.toFixed(4)}, ${rrCI95Upper.toFixed(4)}]\n\n` +
-      `Risk Difference = ${rd.toFixed(4)}\n` +
+    `${corrected ? "OR/RR 已套用 Haldane-Anscombe 修正（每格 +0.5）；RD 使用原始計數\n\n" : ""}` +
+      `2×2 表格${corrected ? "（OR/RR 用，已修正）" : ""}：\n` +
+      `           事件    非事件\n` +
+      `實驗組      ${cells[0]}     ${cells[1]}\n` +
+      `對照組      ${cells[2]}     ${cells[3]}\n\n` +
+      relativeText +
+      `Risk Difference = ${rd.toFixed(4)}（p₁ = ${p1.toFixed(4)}，p₂ = ${p2.toFixed(4)}）\n` +
       `SE(RD) = ${seRD.toFixed(4)}\n` +
-      `95% CI = [${rdCI95Lower.toFixed(4)}, ${rdCI95Upper.toFixed(4)}]`,
+      `95% CI = [${rdCI[0].toFixed(4)}, ${rdCI[1].toFixed(4)}]（Wald 近似）`,
   );
-  addToHistory(result);
 }
